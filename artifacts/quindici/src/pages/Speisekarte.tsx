@@ -21,7 +21,7 @@ const categories: MenuCategory[] = [
     id: "antipasti",
     title: "Antipasti",
     subtitle: "Vorspeisen",
-    image: "/dish-carpaccio-nobg.png",
+    image: "/menu-antipasti.png",
     items: [
       { name: "Parmigiana di Melanzane", description: "Überbackene Auberginen mit Tomatensauce und Mozzarella", price: "14,50 €" },
       { name: "Polpo alla Griglia", description: "Zart gegrillter Oktopus auf cremigem Kartoffelpüree, verfeinert mit Olivenöl und Kräutern", price: "21,50 €" },
@@ -37,7 +37,7 @@ const categories: MenuCategory[] = [
     id: "insalate",
     title: "Insalate",
     subtitle: "Salate",
-    image: "/dish-polpo-nobg.png",
+    image: "/menu-insalate.png",
     items: [
       { name: "Insalata Mista", description: "Gemischter Salat mit italienischem Dressing", price: "10,50 €" },
       { name: "Insalata di Pomodori", description: "Frischer Tomatensalat mit Zwiebeln und Basilikum", price: "10,90 €" },
@@ -51,7 +51,7 @@ const categories: MenuCategory[] = [
     id: "pasta",
     title: "Pasta",
     subtitle: "Nudelgerichte",
-    image: "/dish-pasta-carbonara-nobg.png",
+    image: "/menu-pasta.png",
     items: [
       { name: "Strozzapreti al Ragù di Salsiccia e Vino Bianco", description: "Strozzapreti mit Salsiccia-Ragout, Weißwein und Rosmarin", price: "18,90 €" },
       { name: "Pappardelle al Salmone", description: "Pappardelle mit frischem Lachs in cremiger Tomaten-Sahne-Sauce", price: "19,90 €" },
@@ -65,7 +65,7 @@ const categories: MenuCategory[] = [
     id: "carne",
     title: "Carne",
     subtitle: "Fleischgerichte",
-    image: "/about-restaurant-nobg.png",
+    image: "/menu-carne.png",
     items: [
       { name: "Saltimbocca alla Romana", description: "Zartes Kalbsschnitzel in Weißwein mit Parmaschinken und Salbei serviert, dazu Nudeln", price: "29,90 €" },
       { name: "Piccata alla Milanese", description: "Parmesan-Kalbsschnitzel nach Mailänder Art serviert, dazu Nudeln", price: "29,90 €" },
@@ -76,7 +76,7 @@ const categories: MenuCategory[] = [
     id: "pesce",
     title: "Pesce",
     subtitle: "Fischgerichte",
-    image: "/dish-polpo-nobg.png",
+    image: "/menu-pesce.png",
     items: [
       { name: "Filetti di Orata alla Griglia", description: "Gegrilltes Doradenfilets, serviert mit Tagesgemüse", price: "27,90 €" },
       { name: "Calamaretti Fritti con Insalatina", description: "Frittierte Baby-Calamari, serviert mit buntem Salat", price: "26,90 €" },
@@ -86,7 +86,7 @@ const categories: MenuCategory[] = [
     id: "pizza",
     title: "Pizza",
     subtitle: "Con Pomodori San Marzano",
-    image: "/dish-pizza-margherita-nobg.png",
+    image: "/menu-pizza.png",
     items: [
       { name: "Margherita", description: "Tomatensauce und Mozzarella", price: "12,50 €" },
       { name: "Bufalina", description: "Tomatensauce und Büffelmozzarella", price: "16,00 €" },
@@ -108,7 +108,7 @@ const categories: MenuCategory[] = [
     id: "pizza-bianca",
     title: "Pizza Bianca",
     subtitle: "Ohne Tomatensauce",
-    image: "/dish-pizza-diavola-nobg.png",
+    image: "/menu-pizza-bianca.png",
     items: [
       { name: "Poggioreale", description: "Mozzarella, Salsiccia und neapolitanischer Brokkoli", price: "17,00 €" },
       { name: "Secondigliano", description: "Mozzarella, Mortadella, Pistaziencreme und Burrata (125 g)", price: "21,50 €" },
@@ -120,7 +120,7 @@ const categories: MenuCategory[] = [
     id: "dolci",
     title: "Dolci",
     subtitle: "Desserts",
-    image: "/dish-tiramisu-nobg.png",
+    image: "/menu-dolci.png",
     items: [
       { name: "Tiramisù Classico", description: "Das italienische Dessert — cremig, mit Mascarpone und in Espresso getränkt", price: "9,50 €" },
       { name: "Panna Cotta", description: "Zarte Panna Cotta, vollendet mit einer feinen Mango-Waldfrüchte-Sauce", price: "8,90 €" },

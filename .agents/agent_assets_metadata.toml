@@ -66,6 +66,54 @@ uri = "file://artifacts/quindici/public/dish-pizza-diavola.png"
 type = "image"
 title = "pizza diavola spicy"
 
+[[generated]]
+id = "Yph6yt1qRmCvwapPU6-_v"
+uri = "file://artifacts/quindici/public/menu-antipasti.png"
+type = "image"
+title = "antipasti platter"
+
+[[generated]]
+id = "9l5NqiXO5XKq22u9xotS5"
+uri = "file://artifacts/quindici/public/menu-insalate.png"
+type = "image"
+title = "caprese salad"
+
+[[generated]]
+id = "dnehr19FFWeHayKUAnzIe"
+uri = "file://artifacts/quindici/public/menu-pasta.png"
+type = "image"
+title = "pasta carbonara"
+
+[[generated]]
+id = "kSV2IwmWfrA4h5lt__q44"
+uri = "file://artifacts/quindici/public/menu-carne.png"
+type = "image"
+title = "tagliata beef steak"
+
+[[generated]]
+id = "G1abOOQwcwgyulgcibc2v"
+uri = "file://artifacts/quindici/public/menu-pesce.png"
+type = "image"
+title = "grilled fish"
+
+[[generated]]
+id = "gT6Kdd93p-IpXw2SD-jIK"
+uri = "file://artifacts/quindici/public/menu-pizza.png"
+type = "image"
+title = "neapolitan margherita pizza"
+
+[[generated]]
+id = "9pHrqY0ftnc7nbnwNmuZX"
+uri = "file://artifacts/quindici/public/menu-pizza-bianca.png"
+type = "image"
+title = "pizza bianca"
+
+[[generated]]
+id = "jNMiD1iNI4xOfiYjcY-yH"
+uri = "file://artifacts/quindici/public/menu-dolci.png"
+type = "image"
+title = "tiramisu dessert"
+
 [[outputs]]
 id = "c0nQt3A72QD9h-9-Fgbqy"
 uri = "file://artifacts/quindici/public/hero-bg.jpg"
