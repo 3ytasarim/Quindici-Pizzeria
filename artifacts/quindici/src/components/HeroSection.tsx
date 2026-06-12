@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
 import { ArrowRight, UtensilsCrossed } from "lucide-react";
 
 export default function HeroSection() {
@@ -67,66 +66,60 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, delay: 0.4, ease: "easeOut" }}
-          className="flex flex-col sm:flex-row items-center gap-4 mb-10"
+          className="mb-10"
         >
-          {/* Primary button — unchanged */}
-          <Button
-            size="lg"
-            className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 text-sm tracking-widest uppercase font-semibold h-14 px-8 rounded-none"
-            data-testid="button-hero-tisch-reservieren"
-          >
-            Tisch reservieren
-          </Button>
-
-          {/* Secondary button — animated */}
           <motion.button
             data-testid="button-hero-mittagstisch-ansehen"
             onHoverStart={() => setHovered(true)}
             onHoverEnd={() => setHovered(false)}
-            whileTap={{ scale: 0.97 }}
-            className="relative w-full sm:w-auto h-14 px-8 overflow-hidden border border-foreground/30 text-foreground text-sm tracking-widest uppercase font-semibold rounded-none flex items-center justify-center gap-3 group"
+            whileTap={{ scale: 0.98 }}
+            className="relative overflow-hidden border border-primary/50 text-foreground text-sm tracking-[0.2em] uppercase font-semibold rounded-none flex items-center gap-4 group px-10 h-14"
           >
-            {/* sliding fill background */}
+            {/* amber fill sweeping from left */}
             <motion.span
-              className="absolute inset-0 bg-foreground origin-left"
+              className="absolute inset-0 bg-primary origin-left"
               initial={{ scaleX: 0 }}
               animate={{ scaleX: hovered ? 1 : 0 }}
-              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+            />
+
+            {/* left decorative line */}
+            <motion.span
+              className="relative z-10 block h-px bg-primary/60"
+              animate={{ width: hovered ? "0px" : "20px", backgroundColor: hovered ? "rgba(255,255,255,0.6)" : undefined }}
+              transition={{ duration: 0.3 }}
             />
 
             {/* icon */}
             <motion.span
               className="relative z-10"
-              animate={{ color: hovered ? "hsl(var(--background))" : "currentColor" }}
-              transition={{ duration: 0.2 }}
+              animate={{ color: hovered ? "#fff" : "currentColor" }}
+              transition={{ duration: 0.25 }}
             >
               <UtensilsCrossed className="w-4 h-4" />
             </motion.span>
 
             {/* text */}
             <motion.span
-              className="relative z-10"
-              animate={{ color: hovered ? "hsl(var(--background))" : "currentColor" }}
-              transition={{ duration: 0.2 }}
+              className="relative z-10 leading-none"
+              animate={{ color: hovered ? "#fff" : "currentColor" }}
+              transition={{ duration: 0.25 }}
             >
               Mittagstisch ansehen
             </motion.span>
 
-            {/* arrow that slides in */}
-            <AnimatePresence>
-              {hovered && (
-                <motion.span
-                  className="relative z-10"
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -8 }}
-                  transition={{ duration: 0.2 }}
-                  style={{ color: "hsl(var(--background))" }}
-                >
-                  <ArrowRight className="w-4 h-4" />
-                </motion.span>
-              )}
-            </AnimatePresence>
+            {/* animated arrow */}
+            <motion.span
+              className="relative z-10"
+              animate={{
+                x: hovered ? 0 : -4,
+                opacity: hovered ? 1 : 0,
+                color: "#fff",
+              }}
+              transition={{ duration: 0.25 }}
+            >
+              <ArrowRight className="w-4 h-4" />
+            </motion.span>
           </motion.button>
         </motion.div>
 
