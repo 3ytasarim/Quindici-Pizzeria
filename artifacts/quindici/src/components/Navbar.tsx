@@ -1,9 +1,18 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const navLinks = [
     { name: "Willkommen", href: "/" },
     { name: "Speisekarte", href: "#speisekarte" },
@@ -12,28 +21,45 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 md:px-6 flex h-24 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <img src="/logo.png" alt="Quindici Logo" className="h-16 w-auto" />
+    <header
+      className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        scrolled
+          ? "bg-white shadow-[0_2px_20px_rgba(0,0,0,0.08)] border-b border-amber-100"
+          : "bg-background/80 backdrop-blur-md border-b border-transparent"
+      }`}
+    >
+      <div className="container mx-auto px-6 flex h-20 items-center justify-between">
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-3 shrink-0">
+          <img src="/logo.png" alt="Quindici Logo" className="h-[72px] w-auto" />
         </Link>
-        
+
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-8">
+        <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
-            <Link 
-              key={link.name} 
+            <Link
+              key={link.name}
               href={link.href}
-              className="text-sm font-medium tracking-wide text-foreground/80 hover:text-primary transition-colors"
+              className="relative px-4 py-2 text-sm font-medium tracking-wide text-stone-700 hover:text-amber-700 transition-colors group"
+              data-testid={`nav-link-${link.name.toLowerCase().replace(/\s+/g, "-")}`}
             >
               {link.name}
+              <span className="absolute bottom-0 left-4 right-4 h-px bg-amber-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
             </Link>
           ))}
-          <div className="flex items-center gap-4 ml-4">
-            <Button variant="outline" className="border-primary/50 text-primary hover:bg-primary/5 uppercase tracking-widest text-xs font-semibold rounded-none">
+
+          <div className="flex items-center gap-3 ml-6">
+            <Button
+              variant="outline"
+              className="border-amber-600 text-amber-700 hover:bg-amber-50 hover:text-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 transition-all"
+              data-testid="button-tisch-reservieren"
+            >
               Tisch reservieren
             </Button>
-            <Button className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-widest text-xs font-semibold rounded-none">
+            <Button
+              className="bg-amber-700 text-white hover:bg-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
+              data-testid="button-jetzt-bestellen"
+            >
               Jetzt bestellen
             </Button>
           </div>
@@ -43,27 +69,42 @@ export default function Navbar() {
         <div className="lg:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10">
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Menü öffnen</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10 text-stone-700"
+                data-testid="button-mobile-menu"
+              >
+                <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="bg-background border-l-primary/20">
-              <div className="flex flex-col gap-8 mt-12">
-                {navLinks.map((link) => (
-                  <Link 
-                    key={link.name} 
-                    href={link.href}
-                    className="text-xl font-serif text-foreground hover:text-primary transition-colors"
+            <SheetContent side="right" className="bg-white border-l border-amber-100 w-72">
+              <div className="flex flex-col pt-10">
+                <img src="/logo.png" alt="Quindici Logo" className="h-16 w-auto mx-auto mb-10" />
+                <div className="flex flex-col">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      className="text-base font-medium text-stone-700 hover:text-amber-700 transition-colors py-3 px-2 border-b border-stone-100"
+                      data-testid={`mobile-nav-${link.name.toLowerCase().replace(/\s+/g, "-")}`}
+                    >
+                      {link.name}
+                    </Link>
+                  ))}
+                </div>
+                <div className="flex flex-col gap-3 mt-8 px-2">
+                  <Button
+                    variant="outline"
+                    className="w-full border-amber-600 text-amber-700 hover:bg-amber-50 uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                    data-testid="mobile-button-tisch-reservieren"
                   >
-                    {link.name}
-                  </Link>
-                ))}
-                <div className="flex flex-col gap-4 mt-8">
-                  <Button variant="outline" className="w-full border-primary/50 text-primary uppercase tracking-widest text-xs font-semibold rounded-none">
                     Tisch reservieren
                   </Button>
-                  <Button className="w-full bg-primary text-primary-foreground uppercase tracking-widest text-xs font-semibold rounded-none">
+                  <Button
+                    className="w-full bg-amber-700 text-white hover:bg-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                    data-testid="mobile-button-jetzt-bestellen"
+                  >
                     Jetzt bestellen
                   </Button>
                 </div>
