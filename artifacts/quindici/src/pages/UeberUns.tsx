@@ -53,7 +53,7 @@ export default function UeberUns() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-[52vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-[72vh] flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url(/hero-bg.jpg)", opacity: 0.55 }}
@@ -62,68 +62,56 @@ export default function UeberUns() {
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(253,248,242,0.78) 0%, rgba(253,248,242,0.52) 50%, rgba(253,248,242,0.78) 100%)",
+              "linear-gradient(to bottom, rgba(253,248,242,0.82) 0%, rgba(253,248,242,0.48) 50%, rgba(253,248,242,0.82) 100%)",
           }}
         />
-        <div className="relative z-10 text-center px-6">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-6xl md:text-8xl font-bold text-stone-800 mb-6"
-            style={{ fontFamily: "'Playfair Display', serif" }}
+        <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+          {/* Eyebrow */}
+          <motion.p
+            initial={{ opacity: 0, letterSpacing: "0.15em" }}
+            animate={{ opacity: 1, letterSpacing: "0.3em" }}
+            transition={{ duration: 0.8 }}
+            className="text-amber-700 uppercase text-xs font-semibold mb-6"
+            style={{ letterSpacing: "0.3em" }}
           >
-            Über uns
-          </motion.h1>
+            Trattoria Pizzeria · Ludwigsburg
+          </motion.p>
+
+          {/* Main title */}
+          <div style={{ overflow: "hidden" }}>
+            <motion.h1
+              initial={{ y: "100%", opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+              className="text-6xl md:text-8xl font-bold text-stone-800 mb-6"
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              Über Quindici
+            </motion.h1>
+          </div>
+
+          {/* Divider */}
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
-            className="mx-auto h-px w-24 bg-amber-600 origin-center"
+            transition={{ duration: 0.6, delay: 0.45, ease: "easeOut" }}
+            className="mx-auto h-px w-20 bg-amber-600 mb-8"
+            style={{ transformOrigin: "center" }}
           />
-        </div>
-      </section>
 
-      {/* Intro Text */}
-      <section className="py-24 md:py-32">
-        <div className="container mx-auto px-6 max-w-3xl text-center">
-          <motion.div
-            variants={headingContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
+          {/* Subtext */}
+          <motion.p
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.6, ease: "easeOut" }}
+            className="text-stone-600 text-lg md:text-xl leading-relaxed"
+            style={{ fontFamily: "'Quicksand', sans-serif" }}
           >
-            <motion.p
-              variants={tagLine}
-              className="text-amber-700 uppercase tracking-[0.3em] text-xs font-semibold mb-4"
-            >
-              Über uns
-            </motion.p>
-            <div style={{ overflow: "hidden" }}>
-              <motion.h2
-                variants={titleReveal}
-                className="text-5xl md:text-6xl font-bold text-stone-800 mb-6"
-                style={{ fontFamily: "'Playfair Display', serif" }}
-              >
-                Über Quindici
-              </motion.h2>
-            </div>
-            <motion.div
-              variants={rulerExpand}
-              className="mx-auto h-px w-16 bg-amber-600 mb-10"
-              style={{ transformOrigin: "center" }}
-            />
-            <motion.p
-              variants={fadeUp}
-              className="text-stone-600 text-lg md:text-xl leading-relaxed"
-              style={{ fontFamily: "'Quicksand', sans-serif" }}
-            >
-              Quindici Trattoria Pizzeria steht für italienische Küche, familiäre Atmosphäre und
-              ehrliche Gastfreundschaft. Hier geht es nicht nur darum, gut zu essen – sondern
-              darum, sich wohlzufühlen, gemeinsam Zeit zu verbringen und ein Stück Italien in
-              Ludwigsburg zu erleben.
-            </motion.p>
-          </motion.div>
+            Quindici Trattoria Pizzeria steht für italienische Küche, familiäre Atmosphäre und
+            ehrliche Gastfreundschaft. Hier geht es nicht nur darum, gut zu essen – sondern darum,
+            sich wohlzufühlen, gemeinsam Zeit zu verbringen und ein Stück Italien in Ludwigsburg
+            zu erleben.
+          </motion.p>
         </div>
       </section>
 
