@@ -78,19 +78,16 @@ export default function BenvenutilSection() {
             className="space-y-4 text-stone-600 text-base leading-relaxed"
           >
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque
-              vehicula libero vel felis convallis, at tincidunt eros tincidunt.
-              Vivamus euismod erat nec felis volutpat, vel auctor nunc efficitur.
+              Bei Quindici Trattoria Pizzeria erwartet Sie italienische Küche mit Herz. Von
+              knuspriger Pizza über hausgemachte Pasta, frische Salate, Antipasti,
+              Fleischgerichte, Fischgerichte bis hin zu ausgewählten Spezialitäten bereiten
+              wir unsere Gerichte mit viel Leidenschaft, frischen Zutaten und Liebe zum
+              Detail zu.
             </p>
             <p>
-              Pellentesque habitant morbi tristique senectus et netus et malesuada
-              fames ac turpis egestas. Sed dignissim, libero ut fermentum
-              malesuada, sapien erat volutpat felis, sit amet ultricies nunc velit
-              vel quam.
-            </p>
-            <p>
-              Donec euismod orci at nisl facilisis, eget bibendum risus tempus.
-              Cras vehicula metus in dui malesuada, vitae porttitor metus gravida.
+              Ob gemütliches Abendessen, Mittagspause, Familienessen, Treffen mit Freunden
+              oder ein besonderer Anlass – bei Quindici sollen Sie sich vom ersten Moment
+              an willkommen fühlen.
             </p>
           </motion.div>
 
