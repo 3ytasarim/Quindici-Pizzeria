@@ -28,14 +28,14 @@ export default function Navbar() {
           : "bg-background/80 backdrop-blur-md border-b border-transparent"
       }`}
     >
-      <div className="container mx-auto px-6 flex h-20 items-center justify-between">
-        {/* Logo */}
+      <div className="container mx-auto px-6 flex h-20 items-center">
+        {/* Logo — left */}
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <img src="/logo.png" alt="Quindici Logo" className="h-[72px] w-auto" />
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-1">
+        {/* Desktop Nav — centered */}
+        <nav className="hidden lg:flex flex-1 items-center justify-center gap-1">
           {navLinks.map((link) => (
             <Link
               key={link.name}
@@ -47,23 +47,24 @@ export default function Navbar() {
               <span className="absolute bottom-0 left-4 right-4 h-px bg-amber-600 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-200" />
             </Link>
           ))}
-
-          <div className="flex items-center gap-3 ml-6">
-            <Button
-              variant="outline"
-              className="border-amber-600 text-amber-700 hover:bg-amber-50 hover:text-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 transition-all"
-              data-testid="button-tisch-reservieren"
-            >
-              Tisch reservieren
-            </Button>
-            <Button
-              className="bg-amber-700 text-white hover:bg-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
-              data-testid="button-jetzt-bestellen"
-            >
-              Jetzt bestellen
-            </Button>
-          </div>
         </nav>
+
+        {/* Buttons — right */}
+        <div className="hidden lg:flex items-center gap-3 shrink-0">
+          <Button
+            variant="outline"
+            className="border-amber-600 text-amber-700 hover:bg-amber-50 hover:text-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 transition-all"
+            data-testid="button-tisch-reservieren"
+          >
+            Tisch reservieren
+          </Button>
+          <Button
+            className="bg-amber-700 text-white hover:bg-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
+            data-testid="button-jetzt-bestellen"
+          >
+            Jetzt bestellen
+          </Button>
+        </div>
 
         {/* Mobile Nav */}
         <div className="lg:hidden">
