@@ -3,13 +3,9 @@ import { motion, useInView } from "framer-motion";
 import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
 
 const hours = [
-  { day: "Montag",     time: "11:30 – 14:30  |  17:30 – 22:00" },
-  { day: "Dienstag",   time: "11:30 – 14:30  |  17:30 – 22:00" },
-  { day: "Mittwoch",   time: "11:30 – 14:30  |  17:30 – 22:00" },
-  { day: "Donnerstag", time: "11:30 – 14:30  |  17:30 – 22:00" },
-  { day: "Freitag",    time: "11:30 – 14:30  |  17:30 – 23:00" },
-  { day: "Samstag",    time: "12:00 – 23:00" },
-  { day: "Sonntag",    time: "12:00 – 22:00" },
+  { day: "Mo – Fr",           time: "12:00 – 23:00 Uhr" },
+  { day: "Sa",                time: "17:00 – 23:00 Uhr" },
+  { day: "So (ab 6. Juni)",   time: "12:00 – 21:00 Uhr" },
 ];
 
 export default function InfoSection() {
