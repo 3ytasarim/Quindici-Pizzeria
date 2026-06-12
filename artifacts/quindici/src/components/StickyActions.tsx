@@ -41,7 +41,7 @@ export default function StickyActions() {
         paddingY="py-7"
       />
       <StickyTab
-        label="Mittagstisch"
+        label="Jetzt bestellen"
         icon={<Utensils className="w-3.5 h-3.5" />}
         bgClass="bg-stone-800 hover:bg-stone-900"
         delay={0.45}
