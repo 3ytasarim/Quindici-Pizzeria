@@ -148,130 +148,66 @@ export default function UeberUns() {
       </section>
 
       {/* Team — Teil der Familie */}
-      <section className="relative overflow-hidden bg-stone-900 py-24 md:py-32">
-        {/* Background watermark */}
-        <div
-          className="absolute inset-0 pointer-events-none select-none flex items-center justify-center"
-          aria-hidden="true"
-        >
-          <span
-            className="text-white/[0.03] font-bold leading-none"
-            style={{ fontFamily: "'Playfair Display', serif", fontSize: "clamp(120px, 20vw, 280px)" }}
-          >
-            Famiglia
-          </span>
-        </div>
+      <section className="relative overflow-hidden bg-stone-900 py-20 md:py-28">
 
         <div className="container mx-auto px-6 relative z-10">
-          {/* Heading */}
-          <motion.div
-            variants={headingContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="mb-16 md:mb-20"
-          >
-            <motion.p
-              variants={tagLine}
-              className="text-amber-500 uppercase tracking-[0.35em] text-xs font-semibold mb-4"
+
+          {/* Heading — only title, animated */}
+          <div style={{ overflow: "hidden" }} className="mb-14 md:mb-18">
+            <motion.h2
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold text-white"
+              style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              Unser Team
-            </motion.p>
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
-              <div style={{ overflow: "hidden" }}>
-                <motion.h2
-                  variants={titleReveal}
-                  className="text-5xl md:text-6xl font-bold text-white"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
-                >
-                  Teil der Familie
-                </motion.h2>
-              </div>
-              <motion.p
-                variants={fadeUp}
-                className="text-stone-400 text-sm leading-relaxed max-w-xs md:text-right"
-              >
-                Jeder Teller, jedes Lächeln — das Ergebnis eines Teams, das mit Herz dabei ist.
-              </motion.p>
-            </div>
-            <motion.div
-              variants={rulerExpand}
-              className="mt-6 h-px bg-stone-700"
-              style={{ transformOrigin: "left" }}
-            />
-          </motion.div>
+              Teil der Familie
+            </motion.h2>
+          </div>
 
           {/* Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-5">
             {[
-              { name: "Carlo Russo",  role: "Küchenchef",   initials: "CR", hue: "from-amber-900/60" },
-              { name: "Luca Ferrari", role: "Pizzaiolo",     initials: "LF", hue: "from-stone-700/60" },
-              { name: "Sofia Bianchi",role: "Service",       initials: "SB", hue: "from-amber-900/60" },
-              { name: "Marco Esposito",role:"Sous Chef",     initials: "ME", hue: "from-stone-700/60" },
-              { name: "Elena Ricci",  role: "Service",       initials: "ER", hue: "from-amber-900/60" },
-              { name: "Nico Marino",  role: "Bar",           initials: "NM", hue: "from-stone-700/60" },
+              { name: "Lorem Ipsum", photo: "/about-photo-1.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-2.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-1.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-2.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-1.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-2.png" },
             ].map((member, i) => (
               <motion.div
-                key={member.name}
-                initial={{ opacity: 0, y: 40 }}
+                key={i}
+                initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-30px" }}
-                transition={{ duration: 0.55, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
                 className="group cursor-default"
               >
-                {/* Photo card */}
-                <div className="relative w-full aspect-[3/4] overflow-hidden bg-stone-800 mb-4">
-                  {/* Gradient bg */}
-                  <div className={`absolute inset-0 bg-gradient-to-t ${member.hue} to-transparent opacity-60`} />
-
-                  {/* Silhouette */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-                    <div
-                      className="w-16 h-16 rounded-full bg-stone-600/60 flex items-center justify-center transition-transform duration-500 group-hover:scale-110"
-                    >
-                      <span
-                        className="text-stone-300 font-bold text-lg"
-                        style={{ fontFamily: "'Playfair Display', serif" }}
-                      >
-                        {member.initials}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Hover overlay */}
-                  <motion.div
-                    className="absolute inset-0 bg-amber-700/20"
-                    initial={{ opacity: 0 }}
-                    whileHover={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
+                {/* Photo */}
+                <div className="relative w-full aspect-[3/4] overflow-hidden mb-3">
+                  <img
+                    src={member.photo}
+                    alt={member.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-
-                  {/* Bottom info slide-up on hover */}
-                  <div className="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-400 bg-gradient-to-t from-black/70 to-transparent">
-                    <p className="text-amber-400 text-[10px] uppercase tracking-[0.2em] font-semibold">
-                      {member.role}
-                    </p>
-                  </div>
-
-                  {/* Amber border on hover */}
-                  <div className="absolute inset-0 border border-amber-600/0 group-hover:border-amber-600/50 transition-colors duration-300" />
+                  {/* Dark gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-transparent to-transparent" />
+                  {/* Amber line on hover bottom */}
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-amber-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
                 </div>
 
-                {/* Name below card */}
-                <div>
-                  <p
-                    className="text-white font-semibold text-[14px] leading-tight mb-1 group-hover:text-amber-400 transition-colors duration-300"
-                    style={{ fontFamily: "'Playfair Display', serif" }}
-                  >
-                    {member.name}
-                  </p>
-                  <p className="text-stone-500 text-[11px] uppercase tracking-[0.18em]">
-                    {member.role}
-                  </p>
-                </div>
+                {/* Name */}
+                <p
+                  className="text-white/80 text-[13px] font-medium group-hover:text-amber-400 transition-colors duration-300"
+                  style={{ fontFamily: "'Quicksand', sans-serif" }}
+                >
+                  {member.name}
+                </p>
               </motion.div>
             ))}
           </div>
+
         </div>
       </section>
 
