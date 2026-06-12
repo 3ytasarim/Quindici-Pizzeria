@@ -65,7 +65,7 @@ const categories: MenuCategory[] = [
     id: "carne",
     title: "Carne",
     subtitle: "Fleischgerichte",
-    image: "/about-restaurant.png",
+    image: "/about-restaurant-nobg.png",
     items: [
       { name: "Saltimbocca alla Romana", description: "Zartes Kalbsschnitzel in Weißwein mit Parmaschinken und Salbei serviert, dazu Nudeln", price: "29,90 €" },
       { name: "Piccata alla Milanese", description: "Parmesan-Kalbsschnitzel nach Mailänder Art serviert, dazu Nudeln", price: "29,90 €" },
@@ -272,8 +272,8 @@ export default function Speisekarte() {
                   <img
                     src={cat.image}
                     alt={cat.title}
-                    className="object-contain drop-shadow-2xl"
-                    style={{ maxHeight: "400px", maxWidth: "100%", width: "auto", height: "auto" }}
+                    className="drop-shadow-2xl"
+                    style={{ width: "100%", height: "auto", maxHeight: "460px", objectFit: "contain" }}
                   />
                 </motion.div>
 
