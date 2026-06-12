@@ -130,23 +130,9 @@ export default function UeberUns() {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.6, delay: 0.45, ease: "easeOut" }}
-            className="mx-auto h-px w-20 bg-amber-600 mb-8"
+            className="mx-auto h-px w-20 bg-amber-600"
             style={{ transformOrigin: "center" }}
           />
-
-          {/* Subtext */}
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.6, ease: "easeOut" }}
-            className="text-stone-600 text-lg md:text-xl leading-relaxed"
-            style={{ fontFamily: "'Quicksand', sans-serif" }}
-          >
-            Quindici Trattoria Pizzeria steht für italienische Küche, familiäre Atmosphäre und
-            ehrliche Gastfreundschaft. Hier geht es nicht nur darum, gut zu essen – sondern darum,
-            sich wohlzufühlen, gemeinsam Zeit zu verbringen und ein Stück Italien in Ludwigsburg
-            zu erleben.
-          </motion.p>
         </div>
       </section>
 
@@ -298,6 +284,101 @@ export default function UeberUns() {
                 </div>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Text + Two Photos Section */}
+      <section className="py-20 md:py-28 overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-center">
+
+            {/* Left: Text */}
+            <motion.div
+              className="flex-1 min-w-0"
+              variants={headingContainer}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+            >
+              <motion.p variants={tagLine} className="text-amber-700 uppercase tracking-[0.3em] text-xs font-semibold mb-4">
+                La nostra storia
+              </motion.p>
+              <div style={{ overflow: "hidden" }}>
+                <motion.h2
+                  variants={titleReveal}
+                  className="text-4xl md:text-5xl font-bold text-stone-800 mb-4"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  Herzlich willkommen
+                </motion.h2>
+              </div>
+              <motion.div variants={rulerExpand} className="h-px w-16 bg-amber-600 mb-8" style={{ transformOrigin: "left" }} />
+
+              <motion.p
+                variants={fadeUp}
+                className="text-stone-600 text-[16px] leading-[1.85] mb-6"
+                style={{ fontFamily: "'Quicksand', sans-serif" }}
+              >
+                Quindici Trattoria Pizzeria steht für italienische Küche, familiäre Atmosphäre und
+                ehrliche Gastfreundschaft. Hier geht es nicht nur darum, gut zu essen – sondern
+                darum, sich wohlzufühlen, gemeinsam Zeit zu verbringen und ein Stück Italien in
+                Ludwigsburg zu erleben.
+              </motion.p>
+
+              <motion.p
+                variants={fadeUp}
+                className="text-stone-500 text-[15px] leading-[1.85]"
+                style={{ fontFamily: "'Quicksand', sans-serif" }}
+              >
+                Unsere Küche verbindet frische Zutaten, traditionelle Rezepte und sorgfältige
+                Zubereitung. Ob Pizza, Pasta, Salate, Antipasti oder italienische Klassiker –
+                jedes Gericht wird mit Liebe zum Detail vorbereitet und soll unseren Gästen ein
+                besonderes Geschmackserlebnis bieten.
+              </motion.p>
+            </motion.div>
+
+            {/* Right: Two vertical photos */}
+            <div className="w-full lg:w-[45%] shrink-0 flex gap-4 items-end">
+              {/* Photo 1 — taller, shifts up */}
+              <motion.div
+                className="flex-1 overflow-hidden"
+                initial={{ opacity: 0, y: 80 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+              >
+                <div className="aspect-[3/4] overflow-hidden">
+                  <motion.img
+                    src="/about-photo-1.png"
+                    alt="Quindici Tisch"
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.04 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                </div>
+              </motion.div>
+
+              {/* Photo 2 — slightly shorter, shifts up with delay */}
+              <motion.div
+                className="flex-1 overflow-hidden"
+                initial={{ opacity: 0, y: 120 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-60px" }}
+                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
+                style={{ marginTop: "3rem" }}
+              >
+                <div className="aspect-[3/4] overflow-hidden">
+                  <motion.img
+                    src="/about-photo-2.png"
+                    alt="Quindici Restaurant"
+                    className="w-full h-full object-cover"
+                    whileHover={{ scale: 1.04 }}
+                    transition={{ duration: 0.6 }}
+                  />
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </section>
