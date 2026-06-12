@@ -45,7 +45,7 @@ export default function BenvenutilSection() {
               fontSize: "clamp(60px, 10vw, 110px)",
               fontWeight: 400,
               color: "#C5A485",
-              opacity: 0.14,
+              opacity: 0.07,
               letterSpacing: "0.02em",
             }}
           >
