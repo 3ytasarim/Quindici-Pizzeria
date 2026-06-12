@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, UtensilsCrossed } from "lucide-react";
+import { motion } from "framer-motion";
+import { UtensilsCrossed } from "lucide-react";
 
 export default function HeroSection() {
-  const [hovered, setHovered] = useState(false);
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
@@ -63,77 +61,25 @@ export default function HeroSection() {
         </motion.p>
 
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.85, delay: 0.4, ease: "easeOut" }}
-          className="mb-10"
+          transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
         >
           <motion.button
-            data-testid="button-hero-mittagstisch-ansehen"
-            onHoverStart={() => setHovered(true)}
-            onHoverEnd={() => setHovered(false)}
-            whileTap={{ scale: 0.98 }}
-            className="relative overflow-hidden border border-primary/50 text-foreground text-sm tracking-[0.2em] uppercase font-semibold rounded-none flex items-center gap-4 group px-10 h-14"
-          >
-            {/* amber fill sweeping from left */}
-            <motion.span
-              className="absolute inset-0 bg-primary origin-left"
-              initial={{ scaleX: 0 }}
-              animate={{ scaleX: hovered ? 1 : 0 }}
-              transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-            />
-
-            {/* left decorative line */}
-            <motion.span
-              className="relative z-10 block h-px bg-primary/60"
-              animate={{ width: hovered ? "0px" : "20px", backgroundColor: hovered ? "rgba(255,255,255,0.6)" : undefined }}
-              transition={{ duration: 0.3 }}
-            />
-
-            {/* icon */}
-            <motion.span
-              className="relative z-10"
-              animate={{ color: hovered ? "#fff" : "currentColor" }}
-              transition={{ duration: 0.25 }}
-            >
-              <UtensilsCrossed className="w-4 h-4" />
-            </motion.span>
-
-            {/* text */}
-            <motion.span
-              className="relative z-10 leading-none"
-              animate={{ color: hovered ? "#fff" : "currentColor" }}
-              transition={{ duration: 0.25 }}
-            >
-              Mittagstisch ansehen
-            </motion.span>
-
-            {/* animated arrow */}
-            <motion.span
-              className="relative z-10"
-              animate={{
-                x: hovered ? 0 : -4,
-                opacity: hovered ? 1 : 0,
-                color: "#fff",
-              }}
-              transition={{ duration: 0.25 }}
-            >
-              <ArrowRight className="w-4 h-4" />
-            </motion.span>
-          </motion.button>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
-        >
-          <button
-            className="inline-flex items-center gap-2 px-6 py-2 rounded-full border border-primary/40 bg-background/60 backdrop-blur-sm text-sm font-medium text-primary hover:bg-primary/5 transition-colors"
+            whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(180,130,50,0.25)" }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full border border-amber-600/50 bg-white/70 backdrop-blur-sm text-sm font-semibold text-amber-800 shadow-sm hover:bg-amber-50/80 transition-colors"
             data-testid="button-mittagstisch-der-woche"
           >
+            {/* Pulsing dot */}
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600" />
+            </span>
+            <UtensilsCrossed className="w-3.5 h-3.5 text-amber-600" />
             Mittagstisch der Woche
-          </button>
+          </motion.button>
         </motion.div>
       </div>
     </section>
