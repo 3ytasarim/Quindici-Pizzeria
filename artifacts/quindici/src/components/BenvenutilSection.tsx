@@ -39,13 +39,13 @@ export default function BenvenutilSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="absolute -top-6 left-0 select-none pointer-events-none leading-none"
+            className="absolute bottom-0 left-0 select-none pointer-events-none leading-none"
             style={{
               fontFamily: "'Dancing Script', cursive",
               fontSize: "clamp(60px, 10vw, 110px)",
               fontWeight: 400,
               color: "#C5A485",
-              opacity: 0.22,
+              opacity: 0.14,
               letterSpacing: "0.02em",
             }}
           >
@@ -59,9 +59,6 @@ export default function BenvenutilSection() {
             transition={{ duration: 0.8, delay: 0.25, ease: "easeOut" }}
             className="relative z-10 pt-10"
           >
-            <p className="text-sm font-semibold tracking-[0.25em] uppercase text-amber-700 mb-2">
-              Willkommen
-            </p>
             <h2 className="font-serif text-3xl md:text-4xl text-stone-800 leading-snug">
               In der Trattoria Pizzeria in Ludwigsburg
             </h2>
