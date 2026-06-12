@@ -301,30 +301,20 @@ export default function UeberUns() {
               whileInView="visible"
               viewport={{ once: true, margin: "-80px" }}
             >
-              <div style={{ overflow: "hidden" }}>
-                <motion.h2
-                  variants={titleReveal}
-                  className="text-4xl md:text-5xl font-bold text-stone-800 mb-2 leading-tight"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
-                >
-                  Die Geschichte
-                </motion.h2>
-              </div>
-              <div style={{ overflow: "hidden" }}>
-                <motion.h2
-                  variants={titleReveal}
-                  className="text-4xl md:text-5xl font-bold mb-5 leading-tight"
-                  style={{
-                    fontFamily: "'Playfair Display', serif",
-                    background: "linear-gradient(90deg, #b45309 0%, #d97706 60%, #b45309 100%)",
-                    WebkitBackgroundClip: "text",
-                    WebkitTextFillColor: "transparent",
-                    backgroundClip: "text",
-                  }}
-                >
-                  von Quindici
-                </motion.h2>
-              </div>
+              <motion.h2
+                variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
+                className="text-4xl md:text-5xl font-bold text-stone-800 mb-1 leading-tight"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
+                Die Geschichte
+              </motion.h2>
+              <motion.h2
+                variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.1 } } }}
+                className="text-4xl md:text-5xl font-bold text-amber-700 mb-5 leading-tight"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
+                von Quindici
+              </motion.h2>
               <motion.div variants={rulerExpand} className="h-px w-16 bg-amber-600 mb-8" style={{ transformOrigin: "left" }} />
 
               <motion.p
