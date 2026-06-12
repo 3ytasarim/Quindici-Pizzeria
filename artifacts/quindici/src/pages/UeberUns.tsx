@@ -53,16 +53,75 @@ export default function UeberUns() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-[72vh] flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url(/hero-bg.jpg)", opacity: 0.55 }}
+      <section className="relative min-h-[72vh] flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
+        {/* Animated background blobs */}
+        <motion.div
+          className="absolute z-0 rounded-full pointer-events-none"
+          style={{
+            width: 700,
+            height: 700,
+            top: "50%",
+            left: "50%",
+            x: "-50%",
+            y: "-50%",
+            background: "radial-gradient(circle, rgba(180,120,40,0.13) 0%, rgba(253,248,242,0) 70%)",
+          }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
+        <motion.div
+          className="absolute z-0 rounded-full pointer-events-none"
+          style={{
+            width: 420,
+            height: 420,
+            top: "20%",
+            left: "10%",
+            background: "radial-gradient(circle, rgba(200,150,60,0.10) 0%, transparent 70%)",
+          }}
+          animate={{ x: [0, 40, 0], y: [0, -30, 0], scale: [1, 1.1, 1] }}
+          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute z-0 rounded-full pointer-events-none"
+          style={{
+            width: 300,
+            height: 300,
+            bottom: "15%",
+            right: "8%",
+            background: "radial-gradient(circle, rgba(180,120,40,0.09) 0%, transparent 70%)",
+          }}
+          animate={{ x: [0, -30, 0], y: [0, 25, 0], scale: [1, 1.08, 1] }}
+          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+        {/* Decorative floating rings */}
+        {[
+          { size: 180, top: "8%", left: "5%", delay: 0 },
+          { size: 90, top: "70%", left: "3%", delay: 1.5 },
+          { size: 130, top: "15%", right: "6%", delay: 3 },
+          { size: 60, top: "78%", right: "12%", delay: 2 },
+        ].map((ring, i) => (
+          <motion.div
+            key={i}
+            className="absolute z-0 pointer-events-none"
+            style={{
+              width: ring.size,
+              height: ring.size,
+              top: ring.top,
+              left: "left" in ring ? ring.left : undefined,
+              right: "right" in ring ? ring.right : undefined,
+              borderRadius: "50%",
+              border: "1px solid rgba(180,120,40,0.18)",
+            }}
+            animate={{ scale: [1, 1.12, 1], opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 7 + i * 1.5, repeat: Infinity, ease: "easeInOut", delay: ring.delay }}
+          />
+        ))}
+        {/* Subtle grid texture overlay */}
         <div
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
-            background:
-              "linear-gradient(to bottom, rgba(253,248,242,0.82) 0%, rgba(253,248,242,0.48) 50%, rgba(253,248,242,0.82) 100%)",
+            backgroundImage: "radial-gradient(rgba(180,120,40,0.06) 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
           }}
         />
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
