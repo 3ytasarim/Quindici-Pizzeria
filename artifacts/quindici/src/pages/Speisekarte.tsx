@@ -21,7 +21,7 @@ const categories: MenuCategory[] = [
     id: "antipasti",
     title: "Antipasti",
     subtitle: "Vorspeisen",
-    image: "/dish-carpaccio.png",
+    image: "/dish-carpaccio-nobg.png",
     items: [
       { name: "Parmigiana di Melanzane", description: "Überbackene Auberginen mit Tomatensauce und Mozzarella", price: "14,50 €" },
       { name: "Polpo alla Griglia", description: "Zart gegrillter Oktopus auf cremigem Kartoffelpüree, verfeinert mit Olivenöl und Kräutern", price: "21,50 €" },
@@ -37,7 +37,7 @@ const categories: MenuCategory[] = [
     id: "insalate",
     title: "Insalate",
     subtitle: "Salate",
-    image: "/dish-polpo.png",
+    image: "/dish-polpo-nobg.png",
     items: [
       { name: "Insalata Mista", description: "Gemischter Salat mit italienischem Dressing", price: "10,50 €" },
       { name: "Insalata di Pomodori", description: "Frischer Tomatensalat mit Zwiebeln und Basilikum", price: "10,90 €" },
@@ -51,7 +51,7 @@ const categories: MenuCategory[] = [
     id: "pasta",
     title: "Pasta",
     subtitle: "Nudelgerichte",
-    image: "/dish-pasta-carbonara.png",
+    image: "/dish-pasta-carbonara-nobg.png",
     items: [
       { name: "Strozzapreti al Ragù di Salsiccia e Vino Bianco", description: "Strozzapreti mit Salsiccia-Ragout, Weißwein und Rosmarin", price: "18,90 €" },
       { name: "Pappardelle al Salmone", description: "Pappardelle mit frischem Lachs in cremiger Tomaten-Sahne-Sauce", price: "19,90 €" },
@@ -76,7 +76,7 @@ const categories: MenuCategory[] = [
     id: "pesce",
     title: "Pesce",
     subtitle: "Fischgerichte",
-    image: "/dish-polpo.png",
+    image: "/dish-polpo-nobg.png",
     items: [
       { name: "Filetti di Orata alla Griglia", description: "Gegrilltes Doradenfilets, serviert mit Tagesgemüse", price: "27,90 €" },
       { name: "Calamaretti Fritti con Insalatina", description: "Frittierte Baby-Calamari, serviert mit buntem Salat", price: "26,90 €" },
@@ -86,7 +86,7 @@ const categories: MenuCategory[] = [
     id: "pizza",
     title: "Pizza",
     subtitle: "Con Pomodori San Marzano",
-    image: "/pizza-1.png",
+    image: "/dish-pizza-margherita-nobg.png",
     items: [
       { name: "Margherita", description: "Tomatensauce und Mozzarella", price: "12,50 €" },
       { name: "Bufalina", description: "Tomatensauce und Büffelmozzarella", price: "16,00 €" },
@@ -108,7 +108,7 @@ const categories: MenuCategory[] = [
     id: "pizza-bianca",
     title: "Pizza Bianca",
     subtitle: "Ohne Tomatensauce",
-    image: "/dish-pizza-diavola.png",
+    image: "/dish-pizza-diavola-nobg.png",
     items: [
       { name: "Poggioreale", description: "Mozzarella, Salsiccia und neapolitanischer Brokkoli", price: "17,00 €" },
       { name: "Secondigliano", description: "Mozzarella, Mortadella, Pistaziencreme und Burrata (125 g)", price: "21,50 €" },
@@ -120,7 +120,7 @@ const categories: MenuCategory[] = [
     id: "dolci",
     title: "Dolci",
     subtitle: "Desserts",
-    image: "/dish-tiramisu.png",
+    image: "/dish-tiramisu-nobg.png",
     items: [
       { name: "Tiramisù Classico", description: "Das italienische Dessert — cremig, mit Mascarpone und in Espresso getränkt", price: "9,50 €" },
       { name: "Panna Cotta", description: "Zarte Panna Cotta, vollendet mit einer feinen Mango-Waldfrüchte-Sauce", price: "8,90 €" },
@@ -209,33 +209,44 @@ export default function Speisekarte() {
       <Navbar />
 
       {/* Page Hero */}
-      <section className="relative py-20 text-center overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none" style={{
-          background: "radial-gradient(ellipse at center, rgba(180,130,70,0.07) 0%, transparent 70%)"
-        }} />
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-amber-700 uppercase tracking-[0.3em] text-xs font-semibold mb-4"
-        >
-          Quindici Trattoria Pizzeria
-        </motion.p>
-        <motion.h1
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-5xl md:text-7xl font-bold text-stone-800 mb-6"
-          style={{ fontFamily: "'Playfair Display', serif" }}
-        >
-          Speisekarte
-        </motion.h1>
-        <motion.div
-          initial={{ scaleX: 0 }}
-          animate={{ scaleX: 1 }}
-          transition={{ duration: 0.7, delay: 0.3 }}
-          className="mx-auto h-px w-24 bg-amber-600 origin-center"
+      <section className="relative min-h-[52vh] flex items-center justify-center overflow-hidden">
+        {/* Background image — same as homepage */}
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url(/hero-bg.jpg)", opacity: 0.55 }}
         />
+        {/* Cream overlay */}
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background: "linear-gradient(to bottom, rgba(253,248,242,0.78) 0%, rgba(253,248,242,0.52) 50%, rgba(253,248,242,0.78) 100%)",
+          }}
+        />
+        <div className="relative z-10 text-center px-6">
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-amber-700 uppercase tracking-[0.3em] text-xs font-semibold mb-4"
+          >
+            Quindici Trattoria Pizzeria
+          </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+            className="text-6xl md:text-8xl font-bold text-stone-800 mb-6"
+            style={{ fontFamily: "'Playfair Display', serif" }}
+          >
+            Speisekarte
+          </motion.h1>
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.7, delay: 0.3 }}
+            className="mx-auto h-px w-24 bg-amber-600 origin-center"
+          />
+        </div>
       </section>
 
       {/* Food Categories — alternating layout */}
@@ -256,23 +267,14 @@ export default function Speisekarte() {
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-80px" }}
-                  className="w-full md:w-2/5 shrink-0"
+                  className="w-full md:w-2/5 shrink-0 flex items-center justify-center"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <img
-                      src={cat.image}
-                      alt={cat.title}
-                      className="w-full h-full object-cover"
-                    />
-                    {/* Thin gold border offset */}
-                    <div
-                      className={`absolute border border-amber-600/40 inset-0 pointer-events-none`}
-                      style={{
-                        transform: isEven ? "translate(10px, 10px)" : "translate(-10px, 10px)",
-                        zIndex: -1,
-                      }}
-                    />
-                  </div>
+                  <img
+                    src={cat.image}
+                    alt={cat.title}
+                    className="w-full max-w-sm object-contain drop-shadow-2xl"
+                    style={{ maxHeight: "380px" }}
+                  />
                 </motion.div>
 
                 {/* Content side */}
