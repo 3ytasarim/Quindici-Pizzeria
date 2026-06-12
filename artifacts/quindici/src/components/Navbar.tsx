@@ -17,7 +17,7 @@ export default function Navbar() {
     { name: "Willkommen", href: "/" },
     { name: "Speisekarte", href: "/speisekarte" },
     { name: "Über uns", href: "#ueber-uns" },
-    { name: "Kontakt & Anfahrt", href: "#kontakt" },
+    { name: "Kontakt & Anfahrt", href: "/kontakt" },
   ];
 
   return (
