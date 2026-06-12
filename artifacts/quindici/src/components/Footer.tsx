@@ -1,39 +1,116 @@
-import { Link } from "wouter";
+import { Instagram, Facebook, Phone, CalendarCheck } from "lucide-react";
+
+const navLinks = [
+  { label: "Startseite",        href: "#" },
+  { label: "Speisekarte",       href: "#" },
+  { label: "Tisch reservieren", href: "#" },
+  { label: "Mittagstisch",      href: "#" },
+  { label: "Lieferservice",     href: "#" },
+  { label: "Abholung",          href: "#" },
+  { label: "Kontakt",           href: "#" },
+  { label: "Impressum",         href: "#" },
+  { label: "Datenschutz",       href: "#" },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-foreground text-background py-16 md:py-24">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-          
-          <div className="flex flex-col items-center md:items-start gap-6">
-            <img src="/logo.png" alt="Quindici Logo" className="h-20 w-auto brightness-0 invert opacity-90" />
-            <p className="text-background/70 max-w-xs text-sm">
-              Authentische italienische Küche, zubereitet mit Amore.
+    <footer className="relative overflow-hidden bg-stone-900 text-white">
+      {/* Watermark */}
+      <span
+        className="absolute bottom-0 left-1/2 -translate-x-1/2 select-none pointer-events-none leading-none whitespace-nowrap"
+        style={{
+          fontFamily: "'Dancing Script', cursive",
+          fontSize: "clamp(80px, 14vw, 160px)",
+          fontWeight: 400,
+          color: "#fff",
+          opacity: 0.04,
+          letterSpacing: "0.02em",
+        }}
+      >
+        Quindici
+      </span>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+
+        {/* LEFT — contact / social */}
+        <div>
+          <p className="text-xs font-semibold tracking-[0.25em] uppercase text-stone-400 mb-5">
+            In Verbindung bleiben
+          </p>
+          <div className="flex gap-4 mb-6">
+            <a
+              href="#"
+              className="w-9 h-9 flex items-center justify-center border border-stone-600 text-stone-400 hover:text-white hover:border-white transition-colors"
+              aria-label="Facebook"
+            >
+              <Facebook className="w-4 h-4" />
+            </a>
+            <a
+              href="#"
+              className="w-9 h-9 flex items-center justify-center border border-stone-600 text-stone-400 hover:text-white hover:border-white transition-colors"
+              aria-label="Instagram"
+            >
+              <Instagram className="w-4 h-4" />
+            </a>
+          </div>
+
+          <div className="border-t border-stone-700 pt-6 space-y-1">
+            <p className="font-semibold text-white text-sm">Quindici Trattoria Pizzeria</p>
+            <p className="text-stone-400 text-sm italic">passione in cucina e vino</p>
+            <p className="text-stone-400 text-sm pt-2 leading-relaxed">
+              Bahnhofstraße 17<br />
+              71638 Ludwigsburg
             </p>
           </div>
+        </div>
 
-          <div className="flex flex-col items-center md:items-start gap-4">
-            <h4 className="font-serif text-primary text-xl mb-2">Entdecken</h4>
-            <Link href="/" className="text-background/80 hover:text-primary transition-colors">Willkommen</Link>
-            <Link href="#speisekarte" className="text-background/80 hover:text-primary transition-colors">Speisekarte</Link>
-            <Link href="#ueber-uns" className="text-background/80 hover:text-primary transition-colors">Über uns</Link>
-            <Link href="#kontakt" className="text-background/80 hover:text-primary transition-colors">Kontakt & Anfahrt</Link>
-          </div>
-
-          <div className="flex flex-col items-center md:items-start gap-4" id="kontakt">
-            <h4 className="font-serif text-primary text-xl mb-2">Besuchen Sie uns</h4>
-            <p className="text-background/80">Quindici Trattoria Pizzeria<br/>Ludwigsburg</p>
-            <Link href="#" className="inline-block mt-4 border-b border-primary text-primary hover:text-background hover:border-background transition-colors pb-1 uppercase tracking-widest text-xs font-semibold">
+        {/* CENTER — logo + CTA */}
+        <div className="flex flex-col items-center gap-6">
+          <img
+            src="/logo.png"
+            alt="Quindici Logo"
+            className="h-24 w-auto brightness-0 invert opacity-90"
+          />
+          <div className="space-y-3 text-center">
+            <a
+              href="tel:+4971414732887"
+              className="flex items-center justify-center gap-2 text-stone-300 hover:text-white transition-colors text-sm"
+            >
+              <Phone className="w-4 h-4 text-amber-500 shrink-0" />
+              07141 4732887
+            </a>
+            <a
+              href="#"
+              className="flex items-center justify-center gap-2 text-stone-300 hover:text-white transition-colors text-sm"
+            >
+              <CalendarCheck className="w-4 h-4 text-amber-500 shrink-0" />
               Tisch reservieren
-            </Link>
+            </a>
           </div>
-
         </div>
 
-        <div className="mt-20 pt-8 border-t border-background/10 text-center text-sm text-background/50">
-          <p>© 2025 Quindici Trattoria Pizzeria. Alle Rechte vorbehalten.</p>
+        {/* RIGHT — navigation */}
+        <div className="md:text-right">
+          <nav className="flex flex-col gap-2.5">
+            {navLinks.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="text-xs font-semibold tracking-[0.2em] uppercase text-stone-400 hover:text-white transition-colors"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
         </div>
+
+      </div>
+
+      {/* Bottom bar */}
+      <div className="relative z-10 border-t border-stone-800 py-4 px-6 text-center">
+        <p className="text-xs text-stone-600">
+          © {new Date().getFullYear()} Quindici Trattoria Pizzeria · Alle Rechte vorbehalten
+        </p>
       </div>
     </footer>
   );
