@@ -105,74 +105,67 @@ export default function BenvenutilSection() {
           </motion.div>
         </div>
 
-        {/* Pizza circular slider */}
-        <div className="relative flex items-center justify-center gap-0">
-          {/* Prev arrow */}
-          <button
-            onClick={() => go(-1)}
-            className="shrink-0 w-10 h-10 flex items-center justify-center text-stone-400 hover:text-amber-700 transition-colors"
-            data-testid="slider-prev"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-
-          {/* Slides */}
-          <div className="flex-1 overflow-hidden">
-            <div className="flex items-center justify-center gap-6 md:gap-10">
-              {pizzas.map((pizza, i) => {
-                const offset = (i - active + pizzas.length) % pizzas.length;
-                const isActive = offset === 0;
-                const isNext = offset === 1;
-                const isPrev = offset === pizzas.length - 1;
-                const isVisible = isActive || isNext || isPrev;
-
-                return (
-                  <motion.button
-                    key={pizza.src}
-                    onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
-                    animate={{
-                      scale: isActive ? 1 : 0.78,
-                      opacity: isActive ? 1 : isVisible ? 0.55 : 0,
-                      filter: isActive ? "grayscale(0%)" : "grayscale(30%)",
-                    }}
-                    transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
-                    className="shrink-0 rounded-full overflow-hidden border-2 border-amber-200 shadow-md focus:outline-none"
-                    style={{ width: isActive ? 180 : 140, height: isActive ? 180 : 140 }}
-                    data-testid={`slider-pizza-${i}`}
-                  >
-                    <img
-                      src={pizza.src}
-                      alt={pizza.label}
-                      className="w-full h-full object-cover"
-                    />
-                  </motion.button>
-                );
-              })}
-            </div>
+        {/* Pizza carousel */}
+        <div className="relative">
+          {/* Arrows row */}
+          <div className="flex items-center justify-between mb-6 px-2">
+            <button
+              onClick={() => go(-1)}
+              className="w-10 h-10 flex items-center justify-center text-stone-400 hover:text-amber-700 transition-colors"
+              data-testid="slider-prev"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={() => go(1)}
+              className="w-10 h-10 flex items-center justify-center text-stone-400 hover:text-amber-700 transition-colors"
+              data-testid="slider-next"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
           </div>
 
-          {/* Next arrow */}
-          <button
-            onClick={() => go(1)}
-            className="shrink-0 w-10 h-10 flex items-center justify-center text-stone-400 hover:text-amber-700 transition-colors"
-            data-testid="slider-next"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-        </div>
+          {/* Fixed-position pizza circles — all visible, active grows + colorizes */}
+          <div className="flex items-end justify-center gap-6 md:gap-10">
+            {pizzas.map((pizza, i) => {
+              const isActive = i === active;
+              return (
+                <motion.button
+                  key={pizza.src}
+                  onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
+                  animate={{
+                    width: isActive ? 200 : 130,
+                    height: isActive ? 200 : 130,
+                    filter: isActive ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.75)",
+                    opacity: isActive ? 1 : 0.6,
+                  }}
+                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+                  className="shrink-0 rounded-full overflow-hidden border-2 border-amber-200 shadow-md focus:outline-none"
+                  data-testid={`slider-pizza-${i}`}
+                >
+                  <img
+                    src={pizza.src}
+                    alt={pizza.label}
+                    className="w-full h-full object-cover"
+                  />
+                </motion.button>
+              );
+            })}
+          </div>
 
-        {/* Dots */}
-        <div className="flex justify-center gap-2 mt-6">
-          {pizzas.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
-              className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-                i === active ? "bg-amber-700 w-4" : "bg-stone-300"
-              }`}
-              data-testid={`slider-dot-${i}`}
-            />
-          ))}
+          {/* Dots */}
+          <div className="flex justify-center gap-2 mt-6">
+            {pizzas.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === active ? "bg-amber-700 w-6" : "bg-stone-300 w-1.5"
+                }`}
+                data-testid={`slider-dot-${i}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>
