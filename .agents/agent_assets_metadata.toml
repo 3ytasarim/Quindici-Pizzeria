@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "c0nQt3A72QD9h-9-Fgbqy"
+uri = "file://artifacts/quindici/public/hero-bg.jpg"
+type = "image"
+title = "Elegant italian restaurant interior, warm lighting, fine dining, empty tables"
