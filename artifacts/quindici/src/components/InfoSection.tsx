@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
+import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import MenuCard from "@/components/MenuCard";
 
 const hours = [
   { day: "Mo – Fr",           time: "12:00 – 23:00 Uhr" },
@@ -22,35 +23,12 @@ export default function InfoSection() {
     <section ref={ref} className="bg-[#fdf8f2] py-20 px-6">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-stretch">
 
-        {/* LEFT — Speisekarte image card */}
+        {/* LEFT — Interactive menu card */}
         <motion.div
           {...fadeUp(0.1)}
-          className="relative overflow-hidden shadow-xl group min-h-[480px]"
+          className="min-h-[480px] flex flex-col"
         >
-          <img
-            src="/about-restaurant.png"
-            alt="Speisekarte Quindici"
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-          {/* dark gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-stone-900/70 via-stone-900/20 to-transparent" />
-
-          {/* Bottom label */}
-          <div className="absolute bottom-0 left-0 right-0 p-8">
-            <p className="text-sm font-semibold tracking-[0.25em] uppercase text-amber-400 mb-2">
-              Unsere Küche
-            </p>
-            <h3 className="font-serif text-3xl text-white mb-5 leading-snug">
-              Entdecken Sie<br />unsere Speisekarte
-            </h3>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 border border-white/60 text-white text-sm font-medium px-5 py-2.5 hover:bg-white hover:text-stone-900 transition-all duration-300"
-            >
-              Zur Speisekarte
-              <ExternalLink className="w-4 h-4" />
-            </a>
-          </div>
+          <MenuCard />
         </motion.div>
 
         {/* RIGHT — two stacked boxes */}
