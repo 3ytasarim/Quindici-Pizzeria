@@ -1,5 +1,34 @@
 uploads = []
-generated = []
+
+[[generated]]
+id = "9ZLSyCkdNJ4eBmPp8K4zH"
+uri = "file://artifacts/quindici/public/about-restaurant.png"
+type = "image"
+title = "italian trattoria interior"
+
+[[generated]]
+id = "49EIYi9IzxC-CS1m85Bs-"
+uri = "file://artifacts/quindici/public/pizza-1.png"
+type = "image"
+title = "margherita pizza overhead"
+
+[[generated]]
+id = "V6-vfHdDChpxQzOrBKe-g"
+uri = "file://artifacts/quindici/public/pizza-2.png"
+type = "image"
+title = "diavola pizza overhead"
+
+[[generated]]
+id = "gKDae8DRcSzXEbzwTfN16"
+uri = "file://artifacts/quindici/public/pizza-3.png"
+type = "image"
+title = "quattro formaggi pizza"
+
+[[generated]]
+id = "ZO6omoFnReL44EzHfhTRk"
+uri = "file://artifacts/quindici/public/pizza-4.png"
+type = "image"
+title = "prosciutto rucola pizza"
 
 [[outputs]]
 id = "c0nQt3A72QD9h-9-Fgbqy"

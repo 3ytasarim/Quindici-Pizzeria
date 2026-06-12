@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
+import BenvenutilSection from "@/components/BenvenutilSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import LunchMenuSection from "@/components/LunchMenuSection";
 import MenuPreviewSection from "@/components/MenuPreviewSection";
@@ -13,6 +14,7 @@ export default function Home() {
       <Navbar />
       <main className="flex-1">
         <HeroSection />
+        <BenvenutilSection />
         <FeaturesSection />
         <LunchMenuSection />
         <MenuPreviewSection />
