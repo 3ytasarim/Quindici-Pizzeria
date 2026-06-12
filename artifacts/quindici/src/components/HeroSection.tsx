@@ -1,7 +1,11 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { ArrowRight, UtensilsCrossed } from "lucide-react";
 
 export default function HeroSection() {
+  const [hovered, setHovered] = useState(false);
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
       <div
@@ -51,6 +55,7 @@ export default function HeroSection() {
           transition={{ duration: 0.85, delay: 0.4, ease: "easeOut" }}
           className="flex flex-col sm:flex-row items-center gap-4 mb-10"
         >
+          {/* Primary button — unchanged */}
           <Button
             size="lg"
             className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 text-sm tracking-widest uppercase font-semibold h-14 px-8 rounded-none"
@@ -58,14 +63,57 @@ export default function HeroSection() {
           >
             Tisch reservieren
           </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="w-full sm:w-auto border-foreground/30 text-foreground hover:bg-foreground hover:text-background text-sm tracking-widest uppercase font-semibold h-14 px-8 rounded-none transition-all"
+
+          {/* Secondary button — animated */}
+          <motion.button
             data-testid="button-hero-mittagstisch-ansehen"
+            onHoverStart={() => setHovered(true)}
+            onHoverEnd={() => setHovered(false)}
+            whileTap={{ scale: 0.97 }}
+            className="relative w-full sm:w-auto h-14 px-8 overflow-hidden border border-foreground/30 text-foreground text-sm tracking-widest uppercase font-semibold rounded-none flex items-center justify-center gap-3 group"
           >
-            Mittagstisch ansehen
-          </Button>
+            {/* sliding fill background */}
+            <motion.span
+              className="absolute inset-0 bg-foreground origin-left"
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: hovered ? 1 : 0 }}
+              transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            />
+
+            {/* icon */}
+            <motion.span
+              className="relative z-10"
+              animate={{ color: hovered ? "hsl(var(--background))" : "currentColor" }}
+              transition={{ duration: 0.2 }}
+            >
+              <UtensilsCrossed className="w-4 h-4" />
+            </motion.span>
+
+            {/* text */}
+            <motion.span
+              className="relative z-10"
+              animate={{ color: hovered ? "hsl(var(--background))" : "currentColor" }}
+              transition={{ duration: 0.2 }}
+            >
+              Mittagstisch ansehen
+            </motion.span>
+
+            {/* arrow that slides in */}
+            <AnimatePresence>
+              {hovered && (
+                <motion.span
+                  className="relative z-10"
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -8 }}
+                  transition={{ duration: 0.2 }}
+                  style={{ color: "hsl(var(--background))" }}
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </motion.button>
         </motion.div>
 
         <motion.div
