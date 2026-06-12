@@ -338,46 +338,47 @@ export default function UeberUns() {
               </motion.p>
             </motion.div>
 
-            {/* Right: Two vertical photos */}
-            <div className="w-full lg:w-[45%] shrink-0 flex gap-4 items-end">
-              {/* Photo 1 — taller, shifts up */}
+            {/* Right: Collage — big photo right, small photo left overlapping */}
+            <div className="w-full lg:w-[48%] shrink-0 relative" style={{ height: "520px" }}>
+
+              {/* Large photo — right side, full height */}
               <motion.div
-                className="flex-1 overflow-hidden"
+                className="absolute right-0 top-0 overflow-hidden"
+                style={{ width: "68%", height: "100%" }}
                 initial={{ opacity: 0, y: 80 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+                transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
               >
-                <div className="aspect-[3/4] overflow-hidden">
-                  <motion.img
-                    src="/about-photo-1.png"
-                    alt="Quindici Tisch"
-                    className="w-full h-full object-cover"
-                    whileHover={{ scale: 1.04 }}
-                    transition={{ duration: 0.6 }}
-                  />
-                </div>
+                <motion.img
+                  src="/about-photo-2.png"
+                  alt="Quindici Restaurant"
+                  className="w-full h-full object-cover"
+                  whileHover={{ scale: 1.04 }}
+                  transition={{ duration: 0.6 }}
+                />
               </motion.div>
 
-              {/* Photo 2 — slightly shorter, shifts up with delay */}
+              {/* Small photo — left side, lower, overlaps big photo */}
               <motion.div
-                className="flex-1 overflow-hidden"
-                initial={{ opacity: 0, y: 120 }}
+                className="absolute left-0 overflow-hidden shadow-2xl"
+                style={{ width: "52%", height: "62%", bottom: 0, zIndex: 10 }}
+                initial={{ opacity: 0, y: 100 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.25 }}
-                style={{ marginTop: "3rem" }}
+                transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1], delay: 0.22 }}
               >
-                <div className="aspect-[3/4] overflow-hidden">
-                  <motion.img
-                    src="/about-photo-2.png"
-                    alt="Quindici Restaurant"
-                    className="w-full h-full object-cover"
-                    whileHover={{ scale: 1.04 }}
-                    transition={{ duration: 0.6 }}
-                  />
-                </div>
+                <motion.img
+                  src="/about-photo-1.png"
+                  alt="Quindici Tisch"
+                  className="w-full h-full object-cover"
+                  whileHover={{ scale: 1.04 }}
+                  transition={{ duration: 0.6 }}
+                />
+                {/* Thin amber border accent */}
+                <div className="absolute inset-0 border-4 border-white/30 pointer-events-none" />
               </motion.div>
+
             </div>
           </div>
         </div>
