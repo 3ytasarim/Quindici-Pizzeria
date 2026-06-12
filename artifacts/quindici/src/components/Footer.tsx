@@ -15,20 +15,14 @@ const navLinks = [
 export default function Footer() {
   return (
     <footer className="relative overflow-hidden bg-stone-900 text-white">
-      {/* Watermark */}
-      <span
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 select-none pointer-events-none leading-none whitespace-nowrap"
-        style={{
-          fontFamily: "'Dancing Script', cursive",
-          fontSize: "clamp(80px, 14vw, 160px)",
-          fontWeight: 400,
-          color: "#fff",
-          opacity: 0.04,
-          letterSpacing: "0.02em",
-        }}
-      >
-        Quindici
-      </span>
+      {/* Watermark image — centered */}
+      <img
+        src="/quindici-script.png"
+        alt=""
+        aria-hidden="true"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 select-none pointer-events-none w-[70%] max-w-2xl"
+        style={{ opacity: 0.09 }}
+      />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
 
