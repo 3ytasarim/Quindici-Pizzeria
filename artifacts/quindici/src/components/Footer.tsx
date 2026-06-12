@@ -61,9 +61,9 @@ export default function Footer() {
         {/* CENTER — logo + CTA */}
         <div className="flex flex-col items-center gap-6">
           <img
-            src="/logo.png"
+            src="/logo-footer.png"
             alt="Quindici Logo"
-            className="h-24 w-auto brightness-0 invert opacity-90"
+            className="h-24 w-auto"
           />
           <div className="space-y-3 text-center">
             <a
