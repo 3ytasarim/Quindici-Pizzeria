@@ -301,16 +301,28 @@ export default function UeberUns() {
               whileInView="visible"
               viewport={{ once: true, margin: "-80px" }}
             >
-              <motion.p variants={tagLine} className="text-amber-700 uppercase tracking-[0.3em] text-xs font-semibold mb-4">
-                La nostra storia
-              </motion.p>
               <div style={{ overflow: "hidden" }}>
                 <motion.h2
                   variants={titleReveal}
-                  className="text-4xl md:text-5xl font-bold text-stone-800 mb-4"
+                  className="text-4xl md:text-5xl font-bold text-stone-800 mb-2 leading-tight"
                   style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                  Herzlich willkommen
+                  Die Geschichte
+                </motion.h2>
+              </div>
+              <div style={{ overflow: "hidden" }}>
+                <motion.h2
+                  variants={titleReveal}
+                  className="text-4xl md:text-5xl font-bold mb-5 leading-tight"
+                  style={{
+                    fontFamily: "'Playfair Display', serif",
+                    background: "linear-gradient(90deg, #b45309 0%, #d97706 60%, #b45309 100%)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  von Quindici
                 </motion.h2>
               </div>
               <motion.div variants={rulerExpand} className="h-px w-16 bg-amber-600 mb-8" style={{ transformOrigin: "left" }} />
@@ -345,10 +357,10 @@ export default function UeberUns() {
               <motion.div
                 className="absolute right-0 top-0 overflow-hidden"
                 style={{ width: "68%", height: "100%" }}
-                initial={{ opacity: 0, y: 80 }}
+                initial={{ opacity: 0, y: 70 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
               >
                 <motion.img
                   src="/about-photo-2.png"
@@ -363,10 +375,10 @@ export default function UeberUns() {
               <motion.div
                 className="absolute left-0 overflow-hidden shadow-2xl"
                 style={{ width: "52%", height: "62%", bottom: 0, zIndex: 10 }}
-                initial={{ opacity: 0, y: 100 }}
+                initial={{ opacity: 0, y: 70 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
-                transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1], delay: 0.22 }}
+                transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
               >
                 <motion.img
                   src="/about-photo-1.png"
