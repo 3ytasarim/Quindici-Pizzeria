@@ -371,10 +371,10 @@ export default function UeberUns() {
                 />
               </motion.div>
 
-              {/* Small photo — left side, lower, overlaps big photo */}
+              {/* Small photo — centered vertically, overlaps big photo */}
+              <div className="absolute left-0" style={{ width: "52%", height: "62%", top: "50%", transform: "translateY(-50%)", zIndex: 10 }}>
               <motion.div
-                className="absolute left-0 overflow-hidden shadow-2xl"
-                style={{ width: "52%", height: "62%", bottom: 0, zIndex: 10 }}
+                className="overflow-hidden shadow-2xl w-full h-full"
                 initial={{ opacity: 0, y: 70 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-60px" }}
@@ -390,6 +390,7 @@ export default function UeberUns() {
                 {/* Thin amber border accent */}
                 <div className="absolute inset-0 border-4 border-white/30 pointer-events-none" />
               </motion.div>
+              </div>
 
             </div>
           </div>
