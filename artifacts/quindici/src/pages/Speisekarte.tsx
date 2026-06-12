@@ -268,12 +268,13 @@ export default function Speisekarte() {
                   whileInView="visible"
                   viewport={{ once: true, margin: "-80px" }}
                   className="w-full md:w-2/5 shrink-0 flex items-center justify-center"
+                  style={{ height: "420px" }}
                 >
                   <img
                     src={cat.image}
                     alt={cat.title}
-                    className="w-full max-w-sm object-contain drop-shadow-2xl"
-                    style={{ maxHeight: "380px" }}
+                    className="object-contain drop-shadow-2xl"
+                    style={{ width: "100%", height: "100%", maxWidth: "420px" }}
                   />
                 </motion.div>
 
