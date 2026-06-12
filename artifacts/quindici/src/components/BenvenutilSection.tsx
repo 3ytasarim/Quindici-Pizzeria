@@ -125,8 +125,8 @@ export default function BenvenutilSection() {
             </button>
           </div>
 
-          {/* Fixed-position pizza circles — all visible, active grows + colorizes */}
-          <div className="flex items-end justify-center gap-6 md:gap-10">
+          {/* Fixed-position pizza circles — all visible, active scales up + colorizes */}
+          <div className="flex items-center justify-center gap-6 md:gap-10" style={{ height: 220 }}>
             {pizzas.map((pizza, i) => {
               const isActive = i === active;
               return (
@@ -134,13 +134,13 @@ export default function BenvenutilSection() {
                   key={pizza.src}
                   onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
                   animate={{
-                    width: isActive ? 200 : 130,
-                    height: isActive ? 200 : 130,
+                    scale: isActive ? 1 : 0.65,
                     filter: isActive ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.75)",
                     opacity: isActive ? 1 : 0.6,
                   }}
                   transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
                   className="shrink-0 rounded-full overflow-hidden border-2 border-amber-200 shadow-md focus:outline-none"
+                  style={{ width: 200, height: 200 }}
                   data-testid={`slider-pizza-${i}`}
                 >
                   <img
