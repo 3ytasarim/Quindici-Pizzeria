@@ -5,16 +5,16 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
+      {/* Background image */}
       <div
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-30 mix-blend-multiply"
-        style={{ backgroundImage: "url(/hero-bg.jpg)" }}
+        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url(/hero-bg.jpg)", opacity: 0.55 }}
       />
+      {/* White fade overlay — heavier at top, lighter at bottom */}
       <div
-        className="absolute inset-0 z-0 opacity-20 pointer-events-none"
+        className="absolute inset-0 z-0 pointer-events-none"
         style={{
-          backgroundImage:
-            "radial-gradient(circle at center, hsl(var(--primary)) 0%, transparent 70%)",
-          transform: "translateY(-20%)",
+          background: "linear-gradient(to bottom, rgba(253,248,242,0.72) 0%, rgba(253,248,242,0.45) 50%, rgba(253,248,242,0.65) 100%)",
         }}
       />
 
