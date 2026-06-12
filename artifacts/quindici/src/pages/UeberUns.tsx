@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import MittagstischBanner from "@/components/MittagstischBanner";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -386,6 +387,9 @@ export default function UeberUns() {
           </div>
         </div>
       </section>
+
+      {/* Mittagstisch Banner */}
+      <MittagstischBanner />
 
       {/* Three Pillars */}
       <section className="py-20 md:py-28 bg-stone-50/60">
