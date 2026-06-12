@@ -54,76 +54,52 @@ export default function UeberUns() {
 
       {/* Hero */}
       <section className="relative min-h-[72vh] flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
-        {/* Animated background blobs */}
-        <motion.div
-          className="absolute z-0 rounded-full pointer-events-none"
-          style={{
-            width: 700,
-            height: 700,
-            top: "50%",
-            left: "50%",
-            x: "-50%",
-            y: "-50%",
-            background: "radial-gradient(circle, rgba(180,120,40,0.13) 0%, rgba(253,248,242,0) 70%)",
-          }}
-          animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute z-0 rounded-full pointer-events-none"
-          style={{
-            width: 420,
-            height: 420,
-            top: "20%",
-            left: "10%",
-            background: "radial-gradient(circle, rgba(200,150,60,0.10) 0%, transparent 70%)",
-          }}
-          animate={{ x: [0, 40, 0], y: [0, -30, 0], scale: [1, 1.1, 1] }}
-          transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute z-0 rounded-full pointer-events-none"
-          style={{
-            width: 300,
-            height: 300,
-            bottom: "15%",
-            right: "8%",
-            background: "radial-gradient(circle, rgba(180,120,40,0.09) 0%, transparent 70%)",
-          }}
-          animate={{ x: [0, -30, 0], y: [0, 25, 0], scale: [1, 1.08, 1] }}
-          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        />
-        {/* Decorative floating rings */}
+
+        {/* Floating pizza icons — rise from bottom, fade out at top */}
         {[
-          { size: 180, top: "8%", left: "5%", delay: 0 },
-          { size: 90, top: "70%", left: "3%", delay: 1.5 },
-          { size: 130, top: "15%", right: "6%", delay: 3 },
-          { size: 60, top: "78%", right: "12%", delay: 2 },
-        ].map((ring, i) => (
-          <motion.div
+          { src: "/icon-pizza-1.png",     left: "5%",  size: 36, duration: 10, delay: 0    },
+          { src: "/icon-pizza-slice.png", left: "12%", size: 28, duration: 13, delay: 1.5  },
+          { src: "/icon-pizza-2.png",     left: "22%", size: 44, duration: 9,  delay: 3    },
+          { src: "/icon-pizza-cutter.png",left: "32%", size: 32, duration: 14, delay: 0.8  },
+          { src: "/icon-pizza-3.png",     left: "43%", size: 40, duration: 11, delay: 5    },
+          { src: "/icon-pizza-4.png",     left: "55%", size: 30, duration: 12, delay: 2    },
+          { src: "/icon-pizza-5.png",     left: "64%", size: 46, duration: 10, delay: 4    },
+          { src: "/icon-pizza-6.png",     left: "74%", size: 28, duration: 13, delay: 1    },
+          { src: "/icon-pizza-7.png",     left: "83%", size: 38, duration: 11, delay: 6    },
+          { src: "/icon-pizza-8.png",     left: "91%", size: 32, duration: 9,  delay: 2.5  },
+          { src: "/icon-pizza-1.png",     left: "18%", size: 24, duration: 15, delay: 7    },
+          { src: "/icon-pizza-slice.png", left: "48%", size: 50, duration: 8,  delay: 3.5  },
+          { src: "/icon-pizza-2.png",     left: "70%", size: 26, duration: 12, delay: 8    },
+          { src: "/icon-pizza-3.png",     left: "38%", size: 34, duration: 14, delay: 9    },
+        ].map((p, i) => (
+          <motion.img
             key={i}
-            className="absolute z-0 pointer-events-none"
+            src={p.src}
+            alt=""
+            aria-hidden="true"
+            className="absolute pointer-events-none select-none"
             style={{
-              width: ring.size,
-              height: ring.size,
-              top: ring.top,
-              left: "left" in ring ? ring.left : undefined,
-              right: "right" in ring ? ring.right : undefined,
-              borderRadius: "50%",
-              border: "1px solid rgba(180,120,40,0.18)",
+              left: p.left,
+              bottom: 0,
+              width: p.size,
+              height: p.size,
+              objectFit: "contain",
+              zIndex: 0,
             }}
-            animate={{ scale: [1, 1.12, 1], opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 7 + i * 1.5, repeat: Infinity, ease: "easeInOut", delay: ring.delay }}
+            animate={{
+              y: [0, -(window.innerHeight * 1.4)],
+              opacity: [0, 0.22, 0.22, 0],
+              rotate: [0, i % 2 === 0 ? 20 : -20],
+            }}
+            transition={{
+              duration: p.duration,
+              delay: p.delay,
+              repeat: Infinity,
+              ease: "linear",
+              times: [0, 0.15, 0.8, 1],
+            }}
           />
         ))}
-        {/* Subtle grid texture overlay */}
-        <div
-          className="absolute inset-0 z-0 pointer-events-none"
-          style={{
-            backgroundImage: "radial-gradient(rgba(180,120,40,0.06) 1px, transparent 1px)",
-            backgroundSize: "32px 32px",
-          }}
-        />
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
           {/* Eyebrow */}
           <motion.p
