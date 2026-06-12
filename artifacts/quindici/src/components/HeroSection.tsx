@@ -31,14 +31,28 @@ export default function HeroSection() {
           Willkommen bei Quindici
         </motion.h1>
 
-        <motion.h2
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.85, delay: 0.15, ease: "easeOut" }}
-          className="text-primary font-serif italic text-2xl md:text-3xl mt-3 mb-8"
+        <motion.div
+          initial={{ opacity: 0, scaleX: 0.6, y: 8 }}
+          animate={{ opacity: 1, scaleX: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.18, ease: [0.4, 0, 0.2, 1] }}
+          className="flex items-center gap-4 mt-4 mb-8"
         >
-          Trattoria Pizzeria
-        </motion.h2>
+          <motion.span
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
+            className="block h-px w-16 bg-primary/60 origin-left"
+          />
+          <h2 className="font-serif italic text-3xl md:text-4xl text-primary drop-shadow-sm tracking-wide">
+            Trattoria Pizzeria
+          </h2>
+          <motion.span
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
+            className="block h-px w-16 bg-primary/60 origin-right"
+          />
+        </motion.div>
 
         <motion.p
           initial={{ opacity: 0, y: 16 }}
