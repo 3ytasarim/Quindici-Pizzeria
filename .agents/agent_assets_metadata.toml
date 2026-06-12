@@ -30,6 +30,42 @@ uri = "file://artifacts/quindici/public/pizza-4.png"
 type = "image"
 title = "prosciutto rucola pizza"
 
+[[generated]]
+id = "djabz0QXuydJSUR6J-frJ"
+uri = "file://artifacts/quindici/public/dish-pizza-margherita.png"
+type = "image"
+title = "pizza margherita top view"
+
+[[generated]]
+id = "mGoQul7pGh82GOTUNGfVL"
+uri = "file://artifacts/quindici/public/dish-pasta-carbonara.png"
+type = "image"
+title = "pasta carbonara overhead"
+
+[[generated]]
+id = "x9CF0JCNbPTKCByzlpnhQ"
+uri = "file://artifacts/quindici/public/dish-tiramisu.png"
+type = "image"
+title = "tiramisu glass overhead"
+
+[[generated]]
+id = "2ovU3X6CMCLZSXWSQiTIp"
+uri = "file://artifacts/quindici/public/dish-polpo.png"
+type = "image"
+title = "grilled octopus polpo"
+
+[[generated]]
+id = "FVbL1SfJ_dClzpovjrPrv"
+uri = "file://artifacts/quindici/public/dish-carpaccio.png"
+type = "image"
+title = "beef carpaccio overhead"
+
+[[generated]]
+id = "PjQIhXlEL45G7jgAEexqs"
+uri = "file://artifacts/quindici/public/dish-pizza-diavola.png"
+type = "image"
+title = "pizza diavola spicy"
+
 [[outputs]]
 id = "c0nQt3A72QD9h-9-Fgbqy"
 uri = "file://artifacts/quindici/public/hero-bg.jpg"

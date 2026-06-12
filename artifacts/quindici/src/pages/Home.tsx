@@ -3,7 +3,7 @@ import HeroSection from "@/components/HeroSection";
 import BenvenutilSection from "@/components/BenvenutilSection";
 import InfoSection from "@/components/InfoSection";
 import MittagstischBanner from "@/components/MittagstischBanner";
-import FeaturesSection from "@/components/FeaturesSection";
+import LieblingsgerichteSection from "@/components/LieblingsgerichteSection";
 import LunchMenuSection from "@/components/LunchMenuSection";
 import MenuPreviewSection from "@/components/MenuPreviewSection";
 import AboutSection from "@/components/AboutSection";
@@ -19,7 +19,7 @@ export default function Home() {
         <BenvenutilSection />
         <InfoSection />
         <MittagstischBanner />
-        <FeaturesSection />
+        <LieblingsgerichteSection />
         <LunchMenuSection />
         <MenuPreviewSection />
         <AboutSection />
