@@ -62,14 +62,6 @@ export default function Kontakt() {
           }}
         />
         <div className="relative z-10 text-center px-6">
-          <motion.p
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-amber-700 uppercase tracking-[0.3em] text-xs font-semibold mb-4"
-          >
-            Quindici Trattoria Pizzeria
-          </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
