@@ -4,9 +4,9 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import MenuCard from "@/components/MenuCard";
 
 const hours = [
-  { day: "Mo – Fr",           time: "12:00 – 23:00 Uhr" },
-  { day: "Sa",                time: "17:00 – 23:00 Uhr" },
-  { day: "So (ab 6. Juni)",   time: "12:00 – 21:00 Uhr" },
+  { day: "Mo – Fr",  time: "12:00 – 23:00 Uhr" },
+  { day: "Sa",       time: "17:00 – 23:00 Uhr" },
+  { day: "So",       time: "Ruhetag" },
 ];
 
 export default function InfoSection() {
