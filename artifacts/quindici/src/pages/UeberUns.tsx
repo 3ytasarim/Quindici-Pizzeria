@@ -33,20 +33,6 @@ const rulerExpand = {
   visible: { scaleX: 1, transition: { duration: 0.5, ease: "easeOut", delay: 0.1 } },
 };
 
-const pillars = [
-  {
-    label: "Famiglia",
-    text: "Familiäres Ambiente, herzliche Gastgeber und ein Team, das mit Leidenschaft kocht.",
-  },
-  {
-    label: "Qualità",
-    text: "Frische Zutaten, handgemachter Teig und Rezepte, die aus Neapel direkt zu Ihnen kommen.",
-  },
-  {
-    label: "Passione",
-    text: "Jedes Gericht ist ein Ausdruck unserer Liebe zur italienischen Küche – ehrlich und authentisch.",
-  },
-];
 
 export default function UeberUns() {
   return (
@@ -391,30 +377,6 @@ export default function UeberUns() {
       {/* Mittagstisch Banner */}
       <MittagstischBanner />
 
-      {/* Three Pillars */}
-      <section className="py-20 md:py-28 bg-stone-50/60">
-        <div className="container mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 lg:gap-16">
-            {pillars.map((pillar, i) => (
-              <motion.div
-                key={pillar.label}
-                variants={fadeUp}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: i * 0.1 }}
-                className="flex flex-col items-center text-center"
-              >
-                <p className="text-amber-700 uppercase tracking-[0.3em] text-xs font-semibold mb-3">
-                  {pillar.label}
-                </p>
-                <div className="h-px w-10 bg-amber-600 mb-5" />
-                <p className="text-stone-600 text-[15px] leading-relaxed">{pillar.text}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>
