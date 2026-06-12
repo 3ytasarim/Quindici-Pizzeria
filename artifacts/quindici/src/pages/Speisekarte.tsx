@@ -203,6 +203,68 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
+const headingContainer = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.12 },
+  },
+};
+
+const tagLine = {
+  hidden: { opacity: 0, x: -18 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.45, ease: "easeOut" } },
+};
+
+const titleReveal = {
+  hidden: { opacity: 0, y: 28, clipPath: "inset(0 0 100% 0)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    clipPath: "inset(0 0 0% 0)",
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
+const rulerExpand = {
+  hidden: { scaleX: 0, originX: 0 },
+  visible: { scaleX: 1, originX: 0, transition: { duration: 0.5, ease: "easeOut", delay: 0.1 } },
+};
+
+function CategoryHeading({ subtitle, title }: { subtitle?: string; title: string }) {
+  return (
+    <motion.div
+      variants={headingContainer}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
+      className="mb-8"
+    >
+      {subtitle && (
+        <motion.p
+          variants={tagLine}
+          className="text-amber-700 uppercase tracking-[0.25em] text-xs font-semibold mb-2"
+        >
+          {subtitle}
+        </motion.p>
+      )}
+      <div style={{ overflow: "hidden" }}>
+        <motion.h2
+          variants={titleReveal}
+          className="text-4xl md:text-5xl font-bold text-stone-800 mb-3"
+          style={{ fontFamily: "'Playfair Display', serif" }}
+        >
+          {title}
+        </motion.h2>
+      </div>
+      <motion.div
+        variants={rulerExpand}
+        className="h-px w-16 bg-amber-600"
+        style={{ transformOrigin: "left" }}
+      />
+    </motion.div>
+  );
+}
+
 export default function Speisekarte() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#fdf8f2" }}>
@@ -210,12 +272,10 @@ export default function Speisekarte() {
 
       {/* Page Hero */}
       <section className="relative min-h-[52vh] flex items-center justify-center overflow-hidden">
-        {/* Background image — same as homepage */}
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url(/hero-bg.jpg)", opacity: 0.55 }}
         />
-        {/* Cream overlay */}
         <div
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
@@ -280,29 +340,17 @@ export default function Speisekarte() {
                 </motion.div>
 
                 {/* Content side */}
-                <motion.div
-                  variants={fadeUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-80px" }}
-                  className="flex-1 min-w-0"
-                >
-                  {/* Category header */}
-                  <div className="mb-8">
-                    <p className="text-amber-700 uppercase tracking-[0.25em] text-xs font-semibold mb-2">
-                      {cat.subtitle}
-                    </p>
-                    <h2
-                      className="text-4xl md:text-5xl font-bold text-stone-800 mb-3"
-                      style={{ fontFamily: "'Playfair Display', serif" }}
-                    >
-                      {cat.title}
-                    </h2>
-                    <div className="h-px w-16 bg-amber-600" />
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <CategoryHeading subtitle={cat.subtitle} title={cat.title} />
 
                   {/* Items */}
-                  <div className="space-y-0 divide-y divide-stone-200/70">
+                  <motion.div
+                    variants={fadeUp}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-60px" }}
+                    className="space-y-0 divide-y divide-stone-200/70"
+                  >
                     {cat.items.map((item) => (
                       <div key={item.name} className="py-4 flex justify-between items-start gap-4">
                         <div className="flex-1 min-w-0">
@@ -323,8 +371,8 @@ export default function Speisekarte() {
                         </span>
                       </div>
                     ))}
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               </div>
             </div>
           </section>
@@ -335,22 +383,32 @@ export default function Speisekarte() {
       <section id="getraenke" className="py-20 md:py-28">
         <div className="container mx-auto px-6">
           <motion.div
-            variants={fadeUp}
+            variants={headingContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <p className="text-amber-700 uppercase tracking-[0.3em] text-xs font-semibold mb-3">
-              Getränke
-            </p>
-            <h2
-              className="text-4xl md:text-5xl font-bold text-stone-800 mb-4"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+            <motion.p
+              variants={tagLine}
+              className="text-amber-700 uppercase tracking-[0.3em] text-xs font-semibold mb-3"
             >
               Getränke
-            </h2>
-            <div className="mx-auto h-px w-16 bg-amber-600" />
+            </motion.p>
+            <div style={{ overflow: "hidden" }}>
+              <motion.h2
+                variants={titleReveal}
+                className="text-4xl md:text-5xl font-bold text-stone-800 mb-4"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
+                Getränke
+              </motion.h2>
+            </div>
+            <motion.div
+              variants={rulerExpand}
+              className="mx-auto h-px w-16 bg-amber-600"
+              style={{ transformOrigin: "center" }}
+            />
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
