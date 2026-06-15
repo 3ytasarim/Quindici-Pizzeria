@@ -102,7 +102,7 @@ export default function BenvenutilSection() {
             <img
               src="/restaurant-exterior.jpg"
               alt="Quindici Trattoria Pizzeria Ludwigsburg"
-              className="absolute inset-0 w-full h-full object-cover object-top"
+              className="absolute inset-0 w-full h-full object-cover object-bottom"
             />
             <div className="absolute inset-0 ring-1 ring-inset ring-amber-200/40 pointer-events-none" />
           </motion.div>
