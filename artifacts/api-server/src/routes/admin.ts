@@ -6,7 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = path.resolve(__dirname, "../../uploads");
+const UPLOADS_DIR = path.resolve(__dirname, "../uploads");
 const META_FILE = path.join(UPLOADS_DIR, "meta.json");
 const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
 const ADMIN_USER = "admin";
