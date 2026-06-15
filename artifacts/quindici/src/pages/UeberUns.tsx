@@ -148,7 +148,7 @@ export default function UeberUns() {
       </section>
 
       {/* Team — Teil der Familie */}
-      <section className="relative overflow-hidden bg-stone-900 py-20 md:py-28">
+      <section className="relative overflow-hidden py-20 md:py-28" style={{ backgroundColor: "#fdf8f2" }}>
 
         <div className="container mx-auto px-6 relative z-10">
 
@@ -159,8 +159,8 @@ export default function UeberUns() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold text-white"
-              style={{ fontFamily: "'Playfair Display', serif" }}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold"
+              style={{ fontFamily: "'Playfair Display', serif", color: "#b45309" }}
             >
               Teil der Familie
             </motion.h2>
@@ -191,16 +191,16 @@ export default function UeberUns() {
                     alt={member.name}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                  {/* Dark gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-transparent to-transparent" />
+                  {/* Subtle gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                   {/* Amber line on hover bottom */}
                   <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-amber-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
                 </div>
 
                 {/* Name */}
                 <p
-                  className="text-white/80 text-[13px] font-medium group-hover:text-amber-400 transition-colors duration-300"
-                  style={{ fontFamily: "'Quicksand', sans-serif" }}
+                  className="text-[13px] font-medium transition-colors duration-300"
+                  style={{ color: "#b45309", fontFamily: "'Quicksand', sans-serif" }}
                 >
                   {member.name}
                 </p>
