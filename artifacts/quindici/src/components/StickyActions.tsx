@@ -5,11 +5,12 @@ interface StickyTabProps {
   label: string;
   icon: React.ReactNode;
   bgClass: string;
+  bgStyle?: React.CSSProperties;
   delay: number;
   paddingY: string;
 }
 
-function StickyTab({ label, icon, bgClass, delay, paddingY }: StickyTabProps) {
+function StickyTab({ label, icon, bgClass, bgStyle, delay, paddingY }: StickyTabProps) {
   return (
     <motion.button
       initial={{ x: "100%" }}
@@ -17,7 +18,7 @@ function StickyTab({ label, icon, bgClass, delay, paddingY }: StickyTabProps) {
       transition={{ duration: 0.5, delay, ease: [0.4, 0, 0.2, 1] }}
       whileHover={{ x: -6 }}
       className={`flex items-center gap-2.5 ${paddingY} px-3.5 ${bgClass} text-white shadow-lg cursor-pointer`}
-      style={{ borderRadius: 0 }}
+      style={{ borderRadius: 0, ...bgStyle }}
     >
       <span className="shrink-0">{icon}</span>
       <span
@@ -36,7 +37,8 @@ export default function StickyActions() {
       <StickyTab
         label="Tisch reservieren"
         icon={<CalendarCheck className="w-3.5 h-3.5" />}
-        bgClass="bg-amber-700 hover:bg-amber-800"
+        bgClass="hover:brightness-90"
+        bgStyle={{ backgroundColor: "#d4af37" }}
         delay={0.3}
         paddingY="py-7"
       />

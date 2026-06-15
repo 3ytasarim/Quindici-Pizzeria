@@ -53,13 +53,19 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-3 shrink-0">
           <Button
             variant="outline"
-            className="border-amber-600 text-amber-700 hover:bg-amber-50 hover:text-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 transition-all"
+            className="uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 transition-all"
+            style={{ borderColor: "#d4af37", color: "#d4af37", backgroundColor: "transparent" }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d4af3712"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
             data-testid="button-tisch-reservieren"
           >
             Tisch reservieren
           </Button>
           <Button
-            className="bg-amber-700 text-white hover:bg-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
+            className="text-white uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
+            style={{ backgroundColor: "#d4af37" }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#b8962e"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d4af37"; }}
             data-testid="button-jetzt-bestellen"
           >
             Jetzt bestellen
@@ -97,13 +103,15 @@ export default function Navbar() {
                 <div className="flex flex-col gap-3 mt-8 px-2">
                   <Button
                     variant="outline"
-                    className="w-full border-amber-600 text-amber-700 hover:bg-amber-50 uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                    className="w-full uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                    style={{ borderColor: "#d4af37", color: "#d4af37" }}
                     data-testid="mobile-button-tisch-reservieren"
                   >
                     Tisch reservieren
                   </Button>
                   <Button
-                    className="w-full bg-amber-700 text-white hover:bg-amber-800 uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                    className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                    style={{ backgroundColor: "#d4af37" }}
                     data-testid="mobile-button-jetzt-bestellen"
                   >
                     Jetzt bestellen
