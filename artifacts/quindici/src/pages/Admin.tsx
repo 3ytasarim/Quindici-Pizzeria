@@ -827,31 +827,6 @@ export default function Admin() {
             fetchPizza();
           };
 
-          // ── Gallery helpers ──
-          const openAddG = () => { setEditingGallery(null); setGalleryForm({ title: "", imageUrl: "" }); setGalleryFile(null); setGalleryStatus(null); setShowGalleryForm(true); };
-          const openEditG = (item: GalleryItem) => { setEditingGallery(item); setGalleryForm({ title: item.title, imageUrl: item.imageUrl }); setGalleryFile(null); setGalleryStatus(null); setShowGalleryForm(true); };
-          const closeG = () => { setShowGalleryForm(false); setEditingGallery(null); setGalleryFile(null); };
-          const submitGallery = async (e: React.FormEvent) => {
-            e.preventDefault(); setGalleryUploading(true); setGalleryStatus(null);
-            try {
-              const fd = new FormData();
-              if (galleryForm.title) fd.append("title", galleryForm.title);
-              if (galleryFile) fd.append("image", galleryFile);
-              else if (galleryForm.imageUrl) fd.append("imageUrl", galleryForm.imageUrl);
-              const url = editingGallery ? `${API}/admin/gallery/${editingGallery.id}` : `${API}/admin/gallery`;
-              const r = await fetch(url, { method: editingGallery ? "PUT" : "POST", headers: { Authorization: `Bearer ${token}` }, body: fd });
-              if (!r.ok) throw new Error((await r.json()).error ?? "Fehler");
-              setGalleryStatus({ type: "success", msg: editingGallery ? "Gespeichert" : "Hinzugefügt" });
-              fetchGallery(); closeG();
-            } catch (err: unknown) { setGalleryStatus({ type: "error", msg: err instanceof Error ? err.message : "Fehler" }); }
-            finally { setGalleryUploading(false); }
-          };
-          const deleteGallery = async (id: string) => {
-            if (!confirm("Bild löschen?")) return;
-            await fetch(`${API}/admin/gallery/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
-            fetchGallery();
-          };
-
           // Reusable image form
           const ImageForm = ({ file, setFile, fileRef, dragOver, setDragOver, form, setForm, uploading, onSubmit, onCancel, isEdit, labelField = false }: {
             file: File | null; setFile: (f: File | null) => void; fileRef: React.RefObject<HTMLInputElement | null>;
@@ -989,72 +964,6 @@ export default function Admin() {
                 ))}
               </div>
 
-              {/* ═══════════════ GALERIE FOTO BAND ═══════════════ */}
-              <div className="mt-12 pt-10 border-t border-white/8">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                  <div>
-                    <h2 className="text-lg font-semibold text-white">Foto-Galerie</h2>
-                    <p className="text-xs text-zinc-500 mt-0.5">{gallery.length} Bild{gallery.length !== 1 ? "er" : ""} · rollendes Fotoband am Seitenende</p>
-                  </div>
-                  <button onClick={openAddG} className="flex items-center gap-2 text-xs px-4 py-2.5 font-semibold uppercase tracking-widest shrink-0" style={{ backgroundColor: GOLD, color: "#000" }}>
-                    <Plus className="w-3.5 h-3.5" /> Foto hinzufügen
-                  </button>
-                </div>
-
-                {galleryStatus && (
-                  <div className={`mb-4 flex items-center gap-2 text-sm px-4 py-3 ${galleryStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
-                    {galleryStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
-                    {galleryStatus.msg}
-                  </div>
-                )}
-
-                <AnimatePresence>
-                  {showGalleryForm && (
-                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                      className="mb-6 border border-white/10 bg-[#1a1a1a] p-5 sm:p-6">
-                      <div className="flex items-center justify-between mb-5">
-                        <h3 className="text-sm font-semibold text-white uppercase tracking-widest">{editingGallery ? "Foto bearbeiten" : "Neues Foto"}</h3>
-                        <button onClick={closeG} className="text-zinc-500 hover:text-white"><X className="w-4 h-4" /></button>
-                      </div>
-                      <ImageForm file={galleryFile} setFile={setGalleryFile} fileRef={galleryFileRef}
-                        dragOver={galleryDragOver} setDragOver={setGalleryDragOver}
-                        form={galleryForm} setForm={setGalleryForm}
-                        uploading={galleryUploading} onSubmit={submitGallery} onCancel={closeG}
-                        isEdit={!!editingGallery} labelField={false} />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {gallery.length === 0 ? (
-                  <div className="text-center py-14 text-zinc-600 border border-white/5">
-                    <GalleryHorizontal className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                    <p className="text-sm">Noch keine Fotos. Fügen Sie Restaurantfotos hinzu.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {gallery.map(item => (
-                      <div key={item.id} className="flex items-center gap-4 border border-white/8 bg-[#111] p-3">
-                        <div className="w-16 h-12 shrink-0 overflow-hidden rounded-sm">
-                          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-white truncate">{item.title || <span className="text-zinc-500 italic">Kein Titel</span>}</p>
-                        </div>
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button onClick={() => openEditG(item)}
-                            className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-300 hover:border-[#d4af37] hover:text-[#d4af37] transition-colors">
-                            <Pencil className="w-3 h-3" /> Bearbeiten
-                          </button>
-                          <button onClick={() => deleteGallery(item.id)}
-                            className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-500 hover:border-red-500/40 hover:text-red-400 transition-colors">
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </>
           );
         })()}
