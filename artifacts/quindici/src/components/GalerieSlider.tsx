@@ -2,13 +2,16 @@ import { useEffect, useRef, useState } from "react";
 
 interface GalleryItem { id: string; title: string; imageUrl: string; }
 
-const INTERVAL = 3500;
+const CARD_W = 280;
+const GAP = 20;
+const SPEED = 0.6; // px per frame
 
 export default function GalerieSlider() {
   const [items, setItems] = useState<GalleryItem[]>([]);
-  const [idx, setIdx] = useState(0);
-  const [transitioning, setTransitioning] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const xRef = useRef(0);
+  const rafRef = useRef<number>(0);
+  const pausedRef = useRef(false);
 
   useEffect(() => {
     fetch("/api/gallery")
@@ -17,76 +20,76 @@ export default function GalerieSlider() {
       .catch(() => {});
   }, []);
 
-  const goTo = (next: number, resetT = false) => {
-    if (transitioning) return;
-    if (resetT && timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = setInterval(() => setIdx(p => (p + 1) % items.length), INTERVAL);
-    }
-    setTransitioning(true);
-    setTimeout(() => {
-      setIdx((next + items.length) % items.length);
-      setTransitioning(false);
-    }, 350);
-  };
-
   useEffect(() => {
-    if (items.length < 2) return;
-    timerRef.current = setInterval(() => setIdx(p => (p + 1) % items.length), INTERVAL);
-    return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [items.length]);
+    if (items.length === 0) return;
+    const track = trackRef.current;
+    if (!track) return;
+
+    const itemW = CARD_W + GAP;
+    const totalW = itemW * items.length;
+
+    const animate = () => {
+      if (!pausedRef.current) {
+        xRef.current -= SPEED;
+        if (xRef.current <= -totalW) xRef.current += totalW;
+        track.style.transform = `translateX(${xRef.current}px)`;
+      }
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [items]);
 
   if (items.length === 0) return null;
 
+  // Triple-duplicate so the loop is seamless regardless of viewport width
+  const displayed = [...items, ...items, ...items];
+
   return (
     <section className="py-16 md:py-24" style={{ backgroundColor: "#fdf8f2" }}>
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
-        <div className="text-center mb-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mb-10">
+        <div className="text-center">
           <p className="text-xs tracking-[0.25em] uppercase mb-3" style={{ color: "#d4af37" }}>
             Quindici Trattoria Pizzeria
           </p>
           <h2 className="font-serif text-3xl md:text-4xl text-stone-800">Galerie</h2>
         </div>
+      </div>
 
-        {/* Main image */}
+      {/* Scrolling band — full width, overflow hidden */}
+      <div
+        className="w-full overflow-hidden"
+        onMouseEnter={() => { pausedRef.current = true; }}
+        onMouseLeave={() => { pausedRef.current = false; }}
+      >
         <div
-          className="aspect-[4/3] overflow-hidden rounded-sm shadow-xl transition-opacity duration-350"
-          style={{ opacity: transitioning ? 0 : 1 }}
+          ref={trackRef}
+          className="flex"
+          style={{ gap: GAP, willChange: "transform" }}
         >
-          <img
-            key={idx}
-            src={items[idx].imageUrl}
-            alt={items[idx].title}
-            className="w-full h-full object-cover"
-          />
+          {displayed.map((item, i) => (
+            <div
+              key={i}
+              className="shrink-0 overflow-hidden rounded-sm shadow-md"
+              style={{ width: CARD_W }}
+            >
+              <div className="aspect-[4/3]">
+                <img
+                  src={item.imageUrl}
+                  alt={item.title}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+              </div>
+              {item.title && (
+                <p className="text-xs text-stone-500 text-center px-2 py-1.5 truncate">
+                  {item.title}
+                </p>
+              )}
+            </div>
+          ))}
         </div>
-
-        {items[idx].title && (
-          <p
-            className="text-center text-sm text-stone-500 mt-3 transition-opacity duration-350"
-            style={{ opacity: transitioning ? 0 : 1 }}
-          >
-            {items[idx].title}
-          </p>
-        )}
-
-        {/* Dots */}
-        {items.length > 1 && (
-          <div className="flex justify-center gap-2 mt-6">
-            {items.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goTo(i, true)}
-                className="rounded-full transition-all duration-300"
-                style={{
-                  width: i === idx ? 24 : 8,
-                  height: 8,
-                  backgroundColor: i === idx ? "#d4af37" : "#d6cfc4",
-                }}
-              />
-            ))}
-          </div>
-        )}
       </div>
     </section>
   );
