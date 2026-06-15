@@ -90,6 +90,10 @@ export default function TischReservieren() {
 
   // Warteliste state
   const [warteView, setWarteView] = useState(false);
+  const [warteGuests, setWarteGuests] = useState("2");
+  const [warteDate, setWarteDate] = useState(todayStr());
+  const [warteStart, setWarteStart] = useState("19:00");
+  const [warteEnd, setWarteEnd] = useState("21:00");
   const [warteFirstName, setWarteFirstName] = useState("");
   const [warteLastName, setWarteLastName] = useState("");
   const [warteEmail, setWarteEmail] = useState("");
@@ -412,14 +416,14 @@ export default function TischReservieren() {
                                   className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
                                   style={{ backgroundColor: GOLD }}
                                 >
-                                  <Bell className="w-4.5 h-4.5 text-white" />
+                                  <Bell className="w-5 h-5 text-white" />
                                 </div>
                                 <div>
                                   <h3 className="font-serif text-lg text-stone-800 leading-tight">
                                     Benachrichtigung einrichten
                                   </h3>
                                   <p className="text-xs text-stone-400 mt-0.5">
-                                    Für {formatDate(f1.date)} · {f1.time} Uhr · {f1.guests} {Number(f1.guests) === 1 ? "Person" : "Personen"}
+                                    für Quindici Trattoria Pizzeria
                                   </p>
                                 </div>
                               </div>
@@ -430,7 +434,80 @@ export default function TischReservieren() {
 
                             {/* Form body */}
                             <div className="px-8 md:px-10 py-6 space-y-5">
-                              {/* Gäste Details */}
+
+                              {/* ── Booking details: 2×2 grid ── */}
+                              <div className="grid grid-cols-2 gap-4">
+                                {/* Personenzahl */}
+                                <div>
+                                  <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
+                                    <Users className="w-3 h-3" />Personenzahl
+                                  </label>
+                                  <select
+                                    value={warteGuests}
+                                    onChange={e => setWarteGuests(e.target.value)}
+                                    className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none bg-white appearance-none cursor-pointer"
+                                    onFocus={e => (e.target.style.borderColor = GOLD)}
+                                    onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                                  >
+                                    {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
+                                      <option key={n} value={String(n)}>
+                                        {n} {n === 1 ? "Person" : "Personen"}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                                {/* Datum */}
+                                <div>
+                                  <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
+                                    <Calendar className="w-3 h-3" />Datum
+                                  </label>
+                                  <input
+                                    type="date"
+                                    min={todayStr()}
+                                    value={warteDate}
+                                    onChange={e => setWarteDate(e.target.value)}
+                                    className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none"
+                                    onFocus={e => (e.target.style.borderColor = GOLD)}
+                                    onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                                  />
+                                </div>
+                                {/* Startzeit */}
+                                <div>
+                                  <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
+                                    <Clock className="w-3 h-3" />Startzeit
+                                  </label>
+                                  <select
+                                    value={warteStart}
+                                    onChange={e => setWarteStart(e.target.value)}
+                                    className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none bg-white appearance-none cursor-pointer"
+                                    onFocus={e => (e.target.style.borderColor = GOLD)}
+                                    onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                                  >
+                                    {ALL_TIMES.map(t => (
+                                      <option key={t} value={t}>{t}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                                {/* Ende */}
+                                <div>
+                                  <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
+                                    <Clock className="w-3 h-3" />Ende
+                                  </label>
+                                  <select
+                                    value={warteEnd}
+                                    onChange={e => setWarteEnd(e.target.value)}
+                                    className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none bg-white appearance-none cursor-pointer"
+                                    onFocus={e => (e.target.style.borderColor = GOLD)}
+                                    onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                                  >
+                                    {ALL_TIMES.map(t => (
+                                      <option key={t} value={t}>{t}</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+
+                              {/* ── Gäste Details ── */}
                               <div>
                                 <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-3">
                                   Gäste Details
