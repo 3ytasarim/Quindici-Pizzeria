@@ -9,19 +9,36 @@ import {
 const GOLD = "#d4af37";
 const BG = "#fdf8f2";
 
-const TIMES = [
+const ALL_TIMES = [
   "11:30","12:00","12:30","13:00","13:30","14:00","14:30","15:00",
   "17:00","17:30","18:00","18:30","19:00","19:30","20:00","20:30",
   "21:00","21:30","22:00","22:30","23:00",
 ];
 
 function todayStr() {
-  return new Date().toISOString().split("T")[0];
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function getAvailableTimes(date: string): string[] {
+  if (date !== todayStr()) return ALL_TIMES;
+  const now = new Date();
+  // require at least 60 minutes ahead
+  const cutoff = now.getHours() * 60 + now.getMinutes() + 60;
+  return ALL_TIMES.filter(t => {
+    const [h, m] = t.split(":").map(Number);
+    return h * 60 + m > cutoff;
+  });
+}
+
+function firstAvailableTime(date: string): string {
+  const times = getAvailableTimes(date);
+  return times[0] ?? "19:00";
 }
 
 function formatDate(iso: string) {
   if (!iso) return "—";
-  return new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "long", year: "numeric" }).format(new Date(iso));
+  return new Intl.DateTimeFormat("de-DE", { day: "2-digit", month: "long", year: "numeric" }).format(new Date(iso + "T12:00:00"));
 }
 
 const steps = [
@@ -44,7 +61,7 @@ export default function TischReservieren() {
   const [dir, setDir] = useState(1);
   const [submitted, setSubmitted] = useState(false);
 
-  const [f1, setF1] = useState<Form1>({ date: todayStr(), time: "19:00", guests: "2" });
+  const [f1, setF1] = useState<Form1>({ date: todayStr(), time: firstAvailableTime(todayStr()), guests: "2" });
   const [f2, setF2] = useState<Form2>({ firstName: "", lastName: "", phone: "", email: "", notes: "" });
 
   const [errors2, setErrors2] = useState<Partial<Form2>>({});
@@ -164,7 +181,12 @@ export default function TischReservieren() {
                           type="date"
                           min={todayStr()}
                           value={f1.date}
-                          onChange={e => setF1(p => ({ ...p, date: e.target.value }))}
+                          onChange={e => {
+                            const d = e.target.value;
+                            const times = getAvailableTimes(d);
+                            const time = times.includes(f1.time) ? f1.time : (times[0] ?? f1.time);
+                            setF1(p => ({ ...p, date: d, time }));
+                          }}
                           className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none transition-colors"
                           style={{ "--tw-ring-color": GOLD } as any}
                           onFocus={e => (e.target.style.borderColor = GOLD)}
@@ -184,7 +206,7 @@ export default function TischReservieren() {
                           onFocus={e => (e.target.style.borderColor = GOLD)}
                           onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
                         >
-                          {TIMES.map(t => <option key={t} value={t}>{t} Uhr</option>)}
+                          {getAvailableTimes(f1.date).map(t => <option key={t} value={t}>{t} Uhr</option>)}
                         </select>
                       </div>
 
