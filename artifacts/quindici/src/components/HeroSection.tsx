@@ -4,26 +4,36 @@ import { UtensilsCrossed } from "lucide-react";
 export default function HeroSection() {
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-background">
-      {/* Background image */}
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-stone-900">
+
+      {/* Background video */}
+      <video
+        className="absolute inset-0 w-full h-full object-cover"
+        style={{ zIndex: 0 }}
+        autoPlay
+        loop
+        muted
+        playsInline
+      >
+        <source src="/hero-video.mov" type="video/mp4" />
+        <source src="/hero-video.mov" type="video/quicktime" />
+      </video>
+
+      {/* Dark shadow overlay — so text stays readable */}
       <div
-        className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url(/hero-bg.jpg)", opacity: 0.55 }}
-      />
-      {/* White fade overlay — heavier at top, lighter at bottom */}
-      <div
-        className="absolute inset-0 z-0 pointer-events-none"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: "linear-gradient(to bottom, rgba(253,248,242,0.72) 0%, rgba(253,248,242,0.45) 50%, rgba(253,248,242,0.65) 100%)",
+          zIndex: 1,
+          background: "linear-gradient(to bottom, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.30) 50%, rgba(0,0,0,0.55) 100%)",
         }}
       />
 
-      <div className="container relative z-10 px-4 py-20 mx-auto text-center flex flex-col items-center">
+      <div className="container relative px-4 py-20 mx-auto text-center flex flex-col items-center" style={{ zIndex: 2 }}>
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, ease: "easeOut" }}
-          className="text-5xl md:text-7xl lg:text-8xl font-serif text-foreground leading-tight"
+          className="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-tight drop-shadow-lg"
         >
           Willkommen bei Quindici
         </motion.h1>
@@ -38,16 +48,18 @@ export default function HeroSection() {
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
-            className="block h-px w-16 bg-primary/60 origin-left"
+            className="block h-px w-16 origin-left"
+            style={{ backgroundColor: "#f59e0b" }}
           />
-          <h2 className="font-serif italic text-3xl md:text-4xl text-primary drop-shadow-sm tracking-wide">
+          <h2 className="font-serif italic text-3xl md:text-4xl tracking-wide drop-shadow-md" style={{ color: "#f59e0b" }}>
             Trattoria Pizzeria
           </h2>
           <motion.span
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
-            className="block h-px w-16 bg-primary/60 origin-right"
+            className="block h-px w-16 origin-right"
+            style={{ backgroundColor: "#f59e0b" }}
           />
         </motion.div>
 
@@ -55,7 +67,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.85, delay: 0.28, ease: "easeOut" }}
-          className="text-lg md:text-xl text-foreground/70 max-w-2xl mx-auto mb-10"
+          className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto mb-10 drop-shadow"
         >
           Italienische Auszeit mit frischen, regionalen Zutaten mitten in Ludwigsburg
         </motion.p>
@@ -66,18 +78,17 @@ export default function HeroSection() {
           transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
         >
           <motion.button
-            whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(180,130,50,0.25)" }}
+            whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(245,158,11,0.35)" }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="inline-flex items-center gap-2.5 px-7 py-3 rounded-full border border-amber-600/50 bg-white/70 backdrop-blur-sm text-sm font-semibold text-amber-800 shadow-sm hover:bg-amber-50/80 transition-colors"
+            className="inline-flex items-center gap-2.5 px-7 py-3 border border-amber-400/60 bg-black/30 backdrop-blur-sm text-sm font-semibold text-amber-300 shadow-sm hover:bg-amber-500/20 transition-colors"
             data-testid="button-mittagstisch-der-woche"
           >
-            {/* Pulsing dot */}
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
             </span>
-            <UtensilsCrossed className="w-3.5 h-3.5 text-amber-600" />
+            <UtensilsCrossed className="w-3.5 h-3.5 text-amber-400" />
             Mittagstisch der Woche
           </motion.button>
         </motion.div>
