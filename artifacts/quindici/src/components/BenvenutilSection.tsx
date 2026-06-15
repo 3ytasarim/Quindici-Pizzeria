@@ -99,12 +99,12 @@ export default function BenvenutilSection() {
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.5, ease: "easeOut" }}
             className="relative overflow-hidden shadow-xl"
-            style={{ minHeight: 260 }}
+            style={{ height: 460 }}
           >
             <img
               src="/restaurant-exterior.jpg"
               alt="Quindici Trattoria Pizzeria Ludwigsburg"
-              className="w-full h-full object-cover object-top absolute inset-0"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
             <div className="absolute inset-0 ring-1 ring-inset ring-amber-200/40 pointer-events-none" />
           </motion.div>
