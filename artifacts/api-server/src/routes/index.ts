@@ -5,6 +5,7 @@ import mittagstischRouter from "./mittagstisch";
 import dishesRouter from "./dishes";
 import reservationsRouter from "./reservations";
 import galleryRouter from "./gallery";
+import pizzaRouter from "./pizza";
 
 const router: IRouter = Router();
 
@@ -14,5 +15,6 @@ router.use(mittagstischRouter);
 router.use(dishesRouter);
 router.use(reservationsRouter);
 router.use(galleryRouter);
+router.use(pizzaRouter);
 
 export default router;
