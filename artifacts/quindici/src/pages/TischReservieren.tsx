@@ -9,6 +9,91 @@ import {
 
 const GOLD = "#d4af37";
 const BG = "#fdf8f2";
+
+/* ── Animated gold starfield ── */
+function StarCanvas() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d")!;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
+    // Generate stars
+    const STAR_COUNT = 90;
+    type Star = { x: number; y: number; r: number; speed: number; opacity: number; twinkleSpeed: number; twinkleOffset: number; };
+    const stars: Star[] = Array.from({ length: STAR_COUNT }, () => ({
+      x: Math.random(),
+      y: Math.random(),
+      r: Math.random() * 2 + 0.5,
+      speed: Math.random() * 0.00008 + 0.00003,
+      opacity: Math.random() * 0.5 + 0.15,
+      twinkleSpeed: Math.random() * 0.02 + 0.008,
+      twinkleOffset: Math.random() * Math.PI * 2,
+    }));
+
+    let frame = 0;
+    let raf: number;
+
+    const draw = () => {
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.clearRect(0, 0, w, h);
+
+      stars.forEach(s => {
+        // Drift upward, wrap
+        s.y -= s.speed;
+        if (s.y < 0) { s.y = 1; s.x = Math.random(); }
+
+        // Twinkle
+        const alpha = s.opacity * (0.5 + 0.5 * Math.sin(frame * s.twinkleSpeed + s.twinkleOffset));
+
+        // 4-pointed star shape
+        const cx = s.x * w;
+        const cy = s.y * h;
+        const outer = s.r;
+        const inner = s.r * 0.38;
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = "#b8952a";
+        ctx.beginPath();
+        for (let i = 0; i < 8; i++) {
+          const angle = (i * Math.PI) / 4 - Math.PI / 2;
+          const dist = i % 2 === 0 ? outer : inner;
+          const px = cx + Math.cos(angle) * dist;
+          const py = cy + Math.sin(angle) * dist;
+          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      });
+
+      frame++;
+      raf = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      style={{ zIndex: 0 }}
+    />
+  );
+}
 const COUNTDOWN_SECONDS = 5 * 60; // 5 minutes
 
 const ALL_TIMES = [
@@ -146,7 +231,10 @@ export default function TischReservieren() {
   const noAvailability = availableTimes.length === 0;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: BG }}>
+    <div className="relative min-h-screen flex flex-col overflow-hidden" style={{ backgroundColor: BG }}>
+      <StarCanvas />
+      {/* All content above the starfield */}
+      <div className="relative z-10 flex flex-col min-h-screen">
       {/* Top bar */}
       <div className="flex items-center justify-between px-6 md:px-12 py-5 border-b border-stone-200/70">
         <Link
@@ -877,6 +965,7 @@ export default function TischReservieren() {
           </AnimatePresence>
         </div>
       </div>
+      </div>{/* /z-10 content wrapper */}
     </div>
   );
 }
