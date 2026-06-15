@@ -89,9 +89,11 @@ export default function TischReservieren() {
   const [errors2, setErrors2] = useState<Partial<Form2>>({});
 
   // Warteliste state
-  const [showWarteliste, setShowWarteliste] = useState(false);
+  const [warteFirstName, setWarteFirstName] = useState("");
+  const [warteLastName, setWarteLastName] = useState("");
   const [warteEmail, setWarteEmail] = useState("");
   const [wartePhone, setWartePhone] = useState("");
+  const [warteNotif, setWarteNotif] = useState<"email" | "email_sms">("email_sms");
   const [warteSubmitted, setWarteSubmitted] = useState(false);
 
   // Countdown
@@ -320,72 +322,137 @@ export default function TischReservieren() {
                       Weiter <ArrowRight className="w-4 h-4" />
                     </button>
 
-                    {/* Warteliste toggle */}
-                    <div className="mt-5 border-t border-stone-100 pt-5">
-                      {!showWarteliste ? (
-                        <button
-                          type="button"
-                          onClick={() => setShowWarteliste(true)}
-                          className="w-full flex items-center justify-center gap-2 text-xs text-stone-400 hover:text-stone-600 transition-colors"
-                        >
-                          <Bell className="w-3.5 h-3.5" />
-                          Auf die Warteliste setzen lassen
-                        </button>
-                      ) : warteSubmitted ? (
+                    {/* ── Warteliste ── always visible */}
+                    <div className="mt-6 border-t border-stone-200 pt-0">
+                      {warteSubmitted ? (
                         <motion.div
                           initial={{ opacity: 0, y: 8 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="flex items-start gap-3 bg-green-50 border border-green-200 px-4 py-3"
+                          className="mt-6 flex items-start gap-3 bg-green-50 border border-green-200 px-5 py-4"
                         >
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                          <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
                           <div>
-                            <p className="text-sm font-medium text-green-800">Auf der Warteliste!</p>
-                            <p className="text-xs text-green-600 mt-0.5">
-                              Wir benachrichtigen Sie, sobald ein Tisch für {formatDate(f1.date)} um {f1.time} Uhr frei wird.
+                            <p className="text-sm font-semibold text-green-800">Sie sind auf der Warteliste!</p>
+                            <p className="text-xs text-green-600 mt-1 leading-relaxed">
+                              Wir benachrichtigen Sie, sobald ein Tisch für den {formatDate(f1.date)} um {f1.time} Uhr verfügbar wird.
                             </p>
+                            <button
+                              type="button"
+                              onClick={() => { setWarteSubmitted(false); setWarteEmail(""); setWartePhone(""); setWarteFirstName(""); setWarteLastName(""); }}
+                              className="mt-2 text-xs text-green-700 underline underline-offset-2"
+                            >
+                              Zurück
+                            </button>
                           </div>
                         </motion.div>
                       ) : (
                         <motion.div
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="space-y-3"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="mt-0"
                         >
-                          <p className="text-xs text-stone-500 text-center mb-3 flex items-center justify-center gap-1.5">
-                            <Bell className="w-3.5 h-3.5" style={{ color: GOLD }} />
-                            Benachrichtigung für {formatDate(f1.date)} um {f1.time} Uhr
-                          </p>
-                          <input
-                            type="email"
-                            value={warteEmail}
-                            onChange={e => setWarteEmail(e.target.value)}
-                            placeholder="E-Mail-Adresse *"
-                            className="w-full border border-stone-200 px-4 py-2.5 text-stone-800 text-sm focus:outline-none"
-                            onFocus={e => (e.target.style.borderColor = GOLD)}
-                            onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
-                          />
-                          <input
-                            type="tel"
-                            value={wartePhone}
-                            onChange={e => setWartePhone(e.target.value)}
-                            placeholder="Telefonnummer (optional)"
-                            className="w-full border border-stone-200 px-4 py-2.5 text-stone-800 text-sm focus:outline-none"
-                            onFocus={e => (e.target.style.borderColor = GOLD)}
-                            onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
-                          />
-                          <div className="flex gap-2">
-                            <button
-                              type="button"
-                              onClick={() => setShowWarteliste(false)}
-                              className="flex-1 py-2.5 text-xs font-semibold uppercase tracking-widest text-stone-400 border border-stone-200 hover:border-stone-400 transition-colors"
+                          {/* Header strip */}
+                          <div
+                            className="flex items-center gap-3 px-6 py-4 -mx-8 md:-mx-10"
+                            style={{ backgroundColor: "#fdf3d0" }}
+                          >
+                            <div
+                              className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                              style={{ backgroundColor: GOLD }}
                             >
-                              Abbrechen
-                            </button>
+                              <Bell className="w-4 h-4 text-white" />
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-stone-800">
+                                Benachrichtigung einrichten
+                              </p>
+                              <p className="text-xs text-stone-500 mt-0.5 leading-snug">
+                                Wir informieren Sie, wenn zu Ihrer gewünschten Zeit ein Tisch frei wird.
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="mt-5 space-y-3">
+                            {/* Name row */}
+                            <div className="grid grid-cols-2 gap-3">
+                              <input
+                                type="text"
+                                value={warteFirstName}
+                                onChange={e => setWarteFirstName(e.target.value)}
+                                placeholder="Vorname"
+                                className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none transition-colors"
+                                onFocus={e => (e.target.style.borderColor = GOLD)}
+                                onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                              />
+                              <input
+                                type="text"
+                                value={warteLastName}
+                                onChange={e => setWarteLastName(e.target.value)}
+                                placeholder="Nachname"
+                                className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none transition-colors"
+                                onFocus={e => (e.target.style.borderColor = GOLD)}
+                                onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                              />
+                            </div>
+                            {/* Contact row */}
+                            <div className="grid grid-cols-2 gap-3">
+                              <input
+                                type="tel"
+                                value={wartePhone}
+                                onChange={e => setWartePhone(e.target.value)}
+                                placeholder="Telefonnummer"
+                                className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none transition-colors"
+                                onFocus={e => (e.target.style.borderColor = GOLD)}
+                                onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                              />
+                              <input
+                                type="email"
+                                value={warteEmail}
+                                onChange={e => setWarteEmail(e.target.value)}
+                                placeholder="E-Mail-Adresse *"
+                                className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none transition-colors"
+                                onFocus={e => (e.target.style.borderColor = GOLD)}
+                                onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                              />
+                            </div>
+
+                            {/* Notification type */}
+                            <div className="pt-1 space-y-2">
+                              <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest">
+                                Update-Benachrichtigungen
+                              </p>
+                              {[
+                                { val: "email" as const, label: "Updates nur per E-Mail erhalten" },
+                                { val: "email_sms" as const, label: "Updates per E-Mail und SMS erhalten" },
+                              ].map(opt => (
+                                <label key={opt.val} className="flex items-center gap-2.5 cursor-pointer group">
+                                  <span
+                                    className="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+                                    style={{
+                                      borderColor: warteNotif === opt.val ? GOLD : "#d6d3d1",
+                                      backgroundColor: warteNotif === opt.val ? GOLD : "transparent",
+                                    }}
+                                    onClick={() => setWarteNotif(opt.val)}
+                                  >
+                                    {warteNotif === opt.val && (
+                                      <span className="w-1.5 h-1.5 rounded-full bg-white block" />
+                                    )}
+                                  </span>
+                                  <span
+                                    className="text-sm text-stone-600 group-hover:text-stone-800 transition-colors"
+                                    onClick={() => setWarteNotif(opt.val)}
+                                  >
+                                    {opt.label}
+                                  </span>
+                                </label>
+                              ))}
+                            </div>
+
                             <button
                               type="button"
                               disabled={!warteEmail.trim()}
                               onClick={() => { if (warteEmail.trim()) setWarteSubmitted(true); }}
-                              className="flex-[2] py-2.5 text-xs font-semibold uppercase tracking-widest text-black disabled:opacity-40 hover:opacity-90 transition-opacity"
+                              className="w-full py-3 text-sm font-semibold uppercase tracking-widest text-black disabled:opacity-40 hover:opacity-90 transition-opacity mt-1"
                               style={{ backgroundColor: GOLD }}
                             >
                               Benachrichtigung aktivieren
