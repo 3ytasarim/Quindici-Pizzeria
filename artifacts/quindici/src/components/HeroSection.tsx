@@ -29,6 +29,17 @@ export default function HeroSection() {
       />
 
       <div className="container relative px-4 py-20 mx-auto text-center flex flex-col items-center" style={{ zIndex: 2 }}>
+
+        {/* Logo above heading */}
+        <motion.img
+          src="/logo.png"
+          alt="Quindici Logo"
+          initial={{ opacity: 0, scale: 0.85 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
+          className="w-36 md:w-44 h-auto mb-6 drop-shadow-lg"
+        />
+
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -49,9 +60,9 @@ export default function HeroSection() {
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
             className="block h-px w-16 origin-left"
-            style={{ backgroundColor: "#f59e0b" }}
+            style={{ backgroundColor: "#d4af37" }}
           />
-          <h2 className="font-serif italic text-3xl md:text-4xl tracking-wide drop-shadow-md" style={{ color: "#b45309" }}>
+          <h2 className="font-serif italic text-3xl md:text-4xl tracking-wide drop-shadow-md" style={{ color: "#d4af37" }}>
             Trattoria Pizzeria
           </h2>
           <motion.span
@@ -59,7 +70,7 @@ export default function HeroSection() {
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
             className="block h-px w-16 origin-right"
-            style={{ backgroundColor: "#f59e0b" }}
+            style={{ backgroundColor: "#d4af37" }}
           />
         </motion.div>
 
