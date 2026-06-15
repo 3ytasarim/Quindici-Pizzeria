@@ -90,7 +90,6 @@ export default function BenvenutilSection() {
             </p>
             <p>
               Genießen Sie eine warme Atmosphäre, sorgfältig ausgewählte Weine und Gerichte,
-              die mit echtem Herzblut zubereitet werden – das ist Quindici.
             </p>
           </motion.div>
 
