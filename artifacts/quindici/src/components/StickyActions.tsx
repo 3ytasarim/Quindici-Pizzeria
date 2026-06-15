@@ -42,13 +42,15 @@ export default function StickyActions() {
         delay={0.3}
         paddingY="py-7"
       />
-      <StickyTab
-        label="Jetzt bestellen"
-        icon={<Utensils className="w-3.5 h-3.5" />}
-        bgClass="bg-stone-800 hover:bg-stone-900"
-        delay={0.45}
-        paddingY="py-4"
-      />
+      <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
+        <StickyTab
+          label="Jetzt bestellen"
+          icon={<Utensils className="w-3.5 h-3.5" />}
+          bgClass="bg-stone-800 hover:bg-stone-900"
+          delay={0.45}
+          paddingY="py-4"
+        />
+      </a>
     </div>
   );
 }

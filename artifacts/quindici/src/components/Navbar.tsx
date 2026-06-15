@@ -61,15 +61,17 @@ export default function Navbar() {
           >
             Tisch reservieren
           </Button>
-          <Button
-            className="text-white uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
-            style={{ backgroundColor: "#d4af37" }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#b8962e"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d4af37"; }}
-            data-testid="button-jetzt-bestellen"
-          >
-            Jetzt bestellen
-          </Button>
+          <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
+            <Button
+              className="text-white uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
+              style={{ backgroundColor: "#d4af37" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#b8962e"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d4af37"; }}
+              data-testid="button-jetzt-bestellen"
+            >
+              Jetzt bestellen
+            </Button>
+          </a>
         </div>
 
         {/* Mobile Nav */}
@@ -109,13 +111,15 @@ export default function Navbar() {
                   >
                     Tisch reservieren
                   </Button>
-                  <Button
-                    className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
-                    style={{ backgroundColor: "#d4af37" }}
-                    data-testid="mobile-button-jetzt-bestellen"
-                  >
-                    Jetzt bestellen
-                  </Button>
+                  <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer" className="w-full">
+                    <Button
+                      className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                      style={{ backgroundColor: "#d4af37" }}
+                      data-testid="mobile-button-jetzt-bestellen"
+                    >
+                      Jetzt bestellen
+                    </Button>
+                  </a>
                 </div>
               </div>
             </SheetContent>
