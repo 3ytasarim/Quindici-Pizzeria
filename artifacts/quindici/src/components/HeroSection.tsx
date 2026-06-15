@@ -81,14 +81,15 @@ export default function HeroSection() {
             whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(245,158,11,0.35)" }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="inline-flex items-center gap-2.5 px-7 py-3 border border-amber-400/60 bg-black/30 backdrop-blur-sm text-sm font-semibold text-amber-300 shadow-sm hover:bg-amber-500/20 transition-colors"
+            className="inline-flex items-center gap-2.5 px-7 py-3 border border-amber-700/70 bg-black/30 backdrop-blur-sm text-sm font-semibold shadow-sm hover:bg-amber-700/20 transition-colors"
+            style={{ color: "#b45309" }}
             data-testid="button-mittagstisch-der-woche"
           >
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-60" />
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ backgroundColor: "#b45309" }} />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: "#b45309" }} />
             </span>
-            <UtensilsCrossed className="w-3.5 h-3.5 text-amber-400" />
+            <UtensilsCrossed className="w-3.5 h-3.5" style={{ color: "#b45309" }} />
             Mittagstisch der Woche
           </motion.button>
         </motion.div>
