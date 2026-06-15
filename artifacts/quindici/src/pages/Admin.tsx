@@ -4,7 +4,7 @@ import {
   Upload, LogOut, FileText, CheckCircle, AlertCircle,
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
-  RefreshCw,
+  RefreshCw, ChevronLeft, ChevronRight,
 } from "lucide-react";
 
 const API = "/api";
@@ -97,6 +97,8 @@ export default function Admin() {
   const [lastCount, setLastCount] = useState<number | null>(null);
   const [newBadge, setNewBadge] = useState(0);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const [calendarDate, setCalendarDate] = useState(() => { const d = new Date(); d.setDate(1); return d; });
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const tokenRef = useRef(token);
   tokenRef.current = token;
@@ -531,111 +533,231 @@ export default function Admin() {
         )}
 
         {/* ── RESERVIERUNGEN ── */}
-        {tab === "reservierungen" && (
-          <>
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6 sm:mb-8">
-              <div>
-                <h2 className="text-lg sm:text-xl font-semibold">Reservierungen</h2>
-                <p className="text-zinc-400 text-sm mt-1 flex items-center gap-1.5 flex-wrap">
-                  <RefreshCw className="w-3 h-3 animate-spin shrink-0" style={{ animationDuration: "3s" }} />
-                  Echtzeit-Aktualisierung alle 2 Sek.
-                  {lastRefresh && (
-                    <span className="text-zinc-600">
-                      — {lastRefresh.toLocaleTimeString("de-DE")}
-                    </span>
-                  )}
-                </p>
+        {tab === "reservierungen" && (() => {
+          /* ── calendar helpers ── */
+          const year = calendarDate.getFullYear();
+          const month = calendarDate.getMonth();
+          const firstWeekday = new Date(year, month, 1).getDay(); // 0=Sun
+          // shift so Monday=0
+          const startOffset = (firstWeekday + 6) % 7;
+          const daysInMonth = new Date(year, month + 1, 0).getDate();
+          const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+          // per-day counts
+          const countsByDay: Record<string, { bestätigt: number; neu: number; total: number }> = {};
+          reservations.forEach(r => {
+            if (!countsByDay[r.date]) countsByDay[r.date] = { bestätigt: 0, neu: 0, total: 0 };
+            countsByDay[r.date].total++;
+            if (r.status === "bestätigt") countsByDay[r.date].bestätigt++;
+            if (r.status === "neu") countsByDay[r.date].neu++;
+          });
+
+          const todayStr = new Date().toISOString().slice(0, 10);
+          const monthNames = ["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"];
+          const dayLabels = ["Mo","Di","Mi","Do","Fr","Sa","So"];
+
+          const filteredReservations = selectedDay
+            ? reservations.filter(r => r.date === selectedDay)
+            : reservations;
+
+          return (
+            <>
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-6">
+                <div>
+                  <h2 className="text-lg sm:text-xl font-semibold">Reservierungen</h2>
+                  <p className="text-zinc-400 text-sm mt-1 flex items-center gap-1.5 flex-wrap">
+                    <RefreshCw className="w-3 h-3 animate-spin shrink-0" style={{ animationDuration: "3s" }} />
+                    Echtzeit alle 2 Sek.
+                    {lastRefresh && <span className="text-zinc-600">— {lastRefresh.toLocaleTimeString("de-DE")}</span>}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSoundEnabled(s => !s)}
+                  className={`flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-widest border transition-colors shrink-0 ${soundEnabled ? "border-[#d4af37]/40 text-[#d4af37]" : "border-white/10 text-zinc-500"}`}>
+                  {soundEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+                  {soundEnabled ? "Ton an" : "Ton aus"}
+                </button>
               </div>
-              <button
-                onClick={() => setSoundEnabled(s => !s)}
-                className={`flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-widest border transition-colors shrink-0 ${soundEnabled ? "border-[#d4af37]/40 text-[#d4af37]" : "border-white/10 text-zinc-500"}`}>
-                {soundEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
-                {soundEnabled ? "Ton an" : "Ton aus"}
-              </button>
-            </div>
 
-            {reservations.length === 0 ? (
-              <div className="text-center py-16 sm:py-20 bg-[#1a1a1a] border border-white/8">
-                <CalendarCheck className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-                <p className="text-zinc-400 text-sm">Noch keine Reservierungen eingegangen.</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {reservations.map(r => (
-                  <motion.div
-                    key={r.id}
-                    layout
-                    initial={{ opacity: 0, y: -8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className={`bg-[#1a1a1a] border p-4 sm:p-5 transition-colors rounded-xl ${!r.seen ? "border-[#d4af37]/40" : "border-white/8"}`}
-                  >
-                    {/* Badges row */}
-                    <div className="flex items-center gap-2 flex-wrap mb-3">
-                      {!r.seen && (
-                        <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 text-black rounded-sm"
-                          style={{ backgroundColor: GOLD }}>NEU</span>
-                      )}
-                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 border rounded-sm ${STATUS_COLORS[r.status]}`}>
-                        {STATUS_LABELS[r.status]}
-                      </span>
-                    </div>
+              {/* ── CALENDAR ── */}
+              <div className="bg-[#1a1a1a] border border-white/8 rounded-xl p-4 sm:p-5 mb-6">
+                {/* Month nav */}
+                <div className="flex items-center justify-between mb-4">
+                  <button
+                    onClick={() => setCalendarDate(d => { const n = new Date(d); n.setMonth(n.getMonth() - 1); return n; })}
+                    className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/6 rounded-lg transition-colors">
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <span className="text-sm font-semibold tracking-wide">{monthNames[month]} {year}</span>
+                  <button
+                    onClick={() => setCalendarDate(d => { const n = new Date(d); n.setMonth(n.getMonth() + 1); return n; })}
+                    className="p-1.5 text-zinc-400 hover:text-white hover:bg-white/6 rounded-lg transition-colors">
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
 
-                    {/* Info grid */}
-                    <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2 mb-3">
-                      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
-                        <span className="flex items-center gap-1.5 font-semibold text-white">
-                          <Calendar className="w-3.5 h-3.5 shrink-0" style={{ color: GOLD }} />
-                          {formatReservDate(r.date)}
-                        </span>
-                        <span className="flex items-center gap-1.5 text-zinc-300">
-                          <Clock className="w-3.5 h-3.5 text-zinc-500 shrink-0" />{r.time} Uhr
-                        </span>
-                        <span className="flex items-center gap-1.5 text-zinc-300">
-                          <Users className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                          {r.guests} {r.guests === "1" ? "Person" : "Personen"}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-zinc-400">
-                        <span className="flex items-center gap-1.5">
-                          <User className="w-3 h-3 shrink-0" />{r.firstName} {r.lastName}
-                        </span>
-                        <a href={`tel:${r.phone}`} className="flex items-center gap-1.5 hover:text-[#d4af37] transition-colors">
-                          <Phone className="w-3 h-3 shrink-0" />{r.phone}
-                        </a>
-                        <a href={`mailto:${r.email}`} className="flex items-center gap-1.5 hover:text-[#d4af37] transition-colors break-all">
-                          <Mail className="w-3 h-3 shrink-0" />{r.email}
-                        </a>
-                      </div>
-                    </div>
+                {/* Day labels */}
+                <div className="grid grid-cols-7 mb-1">
+                  {dayLabels.map(d => (
+                    <div key={d} className="text-center text-[10px] uppercase tracking-widest text-zinc-600 pb-2">{d}</div>
+                  ))}
+                </div>
 
-                    {r.notes && <p className="text-xs text-zinc-500 italic mb-2">"{r.notes}"</p>}
-                    <p className="text-[10px] text-zinc-700 mb-3">Eingegangen: {formatDate(r.createdAt)}</p>
+                {/* Day cells */}
+                <div className="grid grid-cols-7 gap-0.5">
+                  {Array.from({ length: totalCells }).map((_, i) => {
+                    const dayNum = i - startOffset + 1;
+                    if (dayNum < 1 || dayNum > daysInMonth) {
+                      return <div key={i} className="aspect-square" />;
+                    }
+                    const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(dayNum).padStart(2, "0")}`;
+                    const counts = countsByDay[dateStr];
+                    const isToday = dateStr === todayStr;
+                    const isSelected = selectedDay === dateStr;
 
-                    {/* Actions — full width on mobile */}
-                    <div className="flex flex-wrap gap-2 pt-3 border-t border-white/6">
-                      {r.status !== "bestätigt" && (
-                        <button onClick={() => updateReservationStatus(r.id, "bestätigt")}
-                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-green-500/30 text-green-400 hover:bg-green-500/10 transition-colors">
-                          <CheckCircle className="w-3 h-3" />Bestätigen
-                        </button>
-                      )}
-                      {r.status !== "storniert" && (
-                        <button onClick={() => updateReservationStatus(r.id, "storniert")}
-                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">
-                          <X className="w-3 h-3" />Stornieren
-                        </button>
-                      )}
-                      <button onClick={() => deleteReservation(r.id)}
-                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-white/10 text-zinc-500 hover:text-red-400 hover:border-red-500/30 transition-colors">
-                        <Trash2 className="w-3 h-3" />Löschen
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedDay(prev => prev === dateStr ? null : dateStr)}
+                        className={`relative aspect-square flex flex-col items-center justify-center rounded-lg transition-all text-xs font-medium
+                          ${isSelected ? "ring-2 ring-[#d4af37] bg-[#d4af37]/15 text-white"
+                            : isToday ? "bg-white/6 text-white"
+                            : counts ? "hover:bg-white/6 text-zinc-200"
+                            : "hover:bg-white/4 text-zinc-600"}`}
+                      >
+                        <span className={`text-[11px] sm:text-xs leading-none mb-0.5 ${isToday && !isSelected ? "font-bold" : ""}`}>{dayNum}</span>
+                        {counts && (
+                          <div className="flex gap-0.5 mt-0.5">
+                            {counts.bestätigt > 0 && (
+                              <span className="inline-flex items-center justify-center min-w-[14px] h-3.5 px-1 rounded-full text-[9px] font-bold bg-green-500/80 text-white leading-none">
+                                {counts.bestätigt}
+                              </span>
+                            )}
+                            {counts.neu > 0 && (
+                              <span className="inline-flex items-center justify-center min-w-[14px] h-3.5 px-1 rounded-full text-[9px] font-bold text-black leading-none"
+                                style={{ backgroundColor: GOLD }}>
+                                {counts.neu}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </button>
-                    </div>
-                  </motion.div>
-                ))}
+                    );
+                  })}
+                </div>
+
+                {/* Legend */}
+                <div className="flex items-center gap-4 mt-4 pt-3 border-t border-white/6 text-[10px] text-zinc-500">
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full bg-green-500/80 inline-block" />Bestätigt
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="w-2.5 h-2.5 rounded-full inline-block" style={{ backgroundColor: GOLD }} />Neu / Ausstehend
+                  </span>
+                  {selectedDay && (
+                    <button onClick={() => setSelectedDay(null)}
+                      className="ml-auto flex items-center gap-1 text-[#d4af37] hover:text-white transition-colors">
+                      <X className="w-3 h-3" />Filter aufheben
+                    </button>
+                  )}
+                </div>
               </div>
-            )}
-          </>
-        )}
+
+              {/* Selected day heading */}
+              {selectedDay && (
+                <div className="flex items-center gap-2 mb-4">
+                  <Calendar className="w-4 h-4 shrink-0" style={{ color: GOLD }} />
+                  <span className="text-sm font-semibold">{formatReservDate(selectedDay)}</span>
+                  <span className="text-xs text-zinc-500">
+                    — {filteredReservations.length} {filteredReservations.length === 1 ? "Reservierung" : "Reservierungen"}
+                  </span>
+                </div>
+              )}
+
+              {/* List */}
+              {filteredReservations.length === 0 ? (
+                <div className="text-center py-14 bg-[#1a1a1a] border border-white/8 rounded-xl">
+                  <CalendarCheck className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
+                  <p className="text-zinc-400 text-sm">
+                    {selectedDay ? "Keine Reservierungen für diesen Tag." : "Noch keine Reservierungen eingegangen."}
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {filteredReservations.map(r => (
+                    <motion.div
+                      key={r.id}
+                      layout
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`bg-[#1a1a1a] border p-4 sm:p-5 transition-colors rounded-xl ${!r.seen ? "border-[#d4af37]/40" : "border-white/8"}`}
+                    >
+                      <div className="flex items-center gap-2 flex-wrap mb-3">
+                        {!r.seen && (
+                          <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 text-black rounded-sm"
+                            style={{ backgroundColor: GOLD }}>NEU</span>
+                        )}
+                        <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 border rounded-sm ${STATUS_COLORS[r.status]}`}>
+                          {STATUS_LABELS[r.status]}
+                        </span>
+                      </div>
+
+                      <div className="grid sm:grid-cols-2 gap-x-6 gap-y-2 mb-3">
+                        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
+                          <span className="flex items-center gap-1.5 font-semibold text-white">
+                            <Calendar className="w-3.5 h-3.5 shrink-0" style={{ color: GOLD }} />
+                            {formatReservDate(r.date)}
+                          </span>
+                          <span className="flex items-center gap-1.5 text-zinc-300">
+                            <Clock className="w-3.5 h-3.5 text-zinc-500 shrink-0" />{r.time} Uhr
+                          </span>
+                          <span className="flex items-center gap-1.5 text-zinc-300">
+                            <Users className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                            {r.guests} {r.guests === "1" ? "Person" : "Personen"}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-zinc-400">
+                          <span className="flex items-center gap-1.5">
+                            <User className="w-3 h-3 shrink-0" />{r.firstName} {r.lastName}
+                          </span>
+                          <a href={`tel:${r.phone}`} className="flex items-center gap-1.5 hover:text-[#d4af37] transition-colors">
+                            <Phone className="w-3 h-3 shrink-0" />{r.phone}
+                          </a>
+                          <a href={`mailto:${r.email}`} className="flex items-center gap-1.5 hover:text-[#d4af37] transition-colors break-all">
+                            <Mail className="w-3 h-3 shrink-0" />{r.email}
+                          </a>
+                        </div>
+                      </div>
+
+                      {r.notes && <p className="text-xs text-zinc-500 italic mb-2">"{r.notes}"</p>}
+                      <p className="text-[10px] text-zinc-700 mb-3">Eingegangen: {formatDate(r.createdAt)}</p>
+
+                      <div className="flex flex-wrap gap-2 pt-3 border-t border-white/6">
+                        {r.status !== "bestätigt" && (
+                          <button onClick={() => updateReservationStatus(r.id, "bestätigt")}
+                            className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-green-500/30 text-green-400 hover:bg-green-500/10 transition-colors">
+                            <CheckCircle className="w-3 h-3" />Bestätigen
+                          </button>
+                        )}
+                        {r.status !== "storniert" && (
+                          <button onClick={() => updateReservationStatus(r.id, "storniert")}
+                            className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">
+                            <X className="w-3 h-3" />Stornieren
+                          </button>
+                        )}
+                        <button onClick={() => deleteReservation(r.id)}
+                          className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-white/10 text-zinc-500 hover:text-red-400 hover:border-red-500/30 transition-colors">
+                          <Trash2 className="w-3 h-3" />Löschen
+                        </button>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
       </div>
     </div>
   );
