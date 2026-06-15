@@ -72,7 +72,7 @@ export default function BenvenutilSection() {
             initial={{ opacity: 0, x: -24 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-            className="space-y-4 text-stone-600 text-base leading-relaxed"
+            className="space-y-5 text-stone-600 text-base leading-relaxed"
           >
             <p>
               Bei Quindici Trattoria Pizzeria erwartet Sie italienische Küche mit Herz. Von
@@ -84,27 +84,25 @@ export default function BenvenutilSection() {
             <p>
               Ob gemütliches Abendessen, entspannte Mittagspause, Familienessen, Treffen mit
               Freunden oder ein besonderer Anlass – bei Quindici sollen Sie sich vom ersten
-              Moment an willkommen fühlen. Unser Ziel ist es, die traditionelle italienische
-              Gastfreundschaft mit hochwertigen Zutaten und authentischen Rezepten zu
-              verbinden.
+              Moment an willkommen fühlen.
             </p>
             <p>
-              Genießen Sie eine warme Atmosphäre, sorgfältig ausgewählte Weine und Gerichte,
+              Unser Ziel ist es, die traditionelle italienische Gastfreundschaft mit
+              hochwertigen Zutaten und authentischen Rezepten zu verbinden.
             </p>
           </motion.div>
 
-          {/* Right — image, cropped top-aligned to match text height */}
+          {/* Right — image stretches to match text column height */}
           <motion.div
             initial={{ opacity: 0, x: 24 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.5, ease: "easeOut" }}
-            className="relative overflow-hidden shadow-xl"
-            style={{ height: 460 }}
+            className="relative overflow-hidden shadow-xl min-h-[260px]"
           >
             <img
               src="/restaurant-exterior.jpg"
               alt="Quindici Trattoria Pizzeria Ludwigsburg"
-              className="absolute inset-0 w-full h-full object-cover object-center"
+              className="absolute inset-0 w-full h-full object-cover object-top"
             />
             <div className="absolute inset-0 ring-1 ring-inset ring-amber-200/40 pointer-events-none" />
           </motion.div>
