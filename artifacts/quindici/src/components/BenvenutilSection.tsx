@@ -33,19 +33,19 @@ export default function BenvenutilSection() {
       {/* Top block: heading + two-col layout */}
       <div className="max-w-6xl mx-auto">
         {/* Heading */}
-        <div className="relative mb-12">
-          {/* Watermark "Benvenuti" */}
+        <div className="relative mb-10">
+          {/* Watermark "Benvenuti" — shifted higher */}
           <motion.span
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: -10 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, ease: "easeOut" }}
-            className="absolute bottom-0 left-0 select-none pointer-events-none leading-none"
+            className="absolute top-[-28px] left-0 select-none pointer-events-none leading-none"
             style={{
               fontFamily: "'Dancing Script', cursive",
               fontSize: "clamp(60px, 10vw, 110px)",
               fontWeight: 400,
               color: "#C5A485",
-              opacity: 0.02,
+              opacity: 0.18,
               letterSpacing: "0.02em",
             }}
           >
@@ -57,7 +57,7 @@ export default function BenvenutilSection() {
             initial={{ opacity: 0, x: -30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.25, ease: "easeOut" }}
-            className="relative z-10 pt-10"
+            className="relative z-10 pt-16"
           >
             <h2 className="font-serif text-3xl md:text-4xl text-stone-800 leading-snug">
               In der Trattoria Pizzeria in Ludwigsburg
@@ -66,7 +66,7 @@ export default function BenvenutilSection() {
         </div>
 
         {/* Two-column: text left, image right */}
-        <div className="grid md:grid-cols-2 gap-10 items-start mb-20">
+        <div className="grid md:grid-cols-2 gap-10 items-stretch mb-20">
           {/* Left — text */}
           <motion.div
             initial={{ opacity: 0, x: -24 }}
@@ -77,30 +77,36 @@ export default function BenvenutilSection() {
             <p>
               Bei Quindici Trattoria Pizzeria erwartet Sie italienische Küche mit Herz. Von
               knuspriger Pizza über hausgemachte Pasta, frische Salate, Antipasti,
-              Fleischgerichte, Fischgerichte bis hin zu ausgewählten Spezialitäten bereiten
-              wir unsere Gerichte mit viel Leidenschaft, frischen Zutaten und Liebe zum
-              Detail zu.
+              Fleischgerichte und Fischspezialitäten bis hin zu ausgewählten saisonalen
+              Empfehlungen bereiten wir unsere Speisen mit viel Leidenschaft, frischen
+              Zutaten und Liebe zum Detail zu.
             </p>
             <p>
-              Ob gemütliches Abendessen, Mittagspause, Familienessen, Treffen mit Freunden
-              oder ein besonderer Anlass – bei Quindici sollen Sie sich vom ersten Moment
-              an willkommen fühlen.
+              Ob gemütliches Abendessen, entspannte Mittagspause, Familienessen, Treffen mit
+              Freunden oder ein besonderer Anlass – bei Quindici sollen Sie sich vom ersten
+              Moment an willkommen fühlen. Unser Ziel ist es, die traditionelle italienische
+              Gastfreundschaft mit hochwertigen Zutaten und authentischen Rezepten zu
+              verbinden.
+            </p>
+            <p>
+              Genießen Sie eine warme Atmosphäre, sorgfältig ausgewählte Weine und Gerichte,
+              die mit echtem Herzblut zubereitet werden – das ist Quindici.
             </p>
           </motion.div>
 
-          {/* Right — image */}
+          {/* Right — image, cropped top-aligned to match text height */}
           <motion.div
             initial={{ opacity: 0, x: 24 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.5, ease: "easeOut" }}
-            className="relative aspect-[4/3] overflow-hidden shadow-xl"
+            className="relative overflow-hidden shadow-xl"
+            style={{ minHeight: 260 }}
           >
             <img
               src="/about-restaurant.png"
               alt="Quindici Trattoria Innenraum"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover object-top absolute inset-0"
             />
-            {/* subtle gold overlay corner */}
             <div className="absolute inset-0 ring-1 ring-inset ring-amber-200/40 pointer-events-none" />
           </motion.div>
         </div>
