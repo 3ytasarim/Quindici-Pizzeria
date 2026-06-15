@@ -62,7 +62,7 @@ export default function Footer() {
           <img
             src="/logo-footer.png"
             alt="Quindici Logo"
-            className="h-24 w-auto"
+            className="h-32 w-auto"
           />
           <div className="space-y-3 text-center">
             <a
