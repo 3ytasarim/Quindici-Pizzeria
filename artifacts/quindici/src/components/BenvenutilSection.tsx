@@ -102,8 +102,8 @@ export default function BenvenutilSection() {
             style={{ minHeight: 260 }}
           >
             <img
-              src="/about-restaurant.png"
-              alt="Quindici Trattoria Innenraum"
+              src="/restaurant-exterior.jpg"
+              alt="Quindici Trattoria Pizzeria Ludwigsburg"
               className="w-full h-full object-cover object-top absolute inset-0"
             />
             <div className="absolute inset-0 ring-1 ring-inset ring-amber-200/40 pointer-events-none" />
