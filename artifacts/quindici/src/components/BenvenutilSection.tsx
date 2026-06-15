@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { motion, useInView } from "framer-motion";
 
 const pizzas = [
@@ -8,9 +8,36 @@ const pizzas = [
   { src: "/pizza-4.png", label: "Prosciutto e Rucola" },
 ];
 
+const CARD_SIZE = 190;
+const GAP = 32;
+const SPEED = 0.5;
+
 export default function BenvenutilSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const trackRef = useRef<HTMLDivElement>(null);
+  const xRef = useRef(0);
+  const rafRef = useRef<number>(0);
+  const pausedRef = useRef(false);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const itemW = CARD_SIZE + GAP;
+    const totalW = itemW * pizzas.length;
+    const animate = () => {
+      if (!pausedRef.current) {
+        xRef.current -= SPEED;
+        if (xRef.current <= -totalW) xRef.current += totalW;
+        track.style.transform = `translateX(${xRef.current}px)`;
+      }
+      rafRef.current = requestAnimationFrame(animate);
+    };
+    rafRef.current = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []);
+
+  const displayed = [...pizzas, ...pizzas, ...pizzas];
 
   return (
     <section ref={ref} className="relative overflow-hidden bg-[#fdf8f2] py-24 px-6">
@@ -33,7 +60,6 @@ export default function BenvenutilSection() {
           >
             Benvenuti
           </motion.span>
-
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -86,24 +112,30 @@ export default function BenvenutilSection() {
             <div className="absolute inset-0 ring-1 ring-inset ring-amber-200/40 pointer-events-none" />
           </motion.div>
         </div>
+      </div>
 
-        {/* Pizza row — static, all visible */}
-        <div className="flex items-center justify-center gap-4 md:gap-8">
-          {pizzas.map((pizza, i) => (
+      {/* Infinite scrolling pizza band — full width */}
+      <div
+        className="w-full overflow-hidden"
+        onMouseEnter={() => { pausedRef.current = true; }}
+        onMouseLeave={() => { pausedRef.current = false; }}
+      >
+        <div
+          ref={trackRef}
+          className="flex items-center"
+          style={{ gap: GAP, willChange: "transform" }}
+        >
+          {displayed.map((pizza, i) => (
             <div
-              key={pizza.src}
+              key={i}
               className="shrink-0 rounded-full overflow-hidden border-2 border-amber-200 shadow-md"
-              style={{
-                width: "clamp(80px, 18vw, 190px)",
-                height: "clamp(80px, 18vw, 190px)",
-                filter: i < pizzas.length - 1 ? "grayscale(100%) brightness(0.75)" : "none",
-                opacity: i < pizzas.length - 1 ? 0.65 : 1,
-              }}
+              style={{ width: CARD_SIZE, height: CARD_SIZE }}
             >
               <img
                 src={pizza.src}
                 alt={pizza.label}
                 className="w-full h-full object-cover"
+                draggable={false}
               />
             </div>
           ))}
