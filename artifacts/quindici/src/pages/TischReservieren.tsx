@@ -28,15 +28,15 @@ function StarCanvas() {
     ro.observe(canvas);
 
     // Generate stars
-    const STAR_COUNT = 90;
+    const STAR_COUNT = 70;
     type Star = { x: number; y: number; r: number; speed: number; opacity: number; twinkleSpeed: number; twinkleOffset: number; };
     const stars: Star[] = Array.from({ length: STAR_COUNT }, () => ({
       x: Math.random(),
       y: Math.random(),
-      r: Math.random() * 2 + 0.5,
-      speed: Math.random() * 0.00008 + 0.00003,
-      opacity: Math.random() * 0.5 + 0.15,
-      twinkleSpeed: Math.random() * 0.02 + 0.008,
+      r: Math.random() * 5 + 2,
+      speed: Math.random() * 0.00012 + 0.00006,
+      opacity: Math.random() * 0.45 + 0.30,
+      twinkleSpeed: Math.random() * 0.025 + 0.01,
       twinkleOffset: Math.random() * Math.PI * 2,
     }));
 
