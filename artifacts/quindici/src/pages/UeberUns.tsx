@@ -229,14 +229,14 @@ export default function UeberUns() {
                 className="text-4xl md:text-5xl font-bold text-stone-800 mb-1 leading-tight"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
-                Die Geschichte
+                Ein Stück Italien
               </motion.h2>
               <motion.h2
                 variants={{ hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1], delay: 0.1 } } }}
-                className="text-4xl md:text-5xl font-bold text-amber-700 mb-5 leading-tight"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                className="text-4xl md:text-5xl font-bold mb-5 leading-tight"
+                style={{ fontFamily: "'Playfair Display', serif", color: "#b45309" }}
               >
-                von Quindici
+                in Ludwigsburg
               </motion.h2>
               <motion.div variants={rulerExpand} className="h-px w-16 bg-amber-600 mb-8" style={{ transformOrigin: "left" }} />
 
