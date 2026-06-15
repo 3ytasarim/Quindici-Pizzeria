@@ -199,15 +199,39 @@ export default function TischReservieren() {
                         <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
                           <Clock className="w-3.5 h-3.5" />Uhrzeit
                         </label>
-                        <select
-                          value={f1.time}
-                          onChange={e => setF1(p => ({ ...p, time: e.target.value }))}
-                          className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none bg-white appearance-none cursor-pointer"
-                          onFocus={e => (e.target.style.borderColor = GOLD)}
-                          onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
-                        >
-                          {getAvailableTimes(f1.date).map(t => <option key={t} value={t}>{t} Uhr</option>)}
-                        </select>
+                        {getAvailableTimes(f1.date).length === 0 ? (
+                          <div className="border border-amber-200 bg-amber-50 px-4 py-4">
+                            <p className="text-sm text-amber-800 font-medium mb-1">
+                              Heute sind leider keine Tische mehr verfügbar.
+                            </p>
+                            <p className="text-xs text-amber-600 mb-3">
+                              Möchten Sie für morgen reservieren?
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const tomorrow = new Date();
+                                tomorrow.setDate(tomorrow.getDate() + 1);
+                                const d = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+                                setF1(p => ({ ...p, date: d, time: "19:00" }));
+                              }}
+                              className="text-xs font-semibold uppercase tracking-widest px-4 py-2 text-white transition-opacity hover:opacity-90"
+                              style={{ backgroundColor: GOLD }}
+                            >
+                              Morgen anzeigen →
+                            </button>
+                          </div>
+                        ) : (
+                          <select
+                            value={f1.time}
+                            onChange={e => setF1(p => ({ ...p, time: e.target.value }))}
+                            className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none bg-white appearance-none cursor-pointer"
+                            onFocus={e => (e.target.style.borderColor = GOLD)}
+                            onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                          >
+                            {getAvailableTimes(f1.date).map(t => <option key={t} value={t}>{t} Uhr</option>)}
+                          </select>
+                        )}
                       </div>
 
                       {/* Personen */}
@@ -238,7 +262,8 @@ export default function TischReservieren() {
 
                     <button
                       onClick={() => go(2)}
-                      className="mt-8 w-full py-3.5 flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-widest text-black transition-opacity hover:opacity-90"
+                      disabled={getAvailableTimes(f1.date).length === 0}
+                      className="mt-8 w-full py-3.5 flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-widest text-black transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
                       style={{ backgroundColor: GOLD }}
                     >
                       Weiter <ArrowRight className="w-4 h-4" />
