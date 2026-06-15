@@ -39,7 +39,7 @@ export default function InfoSection() {
             {...fadeUp(0.25)}
             className="border border-amber-100 bg-white/60 backdrop-blur-sm p-7 shadow-sm flex-1"
           >
-            <div className="flex items-center gap-2 mb-5">
+            <div className="flex items-center justify-center gap-2 mb-5">
               <Clock className="w-4 h-4 text-amber-700 shrink-0" />
               <h4 className="font-serif text-xl text-stone-800 tracking-wide">
                 Öffnungszeiten
@@ -60,13 +60,13 @@ export default function InfoSection() {
             {...fadeUp(0.4)}
             className="border border-amber-100 bg-white/60 backdrop-blur-sm p-7 shadow-sm"
           >
-            <h4 className="font-serif text-xl text-stone-800 tracking-wide mb-5">
+            <h4 className="font-serif text-xl text-stone-800 tracking-wide mb-5 text-center">
               Hier findet ihr uns
             </h4>
-            <ul className="space-y-3.5 text-sm text-stone-600">
+            <ul className="space-y-3.5 text-sm text-stone-600 flex flex-col items-center">
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-amber-700 mt-0.5 shrink-0" />
-                <span>
+                <span className="text-center">
                   Bahnhofstraße 17<br />
                   71638 Ludwigsburg
                 </span>
@@ -84,12 +84,14 @@ export default function InfoSection() {
                 </a>
               </li>
             </ul>
-            <a
-              href="#"
-              className="mt-6 inline-flex items-center gap-2 bg-amber-700 text-white text-sm font-medium px-5 py-2.5 hover:bg-amber-800 transition-colors duration-200"
-            >
-              Tisch reservieren
-            </a>
+            <div className="flex justify-center mt-6">
+              <a
+                href="#"
+                className="inline-flex items-center gap-2 bg-amber-700 text-white text-sm font-medium px-5 py-2.5 hover:bg-amber-800 transition-colors duration-200"
+              >
+                Tisch reservieren
+              </a>
+            </div>
           </motion.div>
 
         </div>
