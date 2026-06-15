@@ -75,6 +75,8 @@ export default function TischReservieren() {
   const [dir, setDir] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [timedOut, setTimedOut] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const [f1, setF1] = useState<Form1>({
     date: todayStr(),
@@ -539,16 +541,40 @@ export default function TischReservieren() {
                       Mit der Bestätigung Ihrer Reservierung erklären Sie sich einverstanden, dass wir Ihre Daten zur Bearbeitung nutzen. Ihre Reservierung wird von uns telefonisch oder per E-Mail bestätigt.
                     </p>
 
+                    {submitError && (
+                      <p className="text-xs text-red-500 mb-3 text-center">{submitError}</p>
+                    )}
                     <div className="flex gap-3">
                       <button onClick={() => go(2)}
                         className="flex-1 py-3.5 flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-widest text-stone-500 border border-stone-200 hover:border-stone-400 transition-colors">
                         <ArrowLeft className="w-4 h-4" /> Zurück
                       </button>
                       <button
-                        onClick={() => setSubmitted(true)}
-                        className="flex-[2] py-3.5 flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-widest text-black hover:opacity-90 transition-opacity"
+                        disabled={submitting}
+                        onClick={async () => {
+                          setSubmitting(true);
+                          setSubmitError("");
+                          try {
+                            const res = await fetch("/api/reservations", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                date: f1.date, time: f1.time, guests: f1.guests,
+                                firstName: f2.firstName, lastName: f2.lastName,
+                                phone: f2.phone, email: f2.email, notes: f2.notes,
+                              }),
+                            });
+                            if (!res.ok) throw new Error("Fehler beim Senden");
+                            setSubmitted(true);
+                          } catch {
+                            setSubmitError("Die Reservierung konnte nicht gesendet werden. Bitte versuchen Sie es erneut.");
+                          } finally {
+                            setSubmitting(false);
+                          }
+                        }}
+                        className="flex-[2] py-3.5 flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-widest text-black hover:opacity-90 transition-opacity disabled:opacity-60"
                         style={{ backgroundColor: GOLD }}>
-                        Jetzt reservieren <CheckCircle className="w-4 h-4" />
+                        {submitting ? "Wird gesendet…" : (<>Jetzt reservieren <CheckCircle className="w-4 h-4" /></>)}
                       </button>
                     </div>
                   </div>

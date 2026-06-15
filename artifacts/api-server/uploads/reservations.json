@@ -1,0 +1,30 @@
+[
+  {
+    "id": "2cfe9a4e-2150-433a-b198-3261d31efa1a",
+    "date": "2026-06-16",
+    "time": "19:00",
+    "guests": "2",
+    "firstName": "Test",
+    "lastName": "Gast",
+    "phone": "+49 711 123456",
+    "email": "test@quindici.de",
+    "notes": "Test-Reservierung",
+    "createdAt": "2026-06-15T21:11:19.958Z",
+    "seen": false,
+    "status": "neu"
+  },
+  {
+    "id": "93b0ef5c-398e-4e60-8e4f-379a9ed847bd",
+    "date": "2026-06-16",
+    "time": "19:00",
+    "guests": "2",
+    "firstName": "Test",
+    "lastName": "Gast",
+    "phone": "+49 711 123456",
+    "email": "test@quindici.de",
+    "notes": "Test-Reservierung",
+    "createdAt": "2026-06-15T21:11:12.635Z",
+    "seen": false,
+    "status": "neu"
+  }
+]
