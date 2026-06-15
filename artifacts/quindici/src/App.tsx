@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import Speisekarte from "@/pages/Speisekarte";
 import Kontakt from "@/pages/Kontakt";
 import UeberUns from "@/pages/UeberUns";
+import Admin from "@/pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/speisekarte" component={Speisekarte} />
       <Route path="/kontakt" component={Kontakt} />
       <Route path="/ueber-uns" component={UeberUns} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
