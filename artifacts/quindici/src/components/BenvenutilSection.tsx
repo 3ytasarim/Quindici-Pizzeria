@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const pizzas = [
   { src: "/pizza-1.png", label: "Margherita" },
@@ -110,24 +109,6 @@ export default function BenvenutilSection() {
 
         {/* Pizza carousel */}
         <div className="relative">
-          {/* Arrows row */}
-          <div className="flex items-center justify-between mb-6 px-2">
-            <button
-              onClick={() => go(-1)}
-              className="w-10 h-10 flex items-center justify-center text-stone-400 hover:text-amber-700 transition-colors"
-              data-testid="slider-prev"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button
-              onClick={() => go(1)}
-              className="w-10 h-10 flex items-center justify-center text-stone-400 hover:text-amber-700 transition-colors"
-              data-testid="slider-next"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-          </div>
-
           {/* Fixed-position pizza circles — all visible, active scales up + colorizes */}
           <div className="flex items-center justify-center gap-6 md:gap-10" style={{ height: 220 }}>
             {pizzas.map((pizza, i) => {
