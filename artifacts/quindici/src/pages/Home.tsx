@@ -4,6 +4,7 @@ import BenvenutilSection from "@/components/BenvenutilSection";
 import InfoSection from "@/components/InfoSection";
 import MittagstischBanner from "@/components/MittagstischBanner";
 import LieblingsgerichteSection from "@/components/LieblingsgerichteSection";
+import GalerieSlider from "@/components/GalerieSlider";
 import Footer from "@/components/Footer";
 import StickyActions from "@/components/StickyActions";
 
@@ -17,6 +18,7 @@ export default function Home() {
         <InfoSection />
         <MittagstischBanner />
         <LieblingsgerichteSection />
+        <GalerieSlider />
       </main>
       <Footer />
       <StickyActions />

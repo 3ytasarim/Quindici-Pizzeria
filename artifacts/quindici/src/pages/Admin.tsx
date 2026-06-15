@@ -4,7 +4,7 @@ import {
   Upload, LogOut, FileText, CheckCircle, AlertCircle,
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
-  RefreshCw, ChevronLeft, ChevronRight,
+  RefreshCw, ChevronLeft, ChevronRight, GalleryHorizontal,
 } from "lucide-react";
 
 const API = "/api";
@@ -56,7 +56,7 @@ interface Reservation {
   status: "neu" | "bestätigt" | "storniert";
 }
 
-type Tab = "mittagstisch" | "gerichte" | "reservierungen";
+type Tab = "mittagstisch" | "gerichte" | "reservierungen" | "galerie";
 
 const STATUS_LABELS: Record<Reservation["status"], string> = {
   neu: "Neu", bestätigt: "Bestätigt", storniert: "Storniert",
@@ -99,6 +99,19 @@ export default function Admin() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [calendarDate, setCalendarDate] = useState(() => { const d = new Date(); d.setDate(1); return d; });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+
+  // — Galerie —
+  interface GalleryItem { id: string; title: string; imageUrl: string; }
+  const [gallery, setGallery] = useState<GalleryItem[]>([]);
+  const [galleryStatus, setGalleryStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [showGalleryForm, setShowGalleryForm] = useState(false);
+  const [editingGallery, setEditingGallery] = useState<GalleryItem | null>(null);
+  const [galleryForm, setGalleryForm] = useState({ title: "", imageUrl: "" });
+  const [galleryFile, setGalleryFile] = useState<File | null>(null);
+  const [galleryDragOver, setGalleryDragOver] = useState(false);
+  const [galleryUploading, setGalleryUploading] = useState(false);
+  const galleryFileRef = useRef<HTMLInputElement>(null);
+
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const tokenRef = useRef(token);
   tokenRef.current = token;
@@ -117,6 +130,11 @@ export default function Admin() {
   const fetchDishes = useCallback(async () => {
     const r = await fetch(`${API}/dishes`);
     if (r.ok) setDishes(await r.json());
+  }, []);
+
+  const fetchGallery = useCallback(async () => {
+    const r = await fetch(`${API}/gallery`);
+    if (r.ok) setGallery(await r.json());
   }, []);
 
   const fetchReservations = useCallback(async (silent = false) => {
@@ -156,8 +174,8 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    if (token) { fetchPdfStatus(token); fetchDishes(); fetchReservations(); }
-  }, [token, fetchPdfStatus, fetchDishes, fetchReservations]);
+    if (token) { fetchPdfStatus(token); fetchDishes(); fetchReservations(); fetchGallery(); }
+  }, [token, fetchPdfStatus, fetchDishes, fetchReservations, fetchGallery]);
 
   useEffect(() => {
     if (!token) return;
@@ -324,9 +342,10 @@ export default function Admin() {
           <div className="flex overflow-x-auto scrollbar-none -mb-px">
             {(
               [
-                ["mittagstisch", "Mittagstisch", "PDF", FileText, 0],
+                ["mittagstisch", "PDF", "Mittagstisch PDF", FileText, 0],
                 ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
-                ["reservierungen", "Reservierung.", "Reservierungen", CalendarCheck, newBadge],
+                ["reservierungen", "Reserv.", "Reservierungen", CalendarCheck, newBadge],
+                ["galerie", "Galerie", "Galerie", GalleryHorizontal, 0],
               ] as const
             ).map(([id, shortLabel, fullLabel, Icon, badge]) => (
               <button key={id} onClick={() => handleTabChange(id as Tab)}
@@ -752,6 +771,181 @@ export default function Admin() {
                         </button>
                       </div>
                     </motion.div>
+                  ))}
+                </div>
+              )}
+            </>
+          );
+        })()}
+
+        {/* ── GALERIE ── */}
+        {tab === "galerie" && (() => {
+          const openAdd = () => {
+            setEditingGallery(null);
+            setGalleryForm({ title: "", imageUrl: "" });
+            setGalleryFile(null);
+            setGalleryStatus(null);
+            setShowGalleryForm(true);
+          };
+          const openEdit = (item: { id: string; title: string; imageUrl: string }) => {
+            setEditingGallery(item);
+            setGalleryForm({ title: item.title, imageUrl: item.imageUrl });
+            setGalleryFile(null);
+            setGalleryStatus(null);
+            setShowGalleryForm(true);
+          };
+          const closeForm = () => { setShowGalleryForm(false); setEditingGallery(null); setGalleryFile(null); };
+          const handleFileDrop = (e: React.DragEvent) => {
+            e.preventDefault(); setGalleryDragOver(false);
+            const f = e.dataTransfer.files[0];
+            if (f && f.type.startsWith("image/")) setGalleryFile(f);
+          };
+          const submitGallery = async (e: React.FormEvent) => {
+            e.preventDefault();
+            setGalleryUploading(true); setGalleryStatus(null);
+            try {
+              const fd = new FormData();
+              if (galleryForm.title) fd.append("title", galleryForm.title);
+              if (galleryFile) fd.append("image", galleryFile);
+              else if (galleryForm.imageUrl) fd.append("imageUrl", galleryForm.imageUrl);
+              const url = editingGallery
+                ? `${API}/admin/gallery/${editingGallery.id}`
+                : `${API}/admin/gallery`;
+              const method = editingGallery ? "PUT" : "POST";
+              const r = await fetch(url, { method, headers: { Authorization: `Bearer ${token}` }, body: fd });
+              if (!r.ok) throw new Error((await r.json()).error ?? "Fehler");
+              setGalleryStatus({ type: "success", msg: editingGallery ? "Bild aktualisiert" : "Bild hinzugefügt" });
+              fetchGallery(); closeForm();
+            } catch (err: unknown) {
+              setGalleryStatus({ type: "error", msg: err instanceof Error ? err.message : "Fehler" });
+            } finally { setGalleryUploading(false); }
+          };
+          const deleteGallery = async (id: string) => {
+            if (!confirm("Bild wirklich löschen?")) return;
+            await fetch(`${API}/admin/gallery/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+            fetchGallery();
+          };
+
+          return (
+            <>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-white">Galerie</h2>
+                  <p className="text-xs text-zinc-500 mt-0.5">{gallery.length} Bild{gallery.length !== 1 ? "er" : ""}</p>
+                </div>
+                <button onClick={openAdd}
+                  className="flex items-center gap-2 text-xs px-4 py-2.5 font-semibold uppercase tracking-widest transition-colors"
+                  style={{ backgroundColor: GOLD, color: "#000" }}>
+                  <Plus className="w-3.5 h-3.5" /> Bild hinzufügen
+                </button>
+              </div>
+
+              {galleryStatus && (
+                <div className={`mb-4 flex items-center gap-2 text-sm px-4 py-3 ${galleryStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
+                  {galleryStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                  {galleryStatus.msg}
+                </div>
+              )}
+
+              {/* Form */}
+              <AnimatePresence>
+                {showGalleryForm && (
+                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                    className="mb-8 border border-white/10 bg-[#1a1a1a] p-5 sm:p-7">
+                    <div className="flex items-center justify-between mb-5">
+                      <h3 className="text-sm font-semibold text-white uppercase tracking-widest">
+                        {editingGallery ? "Bild bearbeiten" : "Neues Bild"}
+                      </h3>
+                      <button onClick={closeForm} className="text-zinc-500 hover:text-white transition-colors"><X className="w-4 h-4" /></button>
+                    </div>
+                    <form onSubmit={submitGallery} className="space-y-4">
+                      {/* Drop zone */}
+                      <div
+                        onDragOver={e => { e.preventDefault(); setGalleryDragOver(true); }}
+                        onDragLeave={() => setGalleryDragOver(false)}
+                        onDrop={handleFileDrop}
+                        onClick={() => galleryFileRef.current?.click()}
+                        className={`relative cursor-pointer border-2 border-dashed transition-colors ${galleryDragOver ? "border-[#d4af37] bg-[#d4af37]/5" : "border-white/15 hover:border-white/30"} flex flex-col items-center justify-center p-8 text-center`}>
+                        <input ref={galleryFileRef} type="file" accept="image/*" className="hidden"
+                          onChange={e => { const f = e.target.files?.[0]; if (f) setGalleryFile(f); }} />
+                        {galleryFile ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <img src={URL.createObjectURL(galleryFile)} alt="Vorschau" className="h-32 w-auto object-contain rounded" />
+                            <span className="text-xs text-zinc-400">{galleryFile.name}</span>
+                          </div>
+                        ) : editingGallery?.imageUrl ? (
+                          <div className="flex flex-col items-center gap-2">
+                            <img src={editingGallery.imageUrl} alt="Aktuell" className="h-32 w-auto object-contain rounded opacity-60" />
+                            <span className="text-xs text-zinc-500">Aktuelles Bild — zum Ersetzen klicken oder ziehen</span>
+                          </div>
+                        ) : (
+                          <>
+                            <Image className="w-8 h-8 text-zinc-600 mb-2" />
+                            <p className="text-sm text-zinc-400">Bild hier ablegen oder klicken</p>
+                            <p className="text-xs text-zinc-600 mt-1">JPG, PNG, WEBP · max. 10 MB</p>
+                          </>
+                        )}
+                      </div>
+                      {/* URL fallback */}
+                      {!galleryFile && (
+                        <div>
+                          <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">oder Bild-URL</label>
+                          <input value={galleryForm.imageUrl} onChange={e => setGalleryForm(p => ({ ...p, imageUrl: e.target.value }))}
+                            className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
+                            placeholder="https://..." />
+                        </div>
+                      )}
+                      {/* Title */}
+                      <div>
+                        <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">Bildunterschrift (optional)</label>
+                        <input value={galleryForm.title} onChange={e => setGalleryForm(p => ({ ...p, title: e.target.value }))}
+                          className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
+                          placeholder="z. B. Pizza Margherita" />
+                      </div>
+                      <div className="flex items-center gap-3 pt-1">
+                        <button type="submit" disabled={galleryUploading || (!galleryFile && !galleryForm.imageUrl && !editingGallery)}
+                          className="flex items-center gap-2 text-xs px-5 py-2.5 font-semibold uppercase tracking-widest transition-opacity disabled:opacity-40"
+                          style={{ backgroundColor: GOLD, color: "#000" }}>
+                          {galleryUploading ? "Lädt…" : editingGallery ? "Speichern" : "Hinzufügen"}
+                        </button>
+                        <button type="button" onClick={closeForm}
+                          className="text-xs px-4 py-2.5 border border-white/10 text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">
+                          Abbrechen
+                        </button>
+                      </div>
+                    </form>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Grid */}
+              {gallery.length === 0 ? (
+                <div className="text-center py-20 text-zinc-600">
+                  <GalleryHorizontal className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                  <p className="text-sm">Noch keine Bilder vorhanden.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {gallery.map(item => (
+                    <div key={item.id} className="group relative border border-white/8 overflow-hidden bg-[#111]">
+                      <div className="aspect-[4/3] overflow-hidden">
+                        <img src={item.imageUrl} alt={item.title}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                      </div>
+                      {item.title && (
+                        <div className="px-2 py-1.5 text-xs text-zinc-400 truncate">{item.title}</div>
+                      )}
+                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <button onClick={() => openEdit(item)}
+                          className="flex items-center gap-1 text-xs px-3 py-1.5 bg-[#d4af37] text-black font-semibold">
+                          <Pencil className="w-3 h-3" /> Edit
+                        </button>
+                        <button onClick={() => deleteGallery(item.id)}
+                          className="flex items-center gap-1 text-xs px-3 py-1.5 border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors">
+                          <Trash2 className="w-3 h-3" /> Del
+                        </button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
