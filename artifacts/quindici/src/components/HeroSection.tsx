@@ -51,7 +51,7 @@ export default function HeroSection() {
             className="block h-px w-16 origin-left"
             style={{ backgroundColor: "#f59e0b" }}
           />
-          <h2 className="font-serif italic text-3xl md:text-4xl tracking-wide drop-shadow-md" style={{ color: "#f59e0b" }}>
+          <h2 className="font-serif italic text-3xl md:text-4xl tracking-wide drop-shadow-md" style={{ color: "#b45309" }}>
             Trattoria Pizzeria
           </h2>
           <motion.span
