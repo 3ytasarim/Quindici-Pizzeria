@@ -6,7 +6,8 @@ import { fileURLToPath } from "url";
 import { randomUUID } from "crypto";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const DATA_FILE = path.resolve(__dirname, "../uploads/reservations.json");
+const RES_FILE = path.resolve(__dirname, "../uploads/reservations.json");
+const WARTE_FILE = path.resolve(__dirname, "../uploads/warteliste.json");
 const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
 
 function authMiddleware(req: any, res: any, next: any) {
@@ -16,58 +17,97 @@ function authMiddleware(req: any, res: any, next: any) {
   catch { res.status(401).json({ error: "Token ungültig" }); }
 }
 
-function read() {
-  try { return JSON.parse(fs.readFileSync(DATA_FILE, "utf-8")); }
+function readFile(file: string) {
+  try { return JSON.parse(fs.readFileSync(file, "utf-8")); }
   catch { return []; }
 }
-function write(data: any[]) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+function writeFile(file: string, data: any[]) {
+  fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
 
 const router = Router();
 
-// Public — submit reservation from form
+/* ─── RESERVATIONS ─── */
+
 router.post("/reservations", (req, res) => {
   const { date, time, guests, firstName, lastName, phone, email, notes } = req.body ?? {};
-  if (!date || !time || !guests || !firstName || !lastName || !phone || !email) {
+  if (!date || !time || !guests || !firstName || !lastName || !phone || !email)
     return res.status(400).json({ error: "Pflichtfelder fehlen" });
-  }
-  const list = read();
+  const list = readFile(RES_FILE);
   const entry = {
-    id: randomUUID(),
+    id: randomUUID(), type: "reservation",
     date, time, guests, firstName, lastName, phone, email,
-    notes: notes ?? "",
-    createdAt: new Date().toISOString(),
-    seen: false,
-    status: "neu" as const,
+    notes: notes ?? "", createdAt: new Date().toISOString(),
+    seen: false, status: "neu" as const,
   };
-  list.unshift(entry); // newest first
-  write(list);
+  list.unshift(entry);
+  writeFile(RES_FILE, list);
   res.status(201).json({ success: true, id: entry.id });
 });
 
-// Admin — list all
 router.get("/admin/reservations", authMiddleware, (_req, res) => {
-  res.json(read());
+  res.json(readFile(RES_FILE));
 });
 
-// Admin — mark seen / update status
 router.patch("/admin/reservations/:id", authMiddleware, (req, res) => {
-  const list = read();
+  const list = readFile(RES_FILE);
   const idx = list.findIndex((r: any) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: "Nicht gefunden" });
   list[idx] = { ...list[idx], ...req.body };
-  write(list);
+  writeFile(RES_FILE, list);
   res.json(list[idx]);
 });
 
-// Admin — delete
 router.delete("/admin/reservations/:id", authMiddleware, (req, res) => {
-  const list = read();
+  const list = readFile(RES_FILE);
   const idx = list.findIndex((r: any) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: "Nicht gefunden" });
   list.splice(idx, 1);
-  write(list);
+  writeFile(RES_FILE, list);
+  res.json({ success: true });
+});
+
+/* ─── WARTELISTE ─── */
+
+router.post("/warteliste", (req, res) => {
+  const { date, startTime, endTime, guests, firstName, lastName, phone, email, notifType } = req.body ?? {};
+  if (!date || !startTime || !email)
+    return res.status(400).json({ error: "Pflichtfelder fehlen" });
+  const list = readFile(WARTE_FILE);
+  const entry = {
+    id: randomUUID(), type: "warteliste",
+    date, startTime, endTime: endTime ?? startTime,
+    guests: guests ?? "2",
+    firstName: firstName ?? "", lastName: lastName ?? "",
+    phone: phone ?? "", email,
+    notifType: notifType ?? "email",
+    createdAt: new Date().toISOString(),
+    seen: false,
+  };
+  list.unshift(entry);
+  writeFile(WARTE_FILE, list);
+  res.status(201).json({ success: true, id: entry.id });
+});
+
+router.get("/admin/warteliste", authMiddleware, (_req, res) => {
+  res.json(readFile(WARTE_FILE));
+});
+
+router.patch("/admin/warteliste/:id", authMiddleware, (req, res) => {
+  const list = readFile(WARTE_FILE);
+  const idx = list.findIndex((r: any) => r.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: "Nicht gefunden" });
+  list[idx] = { ...list[idx], ...req.body };
+  writeFile(WARTE_FILE, list);
+  res.json(list[idx]);
+});
+
+router.delete("/admin/warteliste/:id", authMiddleware, (req, res) => {
+  const list = readFile(WARTE_FILE);
+  const idx = list.findIndex((r: any) => r.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: "Nicht gefunden" });
+  list.splice(idx, 1);
+  writeFile(WARTE_FILE, list);
   res.json({ success: true });
 });
 
