@@ -112,6 +112,18 @@ export default function Admin() {
   const [galleryUploading, setGalleryUploading] = useState(false);
   const galleryFileRef = useRef<HTMLInputElement>(null);
 
+  // — Pizza Carousel —
+  interface PizzaItem { id: string; label: string; imageUrl: string; }
+  const [pizzaItems, setPizzaItems] = useState<PizzaItem[]>([]);
+  const [pizzaStatus, setPizzaStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [showPizzaForm, setShowPizzaForm] = useState(false);
+  const [editingPizza, setEditingPizza] = useState<PizzaItem | null>(null);
+  const [pizzaForm, setPizzaForm] = useState({ label: "", imageUrl: "" });
+  const [pizzaFile, setPizzaFile] = useState<File | null>(null);
+  const [pizzaDragOver, setPizzaDragOver] = useState(false);
+  const [pizzaUploading, setPizzaUploading] = useState(false);
+  const pizzaFileRef = useRef<HTMLInputElement>(null);
+
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const tokenRef = useRef(token);
   tokenRef.current = token;
@@ -135,6 +147,11 @@ export default function Admin() {
   const fetchGallery = useCallback(async () => {
     const r = await fetch(`${API}/gallery`);
     if (r.ok) setGallery(await r.json());
+  }, []);
+
+  const fetchPizza = useCallback(async () => {
+    const r = await fetch(`${API}/pizza`);
+    if (r.ok) setPizzaItems(await r.json());
   }, []);
 
   const fetchReservations = useCallback(async (silent = false) => {
@@ -174,8 +191,8 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    if (token) { fetchPdfStatus(token); fetchDishes(); fetchReservations(); fetchGallery(); }
-  }, [token, fetchPdfStatus, fetchDishes, fetchReservations, fetchGallery]);
+    if (token) { fetchPdfStatus(token); fetchDishes(); fetchReservations(); fetchGallery(); fetchPizza(); }
+  }, [token, fetchPdfStatus, fetchDishes, fetchReservations, fetchGallery, fetchPizza]);
 
   useEffect(() => {
     if (!token) return;
@@ -949,6 +966,169 @@ export default function Admin() {
                   ))}
                 </div>
               )}
+
+              {/* ── Pizza Carousel ── */}
+              {(() => {
+                const openAddP = () => {
+                  setEditingPizza(null);
+                  setPizzaForm({ label: "", imageUrl: "" });
+                  setPizzaFile(null);
+                  setPizzaStatus(null);
+                  setShowPizzaForm(true);
+                };
+                const openEditP = (item: PizzaItem) => {
+                  setEditingPizza(item);
+                  setPizzaForm({ label: item.label, imageUrl: item.imageUrl });
+                  setPizzaFile(null);
+                  setPizzaStatus(null);
+                  setShowPizzaForm(true);
+                };
+                const closeP = () => { setShowPizzaForm(false); setEditingPizza(null); setPizzaFile(null); };
+                const submitPizza = async (e: React.FormEvent) => {
+                  e.preventDefault();
+                  setPizzaUploading(true); setPizzaStatus(null);
+                  try {
+                    const fd = new FormData();
+                    if (pizzaForm.label) fd.append("label", pizzaForm.label);
+                    if (pizzaFile) fd.append("image", pizzaFile);
+                    else if (pizzaForm.imageUrl) fd.append("imageUrl", pizzaForm.imageUrl);
+                    const url = editingPizza ? `${API}/admin/pizza/${editingPizza.id}` : `${API}/admin/pizza`;
+                    const method = editingPizza ? "PUT" : "POST";
+                    const r = await fetch(url, { method, headers: { Authorization: `Bearer ${token}` }, body: fd });
+                    if (!r.ok) throw new Error((await r.json()).error ?? "Fehler");
+                    setPizzaStatus({ type: "success", msg: editingPizza ? "Aktualisiert" : "Hinzugefügt" });
+                    fetchPizza(); closeP();
+                  } catch (err: unknown) {
+                    setPizzaStatus({ type: "error", msg: err instanceof Error ? err.message : "Fehler" });
+                  } finally { setPizzaUploading(false); }
+                };
+                const deletePizza = async (id: string) => {
+                  if (!confirm("Pizza-Bild wirklich löschen?")) return;
+                  await fetch(`${API}/admin/pizza/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+                  fetchPizza();
+                };
+
+                return (
+                  <div className="mt-12 pt-10 border-t border-white/8">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                      <div>
+                        <h2 className="text-lg font-semibold text-white">Pizza Carousel</h2>
+                        <p className="text-xs text-zinc-500 mt-0.5">{pizzaItems.length} Bild{pizzaItems.length !== 1 ? "er" : ""} · Homepage-Kreisband</p>
+                      </div>
+                      <button onClick={openAddP}
+                        className="flex items-center gap-2 text-xs px-4 py-2.5 font-semibold uppercase tracking-widest transition-colors"
+                        style={{ backgroundColor: GOLD, color: "#000" }}>
+                        <Plus className="w-3.5 h-3.5" /> Bild hinzufügen
+                      </button>
+                    </div>
+
+                    {pizzaStatus && (
+                      <div className={`mb-4 flex items-center gap-2 text-sm px-4 py-3 ${pizzaStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
+                        {pizzaStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                        {pizzaStatus.msg}
+                      </div>
+                    )}
+
+                    <AnimatePresence>
+                      {showPizzaForm && (
+                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                          className="mb-8 border border-white/10 bg-[#1a1a1a] p-5 sm:p-7">
+                          <div className="flex items-center justify-between mb-5">
+                            <h3 className="text-sm font-semibold text-white uppercase tracking-widest">
+                              {editingPizza ? "Pizza-Bild bearbeiten" : "Neues Pizza-Bild"}
+                            </h3>
+                            <button onClick={closeP} className="text-zinc-500 hover:text-white transition-colors"><X className="w-4 h-4" /></button>
+                          </div>
+                          <form onSubmit={submitPizza} className="space-y-4">
+                            <div
+                              onDragOver={e => { e.preventDefault(); setPizzaDragOver(true); }}
+                              onDragLeave={() => setPizzaDragOver(false)}
+                              onDrop={e => { e.preventDefault(); setPizzaDragOver(false); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("image/")) setPizzaFile(f); }}
+                              onClick={() => pizzaFileRef.current?.click()}
+                              className={`relative cursor-pointer border-2 border-dashed transition-colors ${pizzaDragOver ? "border-[#d4af37] bg-[#d4af37]/5" : "border-white/15 hover:border-white/30"} flex flex-col items-center justify-center p-8 text-center`}>
+                              <input ref={pizzaFileRef} type="file" accept="image/*" className="hidden"
+                                onChange={e => { const f = e.target.files?.[0]; if (f) setPizzaFile(f); }} />
+                              {pizzaFile ? (
+                                <div className="flex flex-col items-center gap-2">
+                                  <img src={URL.createObjectURL(pizzaFile)} alt="Vorschau" className="h-28 w-28 object-cover rounded-full" />
+                                  <span className="text-xs text-zinc-400">{pizzaFile.name}</span>
+                                </div>
+                              ) : editingPizza?.imageUrl ? (
+                                <div className="flex flex-col items-center gap-2">
+                                  <img src={editingPizza.imageUrl} alt="Aktuell" className="h-28 w-28 object-cover rounded-full opacity-60" />
+                                  <span className="text-xs text-zinc-500">Zum Ersetzen klicken oder ziehen</span>
+                                </div>
+                              ) : (
+                                <>
+                                  <Image className="w-8 h-8 text-zinc-600 mb-2" />
+                                  <p className="text-sm text-zinc-400">Bild hier ablegen oder klicken</p>
+                                  <p className="text-xs text-zinc-600 mt-1">JPG, PNG, WEBP · max. 10 MB</p>
+                                </>
+                              )}
+                            </div>
+                            {!pizzaFile && (
+                              <div>
+                                <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">oder Bild-URL</label>
+                                <input value={pizzaForm.imageUrl} onChange={e => setPizzaForm(p => ({ ...p, imageUrl: e.target.value }))}
+                                  className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
+                                  placeholder="https://..." />
+                              </div>
+                            )}
+                            <div>
+                              <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">Bezeichnung (optional)</label>
+                              <input value={pizzaForm.label} onChange={e => setPizzaForm(p => ({ ...p, label: e.target.value }))}
+                                className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
+                                placeholder="z. B. Margherita" />
+                            </div>
+                            <div className="flex items-center gap-3 pt-1">
+                              <button type="submit" disabled={pizzaUploading || (!pizzaFile && !pizzaForm.imageUrl && !editingPizza)}
+                                className="flex items-center gap-2 text-xs px-5 py-2.5 font-semibold uppercase tracking-widest transition-opacity disabled:opacity-40"
+                                style={{ backgroundColor: GOLD, color: "#000" }}>
+                                {pizzaUploading ? "Lädt…" : editingPizza ? "Speichern" : "Hinzufügen"}
+                              </button>
+                              <button type="button" onClick={closeP}
+                                className="text-xs px-4 py-2.5 border border-white/10 text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">
+                                Abbrechen
+                              </button>
+                            </div>
+                          </form>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    {pizzaItems.length === 0 ? (
+                      <div className="text-center py-12 text-zinc-600">
+                        <Image className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                        <p className="text-sm">Noch keine Pizza-Bilder. Standardbilder werden verwendet.</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
+                        {pizzaItems.map(item => (
+                          <div key={item.id} className="group relative">
+                            <div className="aspect-square rounded-full overflow-hidden border-2 border-amber-700/30 shadow-md bg-[#111]">
+                              <img src={item.imageUrl} alt={item.label}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                            </div>
+                            {item.label && (
+                              <p className="text-xs text-zinc-500 text-center mt-1.5 truncate">{item.label}</p>
+                            )}
+                            <div className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                              <button onClick={() => openEditP(item)}
+                                className="flex items-center gap-1 text-[11px] px-2 py-1 bg-[#d4af37] text-black font-semibold rounded">
+                                <Pencil className="w-2.5 h-2.5" />
+                              </button>
+                              <button onClick={() => deletePizza(item.id)}
+                                className="flex items-center gap-1 text-[11px] px-2 py-1 border border-red-500/50 text-red-400 hover:bg-red-500/10 rounded">
+                                <Trash2 className="w-2.5 h-2.5" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </>
           );
         })()}

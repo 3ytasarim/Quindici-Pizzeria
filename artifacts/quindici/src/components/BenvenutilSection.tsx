@@ -1,11 +1,11 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion, useInView } from "framer-motion";
 
-const pizzas = [
-  { src: "/pizza-1.png", label: "Margherita" },
-  { src: "/pizza-2.png", label: "Diavola" },
-  { src: "/pizza-3.png", label: "Quattro Formaggi" },
-  { src: "/pizza-4.png", label: "Prosciutto e Rucola" },
+const STATIC_PIZZAS = [
+  { id: "s1", src: "/pizza-1.png", label: "Margherita" },
+  { id: "s2", src: "/pizza-2.png", label: "Diavola" },
+  { id: "s3", src: "/pizza-3.png", label: "Quattro Formaggi" },
+  { id: "s4", src: "/pizza-4.png", label: "Prosciutto e Rucola" },
 ];
 
 const CARD_SIZE = 190;
@@ -20,11 +20,25 @@ export default function BenvenutilSection() {
   const rafRef = useRef<number>(0);
   const pausedRef = useRef(false);
 
+  const [pizzas, setPizzas] = useState(STATIC_PIZZAS);
+
+  useEffect(() => {
+    fetch("/api/pizza")
+      .then(r => r.ok ? r.json() : [])
+      .then((data: { id: string; imageUrl: string; label: string }[]) => {
+        if (data.length > 0) {
+          setPizzas(data.map(p => ({ id: p.id, src: p.imageUrl, label: p.label })));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   useEffect(() => {
     const track = trackRef.current;
-    if (!track) return;
+    if (!track || pizzas.length === 0) return;
     const itemW = CARD_SIZE + GAP;
     const totalW = itemW * pizzas.length;
+    xRef.current = 0;
     const animate = () => {
       if (!pausedRef.current) {
         xRef.current -= SPEED;
@@ -33,9 +47,10 @@ export default function BenvenutilSection() {
       }
       rafRef.current = requestAnimationFrame(animate);
     };
+    cancelAnimationFrame(rafRef.current);
     rafRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(rafRef.current);
-  }, []);
+  }, [pizzas]);
 
   const displayed = [...pizzas, ...pizzas, ...pizzas];
 
@@ -72,7 +87,7 @@ export default function BenvenutilSection() {
           </motion.div>
         </div>
 
-        {/* Two-column: text left, image right */}
+        {/* Two-column */}
         <div className="grid md:grid-cols-2 gap-10 items-stretch mb-20">
           <motion.div
             initial={{ opacity: 0, x: -24 }}
@@ -114,7 +129,7 @@ export default function BenvenutilSection() {
         </div>
       </div>
 
-      {/* Infinite scrolling pizza band — full width */}
+      {/* Infinite pizza band */}
       <div
         className="w-full overflow-hidden"
         onMouseEnter={() => { pausedRef.current = true; }}
@@ -127,7 +142,7 @@ export default function BenvenutilSection() {
         >
           {displayed.map((pizza, i) => (
             <div
-              key={i}
+              key={`${pizza.id}-${i}`}
               className="shrink-0 rounded-full overflow-hidden border-2 border-amber-200 shadow-md"
               style={{ width: CARD_SIZE, height: CARD_SIZE }}
             >
