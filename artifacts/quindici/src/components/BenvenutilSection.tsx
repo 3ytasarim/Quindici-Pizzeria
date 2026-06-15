@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, useInView } from "framer-motion";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
 
 const pizzas = [
   { src: "/pizza-1.png", label: "Margherita" },
@@ -9,31 +9,14 @@ const pizzas = [
 ];
 
 export default function BenvenutilSection() {
-  const [active, setActive] = useState(0);
-  const [dir, setDir] = useState(1);
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
-  useEffect(() => {
-    const t = setInterval(() => {
-      setDir(1);
-      setActive((p) => (p + 1) % pizzas.length);
-    }, 3200);
-    return () => clearInterval(t);
-  }, []);
-
-  const go = (d: number) => {
-    setDir(d);
-    setActive((p) => (p + pizzas.length + d) % pizzas.length);
-  };
-
   return (
     <section ref={ref} className="relative overflow-hidden bg-[#fdf8f2] py-24 px-6">
-      {/* Top block: heading + two-col layout */}
       <div className="max-w-6xl mx-auto">
         {/* Heading */}
         <div className="relative mb-10">
-          {/* Watermark "Benvenuti" — shifted higher */}
           <motion.span
             initial={{ opacity: 0, y: -10 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -51,7 +34,6 @@ export default function BenvenutilSection() {
             Benvenuti
           </motion.span>
 
-          {/* Subtitle */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -66,7 +48,6 @@ export default function BenvenutilSection() {
 
         {/* Two-column: text left, image right */}
         <div className="grid md:grid-cols-2 gap-10 items-stretch mb-20">
-          {/* Left — text */}
           <motion.div
             initial={{ opacity: 0, x: -24 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -91,7 +72,6 @@ export default function BenvenutilSection() {
             </p>
           </motion.div>
 
-          {/* Right — image stretches to match text column height */}
           <motion.div
             initial={{ opacity: 0, x: 24 }}
             animate={inView ? { opacity: 1, x: 0 } : {}}
@@ -107,49 +87,26 @@ export default function BenvenutilSection() {
           </motion.div>
         </div>
 
-        {/* Pizza carousel */}
-        <div className="relative">
-          {/* Fixed-position pizza circles — all visible, active scales up + colorizes */}
-          <div className="flex items-center justify-center gap-6 md:gap-10" style={{ height: 220 }}>
-            {pizzas.map((pizza, i) => {
-              const isActive = i === active;
-              return (
-                <motion.button
-                  key={pizza.src}
-                  onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
-                  animate={{
-                    scale: isActive ? 1 : 0.65,
-                    filter: isActive ? "grayscale(0%) brightness(1)" : "grayscale(100%) brightness(0.75)",
-                    opacity: isActive ? 1 : 0.6,
-                  }}
-                  transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                  className="shrink-0 rounded-full overflow-hidden border-2 border-amber-200 shadow-md focus:outline-none"
-                  style={{ width: 200, height: 200 }}
-                  data-testid={`slider-pizza-${i}`}
-                >
-                  <img
-                    src={pizza.src}
-                    alt={pizza.label}
-                    className="w-full h-full object-cover"
-                  />
-                </motion.button>
-              );
-            })}
-          </div>
-
-          {/* Dots */}
-          <div className="flex justify-center gap-2 mt-6">
-            {pizzas.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => { setDir(i > active ? 1 : -1); setActive(i); }}
-                className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === active ? "bg-amber-700 w-6" : "bg-stone-300 w-1.5"
-                }`}
-                data-testid={`slider-dot-${i}`}
+        {/* Pizza row — static, all visible */}
+        <div className="flex items-center justify-center gap-4 md:gap-8">
+          {pizzas.map((pizza, i) => (
+            <div
+              key={pizza.src}
+              className="shrink-0 rounded-full overflow-hidden border-2 border-amber-200 shadow-md"
+              style={{
+                width: "clamp(80px, 18vw, 190px)",
+                height: "clamp(80px, 18vw, 190px)",
+                filter: i < pizzas.length - 1 ? "grayscale(100%) brightness(0.75)" : "none",
+                opacity: i < pizzas.length - 1 ? 0.65 : 1,
+              }}
+            >
+              <img
+                src={pizza.src}
+                alt={pizza.label}
+                className="w-full h-full object-cover"
               />
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

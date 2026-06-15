@@ -10,7 +10,7 @@
     "email": "p.bauer@example.de",
     "notes": "Fensterplatz",
     "createdAt": "2026-06-15T22:04:22.261Z",
-    "seen": false,
+    "seen": true,
     "status": "bestätigt"
   },
   {
@@ -24,7 +24,7 @@
     "email": "m.fischer@example.de",
     "notes": "",
     "createdAt": "2026-06-15T22:04:22.208Z",
-    "seen": false,
+    "seen": true,
     "status": "bestätigt"
   },
   {
@@ -38,7 +38,7 @@
     "email": "k.weber@example.de",
     "notes": "",
     "createdAt": "2026-06-15T22:04:22.157Z",
-    "seen": false,
+    "seen": true,
     "status": "bestätigt"
   },
   {
@@ -52,7 +52,7 @@
     "email": "a.schmidt@example.de",
     "notes": "Geburtstag",
     "createdAt": "2026-06-15T22:04:22.106Z",
-    "seen": false,
+    "seen": true,
     "status": "bestätigt"
   },
   {
@@ -66,7 +66,7 @@
     "email": "t.mueller@example.de",
     "notes": "",
     "createdAt": "2026-06-15T22:04:22.048Z",
-    "seen": false,
+    "seen": true,
     "status": "neu"
   },
   {
@@ -80,7 +80,7 @@
     "email": "test@quindici.de",
     "notes": "Test-Reservierung",
     "createdAt": "2026-06-15T21:11:19.958Z",
-    "seen": false,
+    "seen": true,
     "status": "neu"
   },
   {
@@ -94,7 +94,7 @@
     "email": "test@quindici.de",
     "notes": "Test-Reservierung",
     "createdAt": "2026-06-15T21:11:12.635Z",
-    "seen": false,
+    "seen": true,
     "status": "neu"
   }
 ]
