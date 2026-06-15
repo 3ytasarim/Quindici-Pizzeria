@@ -6,7 +6,6 @@ const navLinks = [
   { label: "Tisch reservieren", href: "#" },
   { label: "Mittagstisch",      href: "#" },
   { label: "Lieferservice",     href: "#" },
-  { label: "Abholung",          href: "#" },
   { label: "Kontakt",           href: "#" },
   { label: "Impressum",         href: "#" },
   { label: "Datenschutz",       href: "#" },
