@@ -88,8 +88,11 @@ export default function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
         >
-          <motion.button
-            whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(245,158,11,0.35)" }}
+          <motion.a
+            href="/api/mittagstisch/pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(212,175,55,0.35)" }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="inline-flex items-center gap-2.5 px-7 py-3 border border-[#d4af37]/70 bg-black/30 backdrop-blur-sm text-sm font-semibold shadow-sm hover:bg-[#d4af37]/10 transition-colors"
@@ -102,7 +105,7 @@ export default function HeroSection() {
             </span>
             <UtensilsCrossed className="w-3.5 h-3.5" style={{ color: "#d4af37" }} />
             Mittagstisch der Woche
-          </motion.button>
+          </motion.a>
         </motion.div>
       </div>
     </section>
