@@ -89,6 +89,7 @@ export default function TischReservieren() {
   const [errors2, setErrors2] = useState<Partial<Form2>>({});
 
   // Warteliste state
+  const [warteView, setWarteView] = useState(false);
   const [warteFirstName, setWarteFirstName] = useState("");
   const [warteLastName, setWarteLastName] = useState("");
   const [warteEmail, setWarteEmail] = useState("");
@@ -217,251 +218,317 @@ export default function TischReservieren() {
 
                 {/* ── STEP 1 ── */}
                 {step === 1 && (
-                  <div className="p-8 md:p-10">
-                    <p className="text-xs font-semibold tracking-[0.2em] uppercase text-stone-400 mb-6">
-                      Schritt 1 — Tisch finden
-                    </p>
+                  <AnimatePresence mode="wait">
+                    {!warteView ? (
+                      /* ── Main booking form ── */
+                      <motion.div
+                        key="main"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.25 }}
+                        className="p-8 md:p-10"
+                      >
+                        <p className="text-xs font-semibold tracking-[0.2em] uppercase text-stone-400 mb-6">
+                          Schritt 1 — Tisch finden
+                        </p>
 
-                    <div className="space-y-5">
-                      {/* Datum */}
-                      <div>
-                        <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
-                          <Calendar className="w-3.5 h-3.5" />Datum
-                        </label>
-                        <input
-                          type="date"
-                          min={todayStr()}
-                          value={f1.date}
-                          onChange={e => {
-                            const d = e.target.value;
-                            const times = getAvailableTimes(d);
-                            const time = times.includes(f1.time) ? f1.time : (times[0] ?? "19:00");
-                            setF1(p => ({ ...p, date: d, time }));
-                            setShowWarteliste(false);
-                            setWarteSubmitted(false);
-                          }}
-                          className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none transition-colors"
-                          onFocus={e => (e.target.style.borderColor = GOLD)}
-                          onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
-                        />
-                      </div>
+                        <div className="space-y-5">
+                          {/* Datum */}
+                          <div>
+                            <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
+                              <Calendar className="w-3.5 h-3.5" />Datum
+                            </label>
+                            <input
+                              type="date"
+                              min={todayStr()}
+                              value={f1.date}
+                              onChange={e => {
+                                const d = e.target.value;
+                                const times = getAvailableTimes(d);
+                                const time = times.includes(f1.time) ? f1.time : (times[0] ?? "19:00");
+                                setF1(p => ({ ...p, date: d, time }));
+                                setWarteSubmitted(false);
+                              }}
+                              className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none transition-colors"
+                              onFocus={e => (e.target.style.borderColor = GOLD)}
+                              onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                            />
+                          </div>
 
-                      {/* Uhrzeit */}
-                      <div>
-                        <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
-                          <Clock className="w-3.5 h-3.5" />Uhrzeit
-                        </label>
+                          {/* Uhrzeit */}
+                          <div>
+                            <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
+                              <Clock className="w-3.5 h-3.5" />Uhrzeit
+                            </label>
+                            {noAvailability ? (
+                              <div className="border border-amber-200 bg-amber-50 px-4 py-4">
+                                <p className="text-sm text-amber-800 font-medium mb-1">
+                                  Heute sind leider keine Tische mehr verfügbar.
+                                </p>
+                                <p className="text-xs text-amber-600 mb-3">
+                                  Möchten Sie für morgen reservieren?
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() => setF1(p => ({ ...p, date: tomorrowStr(), time: "19:00" }))}
+                                  className="text-xs font-semibold uppercase tracking-widest px-4 py-2 text-white hover:opacity-90 transition-opacity"
+                                  style={{ backgroundColor: GOLD }}
+                                >
+                                  Morgen anzeigen →
+                                </button>
+                              </div>
+                            ) : (
+                              <select
+                                value={f1.time}
+                                onChange={e => setF1(p => ({ ...p, time: e.target.value }))}
+                                className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none bg-white appearance-none cursor-pointer"
+                                onFocus={e => (e.target.style.borderColor = GOLD)}
+                                onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                              >
+                                {availableTimes.map(t => (
+                                  <option key={t} value={t}>{t} Uhr</option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
 
-                        {noAvailability ? (
-                          /* ── No slots today ── */
-                          <div className="border border-amber-200 bg-amber-50 px-4 py-4">
-                            <p className="text-sm text-amber-800 font-medium mb-1">
-                              Heute sind leider keine Tische mehr verfügbar.
+                          {/* Personen */}
+                          <div>
+                            <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
+                              <Users className="w-3.5 h-3.5" />Personenanzahl
+                            </label>
+                            <div className="grid grid-cols-5 gap-2">
+                              {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
+                                <button
+                                  key={n}
+                                  type="button"
+                                  onClick={() => setF1(p => ({ ...p, guests: String(n) }))}
+                                  className="py-2.5 text-sm font-semibold border transition-all duration-150"
+                                  style={{
+                                    backgroundColor: f1.guests === String(n) ? GOLD : "transparent",
+                                    borderColor: f1.guests === String(n) ? GOLD : "#e7e5e4",
+                                    color: f1.guests === String(n) ? "#fff" : "#57534e",
+                                  }}
+                                >
+                                  {n}
+                                </button>
+                              ))}
+                            </div>
+                            <p className="text-xs text-stone-400 mt-2">
+                              Für mehr als 10 Personen rufen Sie uns bitte an.
                             </p>
-                            <p className="text-xs text-amber-600 mb-3">
-                              Möchten Sie für morgen reservieren?
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => go(2)}
+                          disabled={noAvailability}
+                          className="mt-8 w-full py-3.5 flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-widest text-black transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+                          style={{ backgroundColor: GOLD }}
+                        >
+                          Weiter <ArrowRight className="w-4 h-4" />
+                        </button>
+
+                        {/* Warteliste trigger button */}
+                        <div className="mt-5 flex justify-center">
+                          <button
+                            type="button"
+                            onClick={() => setWarteView(true)}
+                            className="flex items-center gap-2 px-4 py-2 text-xs font-semibold border transition-all hover:shadow-sm"
+                            style={{
+                              borderColor: GOLD,
+                              color: GOLD,
+                              backgroundColor: "transparent",
+                            }}
+                            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#fdf8f2"; }}
+                            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
+                          >
+                            <Bell className="w-3.5 h-3.5" />
+                            Warteliste
+                          </button>
+                        </div>
+                      </motion.div>
+                    ) : (
+                      /* ── Warteliste form ── */
+                      <motion.div
+                        key="warteliste"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 20 }}
+                        transition={{ duration: 0.25 }}
+                      >
+                        {warteSubmitted ? (
+                          /* Success */
+                          <div className="p-8 md:p-10 flex flex-col items-center text-center">
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                              className="w-14 h-14 rounded-full flex items-center justify-center mb-5"
+                              style={{ backgroundColor: GOLD }}
+                            >
+                              <Bell className="w-6 h-6 text-white" />
+                            </motion.div>
+                            <h3 className="font-serif text-xl text-stone-800 mb-2">Auf der Warteliste!</h3>
+                            <p className="text-sm text-stone-500 leading-relaxed mb-1 max-w-xs">
+                              Wir benachrichtigen Sie, sobald ein Tisch für den
+                            </p>
+                            <p className="text-sm font-semibold text-stone-800 mb-6">
+                              {formatDate(f1.date)} um {f1.time} Uhr
                             </p>
                             <button
                               type="button"
-                              onClick={() => setF1(p => ({ ...p, date: tomorrowStr(), time: "19:00" }))}
-                              className="text-xs font-semibold uppercase tracking-widest px-4 py-2 text-white hover:opacity-90 transition-opacity"
-                              style={{ backgroundColor: GOLD }}
+                              onClick={() => {
+                                setWarteView(false);
+                                setWarteSubmitted(false);
+                                setWarteEmail("");
+                                setWartePhone("");
+                                setWarteFirstName("");
+                                setWarteLastName("");
+                              }}
+                              className="flex items-center gap-2 text-sm font-semibold uppercase tracking-widest px-5 py-2.5 border border-stone-200 text-stone-500 hover:border-stone-400 transition-colors"
                             >
-                              Morgen anzeigen →
+                              <ArrowLeft className="w-4 h-4" /> Zurück zur Reservierung
                             </button>
                           </div>
                         ) : (
-                          <select
-                            value={f1.time}
-                            onChange={e => setF1(p => ({ ...p, time: e.target.value }))}
-                            className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none bg-white appearance-none cursor-pointer"
-                            onFocus={e => (e.target.style.borderColor = GOLD)}
-                            onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
-                          >
-                            {availableTimes.map(t => (
-                              <option key={t} value={t}>{t} Uhr</option>
-                            ))}
-                          </select>
-                        )}
-                      </div>
-
-                      {/* Personen */}
-                      <div>
-                        <label className="flex items-center gap-1.5 text-xs font-semibold text-stone-500 uppercase tracking-widest mb-2">
-                          <Users className="w-3.5 h-3.5" />Personenanzahl
-                        </label>
-                        <div className="grid grid-cols-5 gap-2">
-                          {Array.from({ length: 10 }, (_, i) => i + 1).map(n => (
-                            <button
-                              key={n}
-                              type="button"
-                              onClick={() => setF1(p => ({ ...p, guests: String(n) }))}
-                              className="py-2.5 text-sm font-semibold border transition-all duration-150"
-                              style={{
-                                backgroundColor: f1.guests === String(n) ? GOLD : "transparent",
-                                borderColor: f1.guests === String(n) ? GOLD : "#e7e5e4",
-                                color: f1.guests === String(n) ? "#fff" : "#57534e",
-                              }}
-                            >
-                              {n}
-                            </button>
-                          ))}
-                        </div>
-                        <p className="text-xs text-stone-400 mt-2">
-                          Für mehr als 10 Personen rufen Sie uns bitte an.
-                        </p>
-                      </div>
-                    </div>
-
-                    <button
-                      onClick={() => go(2)}
-                      disabled={noAvailability}
-                      className="mt-8 w-full py-3.5 flex items-center justify-center gap-2 text-sm font-semibold uppercase tracking-widest text-black transition-opacity hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
-                      style={{ backgroundColor: GOLD }}
-                    >
-                      Weiter <ArrowRight className="w-4 h-4" />
-                    </button>
-
-                    {/* ── Warteliste ── always visible */}
-                    <div className="mt-6 border-t border-stone-200 pt-0">
-                      {warteSubmitted ? (
-                        <motion.div
-                          initial={{ opacity: 0, y: 8 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="mt-6 flex items-start gap-3 bg-green-50 border border-green-200 px-5 py-4"
-                        >
-                          <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
-                          <div>
-                            <p className="text-sm font-semibold text-green-800">Sie sind auf der Warteliste!</p>
-                            <p className="text-xs text-green-600 mt-1 leading-relaxed">
-                              Wir benachrichtigen Sie, sobald ein Tisch für den {formatDate(f1.date)} um {f1.time} Uhr verfügbar wird.
-                            </p>
-                            <button
-                              type="button"
-                              onClick={() => { setWarteSubmitted(false); setWarteEmail(""); setWartePhone(""); setWarteFirstName(""); setWarteLastName(""); }}
-                              className="mt-2 text-xs text-green-700 underline underline-offset-2"
-                            >
-                              Zurück
-                            </button>
-                          </div>
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          className="mt-0"
-                        >
-                          {/* Header strip */}
-                          <div
-                            className="flex items-center gap-3 px-6 py-4 -mx-8 md:-mx-10"
-                            style={{ backgroundColor: "#fdf3d0" }}
-                          >
+                          <>
+                            {/* Header */}
                             <div
-                              className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
-                              style={{ backgroundColor: GOLD }}
+                              className="px-8 md:px-10 py-5 border-b border-stone-100"
+                              style={{ backgroundColor: "#fdf8f2" }}
                             >
-                              <Bell className="w-4 h-4 text-white" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-semibold text-stone-800">
-                                Benachrichtigung einrichten
+                              <button
+                                type="button"
+                                onClick={() => setWarteView(false)}
+                                className="flex items-center gap-1.5 text-xs font-semibold text-stone-400 hover:text-stone-700 transition-colors mb-4 group"
+                              >
+                                <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
+                                Zurück
+                              </button>
+                              <div className="flex items-center gap-3">
+                                <div
+                                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                                  style={{ backgroundColor: GOLD }}
+                                >
+                                  <Bell className="w-4.5 h-4.5 text-white" />
+                                </div>
+                                <div>
+                                  <h3 className="font-serif text-lg text-stone-800 leading-tight">
+                                    Benachrichtigung einrichten
+                                  </h3>
+                                  <p className="text-xs text-stone-400 mt-0.5">
+                                    Für {formatDate(f1.date)} · {f1.time} Uhr · {f1.guests} {Number(f1.guests) === 1 ? "Person" : "Personen"}
+                                  </p>
+                                </div>
+                              </div>
+                              <p className="text-xs text-stone-500 mt-3 leading-relaxed">
+                                Wir senden Ihnen eine Benachrichtigung, wenn zu Ihrer gewünschten Zeit ein Tisch verfügbar wird.
                               </p>
-                              <p className="text-xs text-stone-500 mt-0.5 leading-snug">
-                                Wir informieren Sie, wenn zu Ihrer gewünschten Zeit ein Tisch frei wird.
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="mt-5 space-y-3">
-                            {/* Name row */}
-                            <div className="grid grid-cols-2 gap-3">
-                              <input
-                                type="text"
-                                value={warteFirstName}
-                                onChange={e => setWarteFirstName(e.target.value)}
-                                placeholder="Vorname"
-                                className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none transition-colors"
-                                onFocus={e => (e.target.style.borderColor = GOLD)}
-                                onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
-                              />
-                              <input
-                                type="text"
-                                value={warteLastName}
-                                onChange={e => setWarteLastName(e.target.value)}
-                                placeholder="Nachname"
-                                className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none transition-colors"
-                                onFocus={e => (e.target.style.borderColor = GOLD)}
-                                onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
-                              />
-                            </div>
-                            {/* Contact row */}
-                            <div className="grid grid-cols-2 gap-3">
-                              <input
-                                type="tel"
-                                value={wartePhone}
-                                onChange={e => setWartePhone(e.target.value)}
-                                placeholder="Telefonnummer"
-                                className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none transition-colors"
-                                onFocus={e => (e.target.style.borderColor = GOLD)}
-                                onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
-                              />
-                              <input
-                                type="email"
-                                value={warteEmail}
-                                onChange={e => setWarteEmail(e.target.value)}
-                                placeholder="E-Mail-Adresse *"
-                                className="w-full border border-stone-200 px-3 py-2.5 text-stone-800 text-sm focus:outline-none transition-colors"
-                                onFocus={e => (e.target.style.borderColor = GOLD)}
-                                onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
-                              />
                             </div>
 
-                            {/* Notification type */}
-                            <div className="pt-1 space-y-2">
-                              <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest">
-                                Update-Benachrichtigungen
-                              </p>
-                              {[
-                                { val: "email" as const, label: "Updates nur per E-Mail erhalten" },
-                                { val: "email_sms" as const, label: "Updates per E-Mail und SMS erhalten" },
-                              ].map(opt => (
-                                <label key={opt.val} className="flex items-center gap-2.5 cursor-pointer group">
-                                  <span
-                                    className="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
-                                    style={{
-                                      borderColor: warteNotif === opt.val ? GOLD : "#d6d3d1",
-                                      backgroundColor: warteNotif === opt.val ? GOLD : "transparent",
-                                    }}
-                                    onClick={() => setWarteNotif(opt.val)}
-                                  >
-                                    {warteNotif === opt.val && (
-                                      <span className="w-1.5 h-1.5 rounded-full bg-white block" />
-                                    )}
-                                  </span>
-                                  <span
-                                    className="text-sm text-stone-600 group-hover:text-stone-800 transition-colors"
-                                    onClick={() => setWarteNotif(opt.val)}
-                                  >
-                                    {opt.label}
-                                  </span>
-                                </label>
-                              ))}
-                            </div>
+                            {/* Form body */}
+                            <div className="px-8 md:px-10 py-6 space-y-5">
+                              {/* Gäste Details */}
+                              <div>
+                                <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-3">
+                                  Gäste Details
+                                </p>
+                                <div className="grid grid-cols-2 gap-3 mb-3">
+                                  <input
+                                    type="text"
+                                    value={warteFirstName}
+                                    onChange={e => setWarteFirstName(e.target.value)}
+                                    placeholder="Vorname"
+                                    className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none transition-colors"
+                                    onFocus={e => (e.target.style.borderColor = GOLD)}
+                                    onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                                  />
+                                  <input
+                                    type="text"
+                                    value={warteLastName}
+                                    onChange={e => setWarteLastName(e.target.value)}
+                                    placeholder="Nachname"
+                                    className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none transition-colors"
+                                    onFocus={e => (e.target.style.borderColor = GOLD)}
+                                    onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                                  />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <input
+                                    type="tel"
+                                    value={wartePhone}
+                                    onChange={e => setWartePhone(e.target.value)}
+                                    placeholder="Telefonnummer"
+                                    className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none transition-colors"
+                                    onFocus={e => (e.target.style.borderColor = GOLD)}
+                                    onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                                  />
+                                  <input
+                                    type="email"
+                                    value={warteEmail}
+                                    onChange={e => setWarteEmail(e.target.value)}
+                                    placeholder="E-Mail-Adresse *"
+                                    className="w-full border border-stone-200 px-4 py-3 text-stone-800 text-sm focus:outline-none transition-colors"
+                                    onFocus={e => (e.target.style.borderColor = GOLD)}
+                                    onBlur={e => (e.target.style.borderColor = "#e7e5e4")}
+                                  />
+                                </div>
+                              </div>
 
-                            <button
-                              type="button"
-                              disabled={!warteEmail.trim()}
-                              onClick={() => { if (warteEmail.trim()) setWarteSubmitted(true); }}
-                              className="w-full py-3 text-sm font-semibold uppercase tracking-widest text-black disabled:opacity-40 hover:opacity-90 transition-opacity mt-1"
-                              style={{ backgroundColor: GOLD }}
-                            >
-                              Benachrichtigung aktivieren
-                            </button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </div>
-                  </div>
+                              {/* Notification type */}
+                              <div>
+                                <p className="text-xs font-semibold text-stone-500 uppercase tracking-widest mb-3">
+                                  Update-Benachrichtigungen
+                                </p>
+                                <div className="space-y-3">
+                                  {[
+                                    { val: "email" as const, label: "Updates nur per E-Mail erhalten" },
+                                    { val: "email_sms" as const, label: "Updates per E-Mail und SMS erhalten" },
+                                  ].map(opt => (
+                                    <button
+                                      key={opt.val}
+                                      type="button"
+                                      onClick={() => setWarteNotif(opt.val)}
+                                      className="w-full flex items-center gap-3 px-4 py-3 border text-left transition-all"
+                                      style={{
+                                        borderColor: warteNotif === opt.val ? GOLD : "#e7e5e4",
+                                        backgroundColor: warteNotif === opt.val ? "#fdf8f2" : "transparent",
+                                      }}
+                                    >
+                                      <span
+                                        className="w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
+                                        style={{
+                                          borderColor: warteNotif === opt.val ? GOLD : "#d6d3d1",
+                                          backgroundColor: warteNotif === opt.val ? GOLD : "transparent",
+                                        }}
+                                      >
+                                        {warteNotif === opt.val && (
+                                          <span className="w-1.5 h-1.5 rounded-full bg-white block" />
+                                        )}
+                                      </span>
+                                      <span className="text-sm text-stone-700">{opt.label}</span>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              <button
+                                type="button"
+                                disabled={!warteEmail.trim()}
+                                onClick={() => { if (warteEmail.trim()) setWarteSubmitted(true); }}
+                                className="w-full py-3.5 text-sm font-semibold uppercase tracking-widest text-black disabled:opacity-40 hover:opacity-90 transition-opacity"
+                                style={{ backgroundColor: GOLD }}
+                              >
+                                Benachrichtigung aktivieren
+                              </button>
+                            </div>
+                          </>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 )}
 
                 {/* ── STEP 2 ── */}
