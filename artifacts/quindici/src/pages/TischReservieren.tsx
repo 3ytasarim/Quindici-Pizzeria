@@ -348,7 +348,13 @@ export default function TischReservieren() {
                             onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#fdf8f2"; }}
                             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
                           >
-                            <Bell className="w-3.5 h-3.5" />
+                            <motion.span
+                              animate={{ rotate: [0, -18, 18, -12, 12, -6, 6, 0] }}
+                              transition={{ duration: 0.7, repeat: Infinity, repeatDelay: 2.5, ease: "easeInOut" }}
+                              style={{ display: "inline-flex" }}
+                            >
+                              <Bell className="w-3.5 h-3.5" />
+                            </motion.span>
                             Warteliste
                           </button>
                         </div>
@@ -594,7 +600,27 @@ export default function TischReservieren() {
                               <button
                                 type="button"
                                 disabled={!warteEmail.trim()}
-                                onClick={() => { if (warteEmail.trim()) setWarteSubmitted(true); }}
+                                onClick={async () => {
+                                  if (!warteEmail.trim()) return;
+                                  try {
+                                    await fetch("/api/warteliste", {
+                                      method: "POST",
+                                      headers: { "Content-Type": "application/json" },
+                                      body: JSON.stringify({
+                                        date: warteDate,
+                                        startTime: warteStart,
+                                        endTime: warteEnd,
+                                        guests: warteGuests,
+                                        firstName: warteFirstName,
+                                        lastName: warteLastName,
+                                        phone: wartePhone,
+                                        email: warteEmail,
+                                        notifType: warteNotif,
+                                      }),
+                                    });
+                                  } catch (_) {}
+                                  setWarteSubmitted(true);
+                                }}
                                 className="w-full py-3.5 text-sm font-semibold uppercase tracking-widest text-black disabled:opacity-40 hover:opacity-90 transition-opacity"
                                 style={{ backgroundColor: GOLD }}
                               >
