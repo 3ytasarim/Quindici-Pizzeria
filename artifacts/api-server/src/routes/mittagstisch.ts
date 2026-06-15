@@ -4,7 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = path.resolve(__dirname, "../../uploads");
+const UPLOADS_DIR = path.resolve(__dirname, "../uploads");
 const META_FILE = path.join(UPLOADS_DIR, "meta.json");
 const PDF_PATH = path.join(UPLOADS_DIR, "mittagstisch.pdf");
 

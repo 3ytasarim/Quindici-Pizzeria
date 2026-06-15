@@ -1,0 +1,8 @@
+[
+  {"id":"1","name":"Margherita","desc":"Tomatensauce, Mozzarella, frisches Basilikum","imageUrl":"/dish-pizza-margherita.png"},
+  {"id":"2","name":"Spaghetti alla Carbonara","desc":"Guanciale, Ei, Pecorino Romano – klassisch ohne Sahne","imageUrl":"/dish-pasta-carbonara.png"},
+  {"id":"3","name":"Polpo alla Griglia","desc":"Zart gegrillter Oktopus auf cremigem Kartoffelpüree","imageUrl":"/dish-polpo.png"},
+  {"id":"4","name":"Carpaccio di Manzo","desc":"Rohes Rindfleisch, Parmesan, Rucola, Zitronenöl","imageUrl":"/dish-carpaccio.png"},
+  {"id":"5","name":"Diavola","desc":"Tomatensauce, Mozzarella, scharfe Salami","imageUrl":"/dish-pizza-diavola.png"},
+  {"id":"6","name":"Tiramisù Classico","desc":"Mascarpone, Espresso, Löffelbiskuit – hausgemacht","imageUrl":"/dish-tiramisu.png"}
+]
