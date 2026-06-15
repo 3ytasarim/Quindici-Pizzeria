@@ -51,16 +51,18 @@ export default function Navbar() {
 
         {/* Buttons — right */}
         <div className="hidden lg:flex items-center gap-3 shrink-0">
-          <Button
-            variant="outline"
-            className="uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 transition-all"
-            style={{ borderColor: "#d4af37", color: "#d4af37", backgroundColor: "transparent" }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d4af3712"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
-            data-testid="button-tisch-reservieren"
-          >
-            Tisch reservieren
-          </Button>
+          <Link href="/tisch-reservieren">
+            <Button
+              variant="outline"
+              className="uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 transition-all"
+              style={{ borderColor: "#d4af37", color: "#d4af37", backgroundColor: "transparent" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d4af3712"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
+              data-testid="button-tisch-reservieren"
+            >
+              Tisch reservieren
+            </Button>
+          </Link>
           <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
             <Button
               className="text-white uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
@@ -103,14 +105,16 @@ export default function Navbar() {
                   ))}
                 </div>
                 <div className="flex flex-col gap-3 mt-8 px-2">
-                  <Button
-                    variant="outline"
-                    className="w-full uppercase tracking-widest text-[11px] font-semibold rounded-none"
-                    style={{ borderColor: "#d4af37", color: "#d4af37" }}
-                    data-testid="mobile-button-tisch-reservieren"
-                  >
-                    Tisch reservieren
-                  </Button>
+                  <Link href="/tisch-reservieren" className="w-full">
+                    <Button
+                      variant="outline"
+                      className="w-full uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                      style={{ borderColor: "#d4af37", color: "#d4af37" }}
+                      data-testid="mobile-button-tisch-reservieren"
+                    >
+                      Tisch reservieren
+                    </Button>
+                  </Link>
                   <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer" className="w-full">
                     <Button
                       className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"

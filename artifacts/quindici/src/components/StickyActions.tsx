@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "wouter";
 import { CalendarCheck, Utensils } from "lucide-react";
 
 interface StickyTabProps {
@@ -34,14 +35,16 @@ function StickyTab({ label, icon, bgClass, bgStyle, delay, paddingY }: StickyTab
 export default function StickyActions() {
   return (
     <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-px">
-      <StickyTab
-        label="Tisch reservieren"
-        icon={<CalendarCheck className="w-3.5 h-3.5" />}
-        bgClass="hover:brightness-90"
-        bgStyle={{ backgroundColor: "#d4af37" }}
-        delay={0.3}
-        paddingY="py-7"
-      />
+      <Link href="/tisch-reservieren">
+        <StickyTab
+          label="Tisch reservieren"
+          icon={<CalendarCheck className="w-3.5 h-3.5" />}
+          bgClass="hover:brightness-90"
+          bgStyle={{ backgroundColor: "#d4af37" }}
+          delay={0.3}
+          paddingY="py-7"
+        />
+      </Link>
       <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
         <StickyTab
           label="Jetzt bestellen"

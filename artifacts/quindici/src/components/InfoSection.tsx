@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { Link } from "wouter";
 import { motion, useInView } from "framer-motion";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import MenuCard from "@/components/MenuCard";
@@ -85,12 +86,12 @@ export default function InfoSection() {
               </li>
             </ul>
             <div className="flex justify-center mt-6">
-              <a
-                href="#"
+              <Link
+                href="/tisch-reservieren"
                 className="inline-flex items-center gap-2 bg-amber-700 text-white text-sm font-medium px-5 py-2.5 hover:bg-amber-800 transition-colors duration-200"
               >
                 Tisch reservieren
-              </a>
+              </Link>
             </div>
           </motion.div>
 
