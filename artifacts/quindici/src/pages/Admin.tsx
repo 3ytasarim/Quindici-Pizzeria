@@ -5,6 +5,7 @@ import {
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
   RefreshCw, ChevronLeft, ChevronRight, GalleryHorizontal,
+  ChevronUp, ChevronDown,
 } from "lucide-react";
 
 const API = "/api";
@@ -797,338 +798,263 @@ export default function Admin() {
 
         {/* ── GALERIE ── */}
         {tab === "galerie" && (() => {
-          const openAdd = () => {
-            setEditingGallery(null);
-            setGalleryForm({ title: "", imageUrl: "" });
-            setGalleryFile(null);
-            setGalleryStatus(null);
-            setShowGalleryForm(true);
+          // ── Pizza helpers ──
+          const openAddP = () => { setEditingPizza(null); setPizzaForm({ label: "", imageUrl: "" }); setPizzaFile(null); setPizzaStatus(null); setShowPizzaForm(true); };
+          const openEditP = (item: PizzaItem) => { setEditingPizza(item); setPizzaForm({ label: item.label, imageUrl: item.imageUrl }); setPizzaFile(null); setPizzaStatus(null); setShowPizzaForm(true); };
+          const closeP = () => { setShowPizzaForm(false); setEditingPizza(null); setPizzaFile(null); };
+          const submitPizza = async (e: React.FormEvent) => {
+            e.preventDefault(); setPizzaUploading(true); setPizzaStatus(null);
+            try {
+              const fd = new FormData();
+              if (pizzaForm.label) fd.append("label", pizzaForm.label);
+              if (pizzaFile) fd.append("image", pizzaFile);
+              else if (pizzaForm.imageUrl) fd.append("imageUrl", pizzaForm.imageUrl);
+              const url = editingPizza ? `${API}/admin/pizza/${editingPizza.id}` : `${API}/admin/pizza`;
+              const r = await fetch(url, { method: editingPizza ? "PUT" : "POST", headers: { Authorization: `Bearer ${token}` }, body: fd });
+              if (!r.ok) throw new Error((await r.json()).error ?? "Fehler");
+              setPizzaStatus({ type: "success", msg: editingPizza ? "Gespeichert" : "Hinzugefügt" });
+              fetchPizza(); closeP();
+            } catch (err: unknown) { setPizzaStatus({ type: "error", msg: err instanceof Error ? err.message : "Fehler" }); }
+            finally { setPizzaUploading(false); }
           };
-          const openEdit = (item: { id: string; title: string; imageUrl: string }) => {
-            setEditingGallery(item);
-            setGalleryForm({ title: item.title, imageUrl: item.imageUrl });
-            setGalleryFile(null);
-            setGalleryStatus(null);
-            setShowGalleryForm(true);
+          const deletePizza = async (id: string) => {
+            if (!confirm("Bild löschen?")) return;
+            await fetch(`${API}/admin/pizza/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+            fetchPizza();
           };
-          const closeForm = () => { setShowGalleryForm(false); setEditingGallery(null); setGalleryFile(null); };
-          const handleFileDrop = (e: React.DragEvent) => {
-            e.preventDefault(); setGalleryDragOver(false);
-            const f = e.dataTransfer.files[0];
-            if (f && f.type.startsWith("image/")) setGalleryFile(f);
+          const movePizza = async (id: string, direction: "up" | "down") => {
+            await fetch(`${API}/admin/pizza/${id}/move`, { method: "PATCH", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ direction }) });
+            fetchPizza();
           };
+
+          // ── Gallery helpers ──
+          const openAddG = () => { setEditingGallery(null); setGalleryForm({ title: "", imageUrl: "" }); setGalleryFile(null); setGalleryStatus(null); setShowGalleryForm(true); };
+          const openEditG = (item: GalleryItem) => { setEditingGallery(item); setGalleryForm({ title: item.title, imageUrl: item.imageUrl }); setGalleryFile(null); setGalleryStatus(null); setShowGalleryForm(true); };
+          const closeG = () => { setShowGalleryForm(false); setEditingGallery(null); setGalleryFile(null); };
           const submitGallery = async (e: React.FormEvent) => {
-            e.preventDefault();
-            setGalleryUploading(true); setGalleryStatus(null);
+            e.preventDefault(); setGalleryUploading(true); setGalleryStatus(null);
             try {
               const fd = new FormData();
               if (galleryForm.title) fd.append("title", galleryForm.title);
               if (galleryFile) fd.append("image", galleryFile);
               else if (galleryForm.imageUrl) fd.append("imageUrl", galleryForm.imageUrl);
-              const url = editingGallery
-                ? `${API}/admin/gallery/${editingGallery.id}`
-                : `${API}/admin/gallery`;
-              const method = editingGallery ? "PUT" : "POST";
-              const r = await fetch(url, { method, headers: { Authorization: `Bearer ${token}` }, body: fd });
+              const url = editingGallery ? `${API}/admin/gallery/${editingGallery.id}` : `${API}/admin/gallery`;
+              const r = await fetch(url, { method: editingGallery ? "PUT" : "POST", headers: { Authorization: `Bearer ${token}` }, body: fd });
               if (!r.ok) throw new Error((await r.json()).error ?? "Fehler");
-              setGalleryStatus({ type: "success", msg: editingGallery ? "Bild aktualisiert" : "Bild hinzugefügt" });
-              fetchGallery(); closeForm();
-            } catch (err: unknown) {
-              setGalleryStatus({ type: "error", msg: err instanceof Error ? err.message : "Fehler" });
-            } finally { setGalleryUploading(false); }
+              setGalleryStatus({ type: "success", msg: editingGallery ? "Gespeichert" : "Hinzugefügt" });
+              fetchGallery(); closeG();
+            } catch (err: unknown) { setGalleryStatus({ type: "error", msg: err instanceof Error ? err.message : "Fehler" }); }
+            finally { setGalleryUploading(false); }
           };
           const deleteGallery = async (id: string) => {
-            if (!confirm("Bild wirklich löschen?")) return;
+            if (!confirm("Bild löschen?")) return;
             await fetch(`${API}/admin/gallery/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
             fetchGallery();
           };
 
+          // Reusable image form
+          const ImageForm = ({ file, setFile, fileRef, dragOver, setDragOver, form, setForm, uploading, onSubmit, onCancel, isEdit, labelField = false }: {
+            file: File | null; setFile: (f: File | null) => void; fileRef: React.RefObject<HTMLInputElement | null>;
+            dragOver: boolean; setDragOver: (v: boolean) => void;
+            form: { title?: string; label?: string; imageUrl: string };
+            setForm: (fn: (p: any) => any) => void;
+            uploading: boolean; onSubmit: (e: React.FormEvent) => void; onCancel: () => void;
+            isEdit: boolean; labelField?: boolean;
+          }) => (
+            <form onSubmit={onSubmit} className="space-y-4">
+              <div
+                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("image/")) setFile(f); }}
+                onClick={() => fileRef.current?.click()}
+                className={`cursor-pointer border-2 border-dashed transition-colors ${dragOver ? "border-[#d4af37] bg-[#d4af37]/5" : "border-white/15 hover:border-white/30"} flex flex-col items-center justify-center p-6 text-center`}>
+                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) setFile(f); }} />
+                {file ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <img src={URL.createObjectURL(file)} alt="Vorschau" className={`h-28 object-cover ${labelField ? "w-28 rounded-full" : "w-auto rounded"}`} />
+                    <span className="text-xs text-zinc-400">{file.name}</span>
+                  </div>
+                ) : form.imageUrl ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <img src={form.imageUrl} alt="Aktuell" className={`h-28 object-cover opacity-60 ${labelField ? "w-28 rounded-full" : "w-auto rounded"}`} />
+                    <span className="text-xs text-zinc-500">Zum Ersetzen klicken oder ziehen</span>
+                  </div>
+                ) : (
+                  <>
+                    <Image className="w-7 h-7 text-zinc-600 mb-2" />
+                    <p className="text-sm text-zinc-400">Klicken oder Bild ziehen</p>
+                    <p className="text-xs text-zinc-600 mt-1">JPG, PNG, WEBP · max. 10 MB</p>
+                  </>
+                )}
+              </div>
+              {!file && (
+                <div>
+                  <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">oder URL</label>
+                  <input value={form.imageUrl} onChange={e => setForm((p: any) => ({ ...p, imageUrl: e.target.value }))}
+                    className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600" placeholder="https://..." />
+                </div>
+              )}
+              <div>
+                <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">{labelField ? "Bezeichnung" : "Bildunterschrift"} (optional)</label>
+                <input
+                  value={labelField ? (form.label ?? "") : (form.title ?? "")}
+                  onChange={e => setForm((p: any) => labelField ? { ...p, label: e.target.value } : { ...p, title: e.target.value })}
+                  className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
+                  placeholder={labelField ? "z. B. Margherita" : "z. B. Restauranteingang"} />
+              </div>
+              <div className="flex items-center gap-3 pt-1">
+                <button type="submit" disabled={uploading || (!file && !form.imageUrl && !isEdit)}
+                  className="flex items-center gap-2 text-xs px-5 py-2.5 font-semibold uppercase tracking-widest disabled:opacity-40"
+                  style={{ backgroundColor: GOLD, color: "#000" }}>
+                  {uploading ? "Lädt…" : isEdit ? "Speichern" : "Hinzufügen"}
+                </button>
+                <button type="button" onClick={onCancel}
+                  className="text-xs px-4 py-2.5 border border-white/10 text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">
+                  Abbrechen
+                </button>
+              </div>
+            </form>
+          );
+
           return (
             <>
+              {/* ═══════════════ PIZZA BAND ═══════════════ */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
-                  <h2 className="text-lg font-semibold text-white">Galerie</h2>
-                  <p className="text-xs text-zinc-500 mt-0.5">{gallery.length} Bild{gallery.length !== 1 ? "er" : ""}</p>
+                  <h2 className="text-lg font-semibold text-white">Pizza Band</h2>
+                  <p className="text-xs text-zinc-500 mt-0.5">{pizzaItems.length} Bild{pizzaItems.length !== 1 ? "er" : ""} · rollendes Kreisband auf der Homepage</p>
                 </div>
-                <button onClick={openAdd}
-                  className="flex items-center gap-2 text-xs px-4 py-2.5 font-semibold uppercase tracking-widest transition-colors"
-                  style={{ backgroundColor: GOLD, color: "#000" }}>
+                <button onClick={openAddP} className="flex items-center gap-2 text-xs px-4 py-2.5 font-semibold uppercase tracking-widest shrink-0" style={{ backgroundColor: GOLD, color: "#000" }}>
                   <Plus className="w-3.5 h-3.5" /> Bild hinzufügen
                 </button>
               </div>
 
-              {galleryStatus && (
-                <div className={`mb-4 flex items-center gap-2 text-sm px-4 py-3 ${galleryStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
-                  {galleryStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
-                  {galleryStatus.msg}
+              {pizzaStatus && (
+                <div className={`mb-4 flex items-center gap-2 text-sm px-4 py-3 ${pizzaStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
+                  {pizzaStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                  {pizzaStatus.msg}
                 </div>
               )}
 
-              {/* Form */}
               <AnimatePresence>
-                {showGalleryForm && (
+                {showPizzaForm && (
                   <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                    className="mb-8 border border-white/10 bg-[#1a1a1a] p-5 sm:p-7">
+                    className="mb-6 border border-white/10 bg-[#1a1a1a] p-5 sm:p-6">
                     <div className="flex items-center justify-between mb-5">
-                      <h3 className="text-sm font-semibold text-white uppercase tracking-widest">
-                        {editingGallery ? "Bild bearbeiten" : "Neues Bild"}
-                      </h3>
-                      <button onClick={closeForm} className="text-zinc-500 hover:text-white transition-colors"><X className="w-4 h-4" /></button>
+                      <h3 className="text-sm font-semibold text-white uppercase tracking-widest">{editingPizza ? "Bild bearbeiten" : "Neues Bild"}</h3>
+                      <button onClick={closeP} className="text-zinc-500 hover:text-white"><X className="w-4 h-4" /></button>
                     </div>
-                    <form onSubmit={submitGallery} className="space-y-4">
-                      {/* Drop zone */}
-                      <div
-                        onDragOver={e => { e.preventDefault(); setGalleryDragOver(true); }}
-                        onDragLeave={() => setGalleryDragOver(false)}
-                        onDrop={handleFileDrop}
-                        onClick={() => galleryFileRef.current?.click()}
-                        className={`relative cursor-pointer border-2 border-dashed transition-colors ${galleryDragOver ? "border-[#d4af37] bg-[#d4af37]/5" : "border-white/15 hover:border-white/30"} flex flex-col items-center justify-center p-8 text-center`}>
-                        <input ref={galleryFileRef} type="file" accept="image/*" className="hidden"
-                          onChange={e => { const f = e.target.files?.[0]; if (f) setGalleryFile(f); }} />
-                        {galleryFile ? (
-                          <div className="flex flex-col items-center gap-2">
-                            <img src={URL.createObjectURL(galleryFile)} alt="Vorschau" className="h-32 w-auto object-contain rounded" />
-                            <span className="text-xs text-zinc-400">{galleryFile.name}</span>
-                          </div>
-                        ) : editingGallery?.imageUrl ? (
-                          <div className="flex flex-col items-center gap-2">
-                            <img src={editingGallery.imageUrl} alt="Aktuell" className="h-32 w-auto object-contain rounded opacity-60" />
-                            <span className="text-xs text-zinc-500">Aktuelles Bild — zum Ersetzen klicken oder ziehen</span>
-                          </div>
-                        ) : (
-                          <>
-                            <Image className="w-8 h-8 text-zinc-600 mb-2" />
-                            <p className="text-sm text-zinc-400">Bild hier ablegen oder klicken</p>
-                            <p className="text-xs text-zinc-600 mt-1">JPG, PNG, WEBP · max. 10 MB</p>
-                          </>
-                        )}
-                      </div>
-                      {/* URL fallback */}
-                      {!galleryFile && (
-                        <div>
-                          <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">oder Bild-URL</label>
-                          <input value={galleryForm.imageUrl} onChange={e => setGalleryForm(p => ({ ...p, imageUrl: e.target.value }))}
-                            className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
-                            placeholder="https://..." />
-                        </div>
-                      )}
-                      {/* Title */}
-                      <div>
-                        <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">Bildunterschrift (optional)</label>
-                        <input value={galleryForm.title} onChange={e => setGalleryForm(p => ({ ...p, title: e.target.value }))}
-                          className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
-                          placeholder="z. B. Pizza Margherita" />
-                      </div>
-                      <div className="flex items-center gap-3 pt-1">
-                        <button type="submit" disabled={galleryUploading || (!galleryFile && !galleryForm.imageUrl && !editingGallery)}
-                          className="flex items-center gap-2 text-xs px-5 py-2.5 font-semibold uppercase tracking-widest transition-opacity disabled:opacity-40"
-                          style={{ backgroundColor: GOLD, color: "#000" }}>
-                          {galleryUploading ? "Lädt…" : editingGallery ? "Speichern" : "Hinzufügen"}
-                        </button>
-                        <button type="button" onClick={closeForm}
-                          className="text-xs px-4 py-2.5 border border-white/10 text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">
-                          Abbrechen
-                        </button>
-                      </div>
-                    </form>
+                    <ImageForm file={pizzaFile} setFile={setPizzaFile} fileRef={pizzaFileRef}
+                      dragOver={pizzaDragOver} setDragOver={setPizzaDragOver}
+                      form={pizzaForm} setForm={setPizzaForm}
+                      uploading={pizzaUploading} onSubmit={submitPizza} onCancel={closeP}
+                      isEdit={!!editingPizza} labelField />
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              {/* Grid */}
-              {gallery.length === 0 ? (
-                <div className="text-center py-20 text-zinc-600">
-                  <GalleryHorizontal className="w-10 h-10 mx-auto mb-3 opacity-30" />
-                  <p className="text-sm">Noch keine Bilder vorhanden.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {gallery.map(item => (
-                    <div key={item.id} className="group relative border border-white/8 overflow-hidden bg-[#111]">
-                      <div className="aspect-[4/3] overflow-hidden">
-                        <img src={item.imageUrl} alt={item.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                      </div>
-                      {item.title && (
-                        <div className="px-2 py-1.5 text-xs text-zinc-400 truncate">{item.title}</div>
-                      )}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                        <button onClick={() => openEdit(item)}
-                          className="flex items-center gap-1 text-xs px-3 py-1.5 bg-[#d4af37] text-black font-semibold">
-                          <Pencil className="w-3 h-3" /> Edit
-                        </button>
-                        <button onClick={() => deleteGallery(item.id)}
-                          className="flex items-center gap-1 text-xs px-3 py-1.5 border border-red-500/50 text-red-400 hover:bg-red-500/10 transition-colors">
-                          <Trash2 className="w-3 h-3" /> Del
-                        </button>
-                      </div>
+              {/* Pizza list — all visible, with reorder + edit + delete */}
+              <div className="space-y-2">
+                {pizzaItems.map((item, i) => (
+                  <div key={item.id} className="flex items-center gap-4 border border-white/8 bg-[#111] p-3">
+                    {/* Thumbnail */}
+                    <div className="w-14 h-14 shrink-0 rounded-full overflow-hidden border border-amber-700/30">
+                      <img src={item.imageUrl} alt={item.label} className="w-full h-full object-cover" />
                     </div>
-                  ))}
-                </div>
-              )}
-
-              {/* ── Pizza Carousel ── */}
-              {(() => {
-                const openAddP = () => {
-                  setEditingPizza(null);
-                  setPizzaForm({ label: "", imageUrl: "" });
-                  setPizzaFile(null);
-                  setPizzaStatus(null);
-                  setShowPizzaForm(true);
-                };
-                const openEditP = (item: PizzaItem) => {
-                  setEditingPizza(item);
-                  setPizzaForm({ label: item.label, imageUrl: item.imageUrl });
-                  setPizzaFile(null);
-                  setPizzaStatus(null);
-                  setShowPizzaForm(true);
-                };
-                const closeP = () => { setShowPizzaForm(false); setEditingPizza(null); setPizzaFile(null); };
-                const submitPizza = async (e: React.FormEvent) => {
-                  e.preventDefault();
-                  setPizzaUploading(true); setPizzaStatus(null);
-                  try {
-                    const fd = new FormData();
-                    if (pizzaForm.label) fd.append("label", pizzaForm.label);
-                    if (pizzaFile) fd.append("image", pizzaFile);
-                    else if (pizzaForm.imageUrl) fd.append("imageUrl", pizzaForm.imageUrl);
-                    const url = editingPizza ? `${API}/admin/pizza/${editingPizza.id}` : `${API}/admin/pizza`;
-                    const method = editingPizza ? "PUT" : "POST";
-                    const r = await fetch(url, { method, headers: { Authorization: `Bearer ${token}` }, body: fd });
-                    if (!r.ok) throw new Error((await r.json()).error ?? "Fehler");
-                    setPizzaStatus({ type: "success", msg: editingPizza ? "Aktualisiert" : "Hinzugefügt" });
-                    fetchPizza(); closeP();
-                  } catch (err: unknown) {
-                    setPizzaStatus({ type: "error", msg: err instanceof Error ? err.message : "Fehler" });
-                  } finally { setPizzaUploading(false); }
-                };
-                const deletePizza = async (id: string) => {
-                  if (!confirm("Pizza-Bild wirklich löschen?")) return;
-                  await fetch(`${API}/admin/pizza/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
-                  fetchPizza();
-                };
-
-                return (
-                  <div className="mt-12 pt-10 border-t border-white/8">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                      <div>
-                        <h2 className="text-lg font-semibold text-white">Pizza Carousel</h2>
-                        <p className="text-xs text-zinc-500 mt-0.5">{pizzaItems.length} Bild{pizzaItems.length !== 1 ? "er" : ""} · Homepage-Kreisband</p>
-                      </div>
-                      <button onClick={openAddP}
-                        className="flex items-center gap-2 text-xs px-4 py-2.5 font-semibold uppercase tracking-widest transition-colors"
-                        style={{ backgroundColor: GOLD, color: "#000" }}>
-                        <Plus className="w-3.5 h-3.5" /> Bild hinzufügen
+                    {/* Name */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-white truncate">{item.label || <span className="text-zinc-500 italic">Kein Name</span>}</p>
+                      <p className="text-[11px] text-zinc-600 mt-0.5">Position {i + 1}</p>
+                    </div>
+                    {/* Actions */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button onClick={() => movePizza(item.id, "up")} disabled={i === 0}
+                        className="p-1.5 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors border border-white/8 hover:border-white/20">
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => movePizza(item.id, "down")} disabled={i === pizzaItems.length - 1}
+                        className="p-1.5 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors border border-white/8 hover:border-white/20">
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => openEditP(item)}
+                        className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-300 hover:border-[#d4af37] hover:text-[#d4af37] transition-colors">
+                        <Pencil className="w-3 h-3" /> Bearbeiten
+                      </button>
+                      <button onClick={() => deletePizza(item.id)}
+                        className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-500 hover:border-red-500/40 hover:text-red-400 transition-colors">
+                        <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
-
-                    {pizzaStatus && (
-                      <div className={`mb-4 flex items-center gap-2 text-sm px-4 py-3 ${pizzaStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
-                        {pizzaStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
-                        {pizzaStatus.msg}
-                      </div>
-                    )}
-
-                    <AnimatePresence>
-                      {showPizzaForm && (
-                        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                          className="mb-8 border border-white/10 bg-[#1a1a1a] p-5 sm:p-7">
-                          <div className="flex items-center justify-between mb-5">
-                            <h3 className="text-sm font-semibold text-white uppercase tracking-widest">
-                              {editingPizza ? "Pizza-Bild bearbeiten" : "Neues Pizza-Bild"}
-                            </h3>
-                            <button onClick={closeP} className="text-zinc-500 hover:text-white transition-colors"><X className="w-4 h-4" /></button>
-                          </div>
-                          <form onSubmit={submitPizza} className="space-y-4">
-                            <div
-                              onDragOver={e => { e.preventDefault(); setPizzaDragOver(true); }}
-                              onDragLeave={() => setPizzaDragOver(false)}
-                              onDrop={e => { e.preventDefault(); setPizzaDragOver(false); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("image/")) setPizzaFile(f); }}
-                              onClick={() => pizzaFileRef.current?.click()}
-                              className={`relative cursor-pointer border-2 border-dashed transition-colors ${pizzaDragOver ? "border-[#d4af37] bg-[#d4af37]/5" : "border-white/15 hover:border-white/30"} flex flex-col items-center justify-center p-8 text-center`}>
-                              <input ref={pizzaFileRef} type="file" accept="image/*" className="hidden"
-                                onChange={e => { const f = e.target.files?.[0]; if (f) setPizzaFile(f); }} />
-                              {pizzaFile ? (
-                                <div className="flex flex-col items-center gap-2">
-                                  <img src={URL.createObjectURL(pizzaFile)} alt="Vorschau" className="h-28 w-28 object-cover rounded-full" />
-                                  <span className="text-xs text-zinc-400">{pizzaFile.name}</span>
-                                </div>
-                              ) : editingPizza?.imageUrl ? (
-                                <div className="flex flex-col items-center gap-2">
-                                  <img src={editingPizza.imageUrl} alt="Aktuell" className="h-28 w-28 object-cover rounded-full opacity-60" />
-                                  <span className="text-xs text-zinc-500">Zum Ersetzen klicken oder ziehen</span>
-                                </div>
-                              ) : (
-                                <>
-                                  <Image className="w-8 h-8 text-zinc-600 mb-2" />
-                                  <p className="text-sm text-zinc-400">Bild hier ablegen oder klicken</p>
-                                  <p className="text-xs text-zinc-600 mt-1">JPG, PNG, WEBP · max. 10 MB</p>
-                                </>
-                              )}
-                            </div>
-                            {!pizzaFile && (
-                              <div>
-                                <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">oder Bild-URL</label>
-                                <input value={pizzaForm.imageUrl} onChange={e => setPizzaForm(p => ({ ...p, imageUrl: e.target.value }))}
-                                  className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
-                                  placeholder="https://..." />
-                              </div>
-                            )}
-                            <div>
-                              <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">Bezeichnung (optional)</label>
-                              <input value={pizzaForm.label} onChange={e => setPizzaForm(p => ({ ...p, label: e.target.value }))}
-                                className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
-                                placeholder="z. B. Margherita" />
-                            </div>
-                            <div className="flex items-center gap-3 pt-1">
-                              <button type="submit" disabled={pizzaUploading || (!pizzaFile && !pizzaForm.imageUrl && !editingPizza)}
-                                className="flex items-center gap-2 text-xs px-5 py-2.5 font-semibold uppercase tracking-widest transition-opacity disabled:opacity-40"
-                                style={{ backgroundColor: GOLD, color: "#000" }}>
-                                {pizzaUploading ? "Lädt…" : editingPizza ? "Speichern" : "Hinzufügen"}
-                              </button>
-                              <button type="button" onClick={closeP}
-                                className="text-xs px-4 py-2.5 border border-white/10 text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">
-                                Abbrechen
-                              </button>
-                            </div>
-                          </form>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {pizzaItems.length === 0 ? (
-                      <div className="text-center py-12 text-zinc-600">
-                        <Image className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                        <p className="text-sm">Noch keine Pizza-Bilder. Standardbilder werden verwendet.</p>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-4">
-                        {pizzaItems.map(item => (
-                          <div key={item.id} className="group relative">
-                            <div className="aspect-square rounded-full overflow-hidden border-2 border-amber-700/30 shadow-md bg-[#111]">
-                              <img src={item.imageUrl} alt={item.label}
-                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                            </div>
-                            {item.label && (
-                              <p className="text-xs text-zinc-500 text-center mt-1.5 truncate">{item.label}</p>
-                            )}
-                            <div className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
-                              <button onClick={() => openEditP(item)}
-                                className="flex items-center gap-1 text-[11px] px-2 py-1 bg-[#d4af37] text-black font-semibold rounded">
-                                <Pencil className="w-2.5 h-2.5" />
-                              </button>
-                              <button onClick={() => deletePizza(item.id)}
-                                className="flex items-center gap-1 text-[11px] px-2 py-1 border border-red-500/50 text-red-400 hover:bg-red-500/10 rounded">
-                                <Trash2 className="w-2.5 h-2.5" />
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
-                );
-              })()}
+                ))}
+              </div>
+
+              {/* ═══════════════ GALERIE FOTO BAND ═══════════════ */}
+              <div className="mt-12 pt-10 border-t border-white/8">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-white">Foto-Galerie</h2>
+                    <p className="text-xs text-zinc-500 mt-0.5">{gallery.length} Bild{gallery.length !== 1 ? "er" : ""} · rollendes Fotoband am Seitenende</p>
+                  </div>
+                  <button onClick={openAddG} className="flex items-center gap-2 text-xs px-4 py-2.5 font-semibold uppercase tracking-widest shrink-0" style={{ backgroundColor: GOLD, color: "#000" }}>
+                    <Plus className="w-3.5 h-3.5" /> Foto hinzufügen
+                  </button>
+                </div>
+
+                {galleryStatus && (
+                  <div className={`mb-4 flex items-center gap-2 text-sm px-4 py-3 ${galleryStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
+                    {galleryStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
+                    {galleryStatus.msg}
+                  </div>
+                )}
+
+                <AnimatePresence>
+                  {showGalleryForm && (
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                      className="mb-6 border border-white/10 bg-[#1a1a1a] p-5 sm:p-6">
+                      <div className="flex items-center justify-between mb-5">
+                        <h3 className="text-sm font-semibold text-white uppercase tracking-widest">{editingGallery ? "Foto bearbeiten" : "Neues Foto"}</h3>
+                        <button onClick={closeG} className="text-zinc-500 hover:text-white"><X className="w-4 h-4" /></button>
+                      </div>
+                      <ImageForm file={galleryFile} setFile={setGalleryFile} fileRef={galleryFileRef}
+                        dragOver={galleryDragOver} setDragOver={setGalleryDragOver}
+                        form={galleryForm} setForm={setGalleryForm}
+                        uploading={galleryUploading} onSubmit={submitGallery} onCancel={closeG}
+                        isEdit={!!editingGallery} labelField={false} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {gallery.length === 0 ? (
+                  <div className="text-center py-14 text-zinc-600 border border-white/5">
+                    <GalleryHorizontal className="w-8 h-8 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">Noch keine Fotos. Fügen Sie Restaurantfotos hinzu.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {gallery.map(item => (
+                      <div key={item.id} className="flex items-center gap-4 border border-white/8 bg-[#111] p-3">
+                        <div className="w-16 h-12 shrink-0 overflow-hidden rounded-sm">
+                          <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-white truncate">{item.title || <span className="text-zinc-500 italic">Kein Titel</span>}</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button onClick={() => openEditG(item)}
+                            className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-300 hover:border-[#d4af37] hover:text-[#d4af37] transition-colors">
+                            <Pencil className="w-3 h-3" /> Bearbeiten
+                          </button>
+                          <button onClick={() => deleteGallery(item.id)}
+                            className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-500 hover:border-red-500/40 hover:text-red-400 transition-colors">
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </>
           );
         })()}

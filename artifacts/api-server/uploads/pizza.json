@@ -1,0 +1,26 @@
+[
+  {
+    "id": "default-1",
+    "label": "Margherita",
+    "imageUrl": "/pizza-1.png",
+    "isDefault": true
+  },
+  {
+    "id": "default-2",
+    "label": "Diavola",
+    "imageUrl": "/pizza-2.png",
+    "isDefault": true
+  },
+  {
+    "id": "default-3",
+    "label": "Quattro Formaggi",
+    "imageUrl": "/pizza-3.png",
+    "isDefault": true
+  },
+  {
+    "id": "default-4",
+    "label": "Prosciutto e Rucola",
+    "imageUrl": "/pizza-4.png",
+    "isDefault": true
+  }
+]
