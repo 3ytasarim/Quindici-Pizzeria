@@ -34,8 +34,8 @@ export default function Navbar() {
           <img src="/logo.png" alt="Quindici Logo" className="h-[72px] w-auto" />
         </Link>
 
-        {/* Desktop Nav — centered */}
-        <nav className="hidden lg:flex flex-1 items-center justify-center gap-1">
+        {/* Desktop Nav — right-aligned toward buttons */}
+        <nav className="hidden lg:flex flex-1 items-center justify-end gap-1 mr-6">
           {navLinks.map((link) => (
             <Link
               key={link.name}
