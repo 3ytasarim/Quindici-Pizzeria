@@ -71,7 +71,7 @@ export default function MittagstischBanner() {
             className="inline-flex items-center justify-center gap-2 border border-white/50 hover:border-white text-white text-sm font-medium px-7 py-3.5 transition-colors duration-200 hover:bg-white/10"
           >
             <CalendarCheck className="w-4 h-4" />
-            Mittagstisch reservieren
+            Jetzt reservieren
           </a>
         </motion.div>
 
