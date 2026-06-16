@@ -124,7 +124,7 @@ export default function UeberUns() {
       </section>
 
       {/* Text + Two Photos Section */}
-      <section className="pt-8 pb-20 md:pt-10 md:pb-28 overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
+      <section className="pt-2 pb-20 md:pt-4 md:pb-28 overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
         <div className="container mx-auto px-6">
           <div className="flex flex-col lg:flex-row gap-16 lg:gap-24 items-center">
 
