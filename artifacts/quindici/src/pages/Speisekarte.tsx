@@ -37,7 +37,7 @@ const categories: MenuCategory[] = [
     id: "insalate",
     title: "Insalate",
     subtitle: "Salate",
-    image: "/menu-insalate.png",
+    image: "/insalate.png",
     items: [
       { name: "Insalata Mista", description: "Gemischter Salat mit italienischem Dressing", price: "10,50 €" },
       { name: "Insalata di Pomodori", description: "Frischer Tomatensalat mit Zwiebeln und Basilikum", price: "10,90 €" },
