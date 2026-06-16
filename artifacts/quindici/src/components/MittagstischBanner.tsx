@@ -60,14 +60,16 @@ export default function MittagstischBanner() {
           className="flex flex-col gap-3 shrink-0 w-full md:w-auto md:self-center"
         >
           <a
-            href="#"
+            href="/api/mittagstisch/pdf"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 bg-amber-700 hover:bg-amber-600 text-white text-sm font-semibold px-7 py-3.5 transition-colors duration-200"
           >
             <ArrowRight className="w-4 h-4" />
             Jetzt ansehen
           </a>
           <a
-            href="#"
+            href="/tisch-reservieren"
             className="inline-flex items-center justify-center gap-2 border border-white/50 hover:border-white text-white text-sm font-medium px-7 py-3.5 transition-colors duration-200 hover:bg-white/10"
           >
             <CalendarCheck className="w-4 h-4" />
