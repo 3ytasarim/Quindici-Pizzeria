@@ -15,7 +15,7 @@ export default function MittagstischBanner() {
       {/* Fixed background image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-fixed"
-        style={{ backgroundImage: "url('/about-restaurant.png')" }}
+        style={{ backgroundImage: "url('/mittagstisch-bg.jpg')" }}
       />
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-stone-900/68" />
