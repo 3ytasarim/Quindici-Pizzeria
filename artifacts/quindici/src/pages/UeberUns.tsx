@@ -123,30 +123,6 @@ export default function UeberUns() {
         </div>
       </section>
 
-      {/* Large Photo */}
-      <section className="relative h-[60vh] md:h-[75vh] overflow-hidden">
-        <motion.div
-          initial={{ scale: 1.06, opacity: 0 }}
-          whileInView={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1, ease: "easeOut" }}
-          viewport={{ once: true }}
-          className="absolute inset-0"
-        >
-          <img
-            src="/hero-bg.jpg"
-            alt="Quindici Trattoria Pizzeria"
-            className="w-full h-full object-cover"
-          />
-          <div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to bottom, rgba(253,248,242,0.18) 0%, rgba(253,248,242,0.08) 60%, rgba(253,248,242,0.45) 100%)",
-            }}
-          />
-        </motion.div>
-      </section>
-
       {/* Text + Two Photos Section */}
       <section className="py-20 md:py-28 overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
         <div className="container mx-auto px-6">
