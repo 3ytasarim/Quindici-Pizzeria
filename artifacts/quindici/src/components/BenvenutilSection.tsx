@@ -143,7 +143,7 @@ export default function BenvenutilSection() {
           {displayed.map((pizza, i) => (
             <div
               key={`${pizza.id}-${i}`}
-              className="shrink-0 rounded-full overflow-hidden border-2 border-amber-200 shadow-md"
+              className="shrink-0 rounded-full overflow-hidden"
               style={{ width: CARD_SIZE, height: CARD_SIZE }}
             >
               <img
