@@ -221,7 +221,7 @@ export default function MenuCard() {
           {page + 1} / {categories.length}
         </span>
         <a
-          href="#"
+          href="/speisekarte"
           className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700 hover:text-amber-800 transition-colors"
         >
           Vollständige Speisekarte
