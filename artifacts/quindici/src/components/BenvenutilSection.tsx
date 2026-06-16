@@ -131,7 +131,7 @@ export default function BenvenutilSection() {
 
       {/* Infinite pizza band */}
       <div
-        className="w-full overflow-hidden"
+        className="w-full overflow-hidden mt-16"
         onMouseEnter={() => { pausedRef.current = true; }}
         onMouseLeave={() => { pausedRef.current = false; }}
       >
