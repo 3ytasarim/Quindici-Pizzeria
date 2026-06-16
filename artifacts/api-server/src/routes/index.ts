@@ -6,6 +6,7 @@ import dishesRouter from "./dishes";
 import reservationsRouter from "./reservations";
 import galleryRouter from "./gallery";
 import pizzaRouter from "./pizza";
+import filesRouter from "./files";
 
 const router: IRouter = Router();
 
@@ -16,5 +17,6 @@ router.use(dishesRouter);
 router.use(reservationsRouter);
 router.use(galleryRouter);
 router.use(pizzaRouter);
+router.use(filesRouter);
 
 export default router;

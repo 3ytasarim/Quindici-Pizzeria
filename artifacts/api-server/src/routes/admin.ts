@@ -1,24 +1,16 @@
 import { Router } from "express";
 import multer from "multer";
 import jwt from "jsonwebtoken";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import { uploadFile, deleteFile, readJSON, writeJSON } from "../lib/gcs";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const UPLOADS_DIR = path.resolve(__dirname, "../uploads");
-const META_FILE = path.join(UPLOADS_DIR, "meta.json");
 const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
 const ADMIN_USER = "admin";
 const ADMIN_PASS = "admin1234!";
 
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, UPLOADS_DIR),
-  filename: (_req, _file, cb) => cb(null, "mittagstisch.pdf"),
-});
+interface PdfMeta { filename: string | null; uploadedAt: string | null; gcsUrl?: string | null }
 
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   fileFilter: (_req, file, cb) => {
     if (file.mimetype === "application/pdf") cb(null, true);
     else cb(new Error("Nur PDF-Dateien erlaubt"));
@@ -29,12 +21,8 @@ const upload = multer({
 function authMiddleware(req: any, res: any, next: any) {
   const token = req.headers["authorization"]?.replace("Bearer ", "");
   if (!token) return res.status(401).json({ error: "Nicht autorisiert" });
-  try {
-    jwt.verify(token, JWT_SECRET);
-    next();
-  } catch {
-    res.status(401).json({ error: "Token ungültig oder abgelaufen" });
-  }
+  try { jwt.verify(token, JWT_SECRET); next(); }
+  catch { res.status(401).json({ error: "Token ungültig oder abgelaufen" }); }
 }
 
 const router = Router();
@@ -49,22 +37,23 @@ router.post("/admin/login", (req, res) => {
   }
 });
 
-router.post(
-  "/admin/mittagstisch",
-  authMiddleware,
-  upload.single("pdf"),
-  (req, res) => {
-    if (!req.file) return res.status(400).json({ error: "Keine Datei hochgeladen" });
-    const meta = { filename: req.file.filename, uploadedAt: new Date().toISOString() };
-    fs.writeFileSync(META_FILE, JSON.stringify(meta));
-    res.json({ success: true, uploadedAt: meta.uploadedAt });
-  },
-);
+router.post("/admin/mittagstisch", authMiddleware, upload.single("pdf"), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "Keine Datei hochgeladen" });
+  const gcsUrl = await uploadFile("pdf", req.file.buffer, ".pdf", "application/pdf");
+  const meta: PdfMeta = { filename: "mittagstisch.pdf", uploadedAt: new Date().toISOString(), gcsUrl };
+  await writeJSON("mittagstisch-meta", meta);
+  res.json({ success: true, uploadedAt: meta.uploadedAt });
+});
 
-router.delete("/admin/mittagstisch", authMiddleware, (req, res) => {
-  const pdfPath = path.join(UPLOADS_DIR, "mittagstisch.pdf");
-  if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
-  fs.writeFileSync(META_FILE, JSON.stringify({ filename: null, uploadedAt: null }));
+router.get("/admin/mittagstisch/meta", authMiddleware, async (_req, res) => {
+  const meta = await readJSON<PdfMeta>("mittagstisch-meta");
+  res.json(meta ?? { filename: null, uploadedAt: null, gcsUrl: null });
+});
+
+router.delete("/admin/mittagstisch", authMiddleware, async (_req, res) => {
+  const meta = await readJSON<PdfMeta>("mittagstisch-meta");
+  if (meta?.gcsUrl) await deleteFile(meta.gcsUrl);
+  await writeJSON("mittagstisch-meta", { filename: null, uploadedAt: null, gcsUrl: null });
   res.json({ success: true });
 });
 
