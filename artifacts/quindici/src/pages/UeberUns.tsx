@@ -276,7 +276,7 @@ export default function UeberUns() {
                 transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
               >
                 <motion.img
-                  src="/about-photo-2.png"
+                  src="/ueberuns-large.jpg"
                   alt="Quindici Restaurant"
                   className="w-full h-full object-cover"
                   whileHover={{ scale: 1.04 }}
@@ -294,7 +294,7 @@ export default function UeberUns() {
                 transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.18 }}
               >
                 <motion.img
-                  src="/about-photo-1.png"
+                  src="/ueberuns-small.jpg"
                   alt="Quindici Tisch"
                   className="w-full h-full object-cover"
                   whileHover={{ scale: 1.04 }}
