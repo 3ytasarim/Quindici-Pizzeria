@@ -141,7 +141,7 @@ export default function Kontakt() {
                   className="text-xl font-bold text-stone-800 mb-3"
                   style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                  Schreiben Sie uns
+                  Rufen Sie uns an
                 </h3>
                 <div className="space-y-2 text-sm text-stone-600">
                   <p>
@@ -196,7 +196,7 @@ export default function Kontakt() {
                 </p>
               </div>
               <a
-                href="tel:+4971414732887"
+                href="/tisch-reservieren"
                 className="mt-auto inline-block bg-white text-amber-700 text-xs font-bold uppercase tracking-[0.18em] px-5 py-3 text-center hover:bg-amber-50 transition-colors"
               >
                 Jetzt reservieren
