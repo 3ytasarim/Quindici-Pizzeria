@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 const API = "/api";
-const GOLD = "#d4af37";
+const GOLD = "#c5a485";
 const POLL_INTERVAL = 2000;
 
 function formatDate(iso: string | null) {
@@ -317,7 +317,7 @@ export default function Admin() {
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                   <input type="text" value={loginForm.username} onChange={e => setLoginForm(f => ({ ...f, username: e.target.value }))}
-                    className="w-full bg-[#111] border border-white/10 text-white pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#d4af37] transition-colors" placeholder="admin" required />
+                    className="w-full bg-[#111] border border-white/10 text-white pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#c5a485] transition-colors" placeholder="admin" required />
                 </div>
               </div>
               <div>
@@ -325,7 +325,7 @@ export default function Admin() {
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
                   <input type="password" value={loginForm.password} onChange={e => setLoginForm(f => ({ ...f, password: e.target.value }))}
-                    className="w-full bg-[#111] border border-white/10 text-white pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#d4af37] transition-colors" placeholder="••••••••" required />
+                    className="w-full bg-[#111] border border-white/10 text-white pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#c5a485] transition-colors" placeholder="••••••••" required />
                 </div>
               </div>
             </div>
@@ -380,7 +380,7 @@ export default function Admin() {
               ] as const
             ).map(([id, shortLabel, fullLabel, Icon, badge]) => (
               <button key={id} onClick={() => handleTabChange(id as Tab)}
-                className={`relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-3.5 sm:py-4 text-[11px] sm:text-xs uppercase tracking-widest font-semibold border-b-2 transition-colors whitespace-nowrap shrink-0 ${tab === id ? "border-[#d4af37] text-[#d4af37]" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
+                className={`relative flex items-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-3.5 sm:py-4 text-[11px] sm:text-xs uppercase tracking-widest font-semibold border-b-2 transition-colors whitespace-nowrap shrink-0 ${tab === id ? "border-[#c5a485] text-[#c5a485]" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}>
                 <Icon className="w-3.5 h-3.5 shrink-0" />
                 <span className="sm:hidden">{shortLabel}</span>
                 <span className="hidden sm:inline">{fullLabel}</span>
@@ -422,7 +422,7 @@ export default function Admin() {
                 {pdfAvailable && (
                   <div className="flex flex-wrap gap-2 mt-4 sm:mt-5">
                     <a href="/api/mittagstisch/pdf" target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs px-3 py-2 border border-[#d4af37]/40 text-[#d4af37] hover:bg-[#d4af37]/10 transition-colors">
+                      className="flex items-center gap-1.5 text-xs px-3 py-2 border border-[#c5a485]/40 text-[#c5a485] hover:bg-[#c5a485]/10 transition-colors">
                       <Eye className="w-3.5 h-3.5" />Vorschau
                     </a>
                     <button onClick={handlePdfDelete}
@@ -438,7 +438,7 @@ export default function Admin() {
                 <div onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)}
                   onDrop={e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) setSelectedPdf(f); }}
                   onClick={() => pdfRef.current?.click()}
-                  className={`border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all ${dragOver ? "border-[#d4af37] bg-[#d4af37]/5" : selectedPdf ? "border-green-500/50 bg-green-500/5" : "border-white/15 hover:border-white/30"}`}>
+                  className={`border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all ${dragOver ? "border-[#c5a485] bg-[#c5a485]/5" : selectedPdf ? "border-green-500/50 bg-green-500/5" : "border-white/15 hover:border-white/30"}`}>
                   <input ref={pdfRef} type="file" accept=".pdf,application/pdf" className="hidden" onChange={e => e.target.files?.[0] && setSelectedPdf(e.target.files[0])} />
                   {selectedPdf ? (
                     <div><CheckCircle className="w-7 h-7 sm:w-8 sm:h-8 text-green-400 mx-auto mb-2" />
@@ -511,12 +511,12 @@ export default function Admin() {
                       <div>
                         <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-2">Name *</label>
                         <input type="text" value={dishForm.name} onChange={e => setDishForm(f => ({ ...f, name: e.target.value }))} required
-                          className="w-full bg-[#111] border border-white/10 text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#d4af37] transition-colors" placeholder="z.B. Margherita" />
+                          className="w-full bg-[#111] border border-white/10 text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a485] transition-colors" placeholder="z.B. Margherita" />
                       </div>
                       <div>
                         <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-2">Beschreibung</label>
                         <textarea value={dishForm.desc} onChange={e => setDishForm(f => ({ ...f, desc: e.target.value }))} rows={3}
-                          className="w-full bg-[#111] border border-white/10 text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#d4af37] transition-colors resize-none"
+                          className="w-full bg-[#111] border border-white/10 text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a485] transition-colors resize-none"
                           placeholder="Zutaten oder kurze Beschreibung" />
                       </div>
                     </div>
@@ -525,7 +525,7 @@ export default function Admin() {
                       <div onDragOver={e => { e.preventDefault(); setDishDragOver(true); }} onDragLeave={() => setDishDragOver(false)}
                         onDrop={e => { e.preventDefault(); setDishDragOver(false); const f = e.dataTransfer.files[0]; if (f) setDishFile(f); }}
                         onClick={() => dishFileRef.current?.click()}
-                        className={`border-2 border-dashed p-5 text-center cursor-pointer transition-all h-[130px] sm:h-[140px] flex flex-col items-center justify-center ${dishDragOver ? "border-[#d4af37] bg-[#d4af37]/5" : dishFile ? "border-green-500/50 bg-green-500/5" : "border-white/15 hover:border-white/30"}`}>
+                        className={`border-2 border-dashed p-5 text-center cursor-pointer transition-all h-[130px] sm:h-[140px] flex flex-col items-center justify-center ${dishDragOver ? "border-[#c5a485] bg-[#c5a485]/5" : dishFile ? "border-green-500/50 bg-green-500/5" : "border-white/15 hover:border-white/30"}`}>
                         <input ref={dishFileRef} type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && setDishFile(e.target.files[0])} />
                         {dishFile
                           ? (<><CheckCircle className="w-6 h-6 text-green-400 mb-1.5" /><p className="text-xs font-medium truncate max-w-full px-2">{dishFile.name}</p></>)
@@ -536,7 +536,7 @@ export default function Admin() {
                       {!dishFile && (
                         <div className="mt-2">
                           <input type="text" value={dishForm.imageUrl} onChange={e => setDishForm(f => ({ ...f, imageUrl: e.target.value }))}
-                            className="w-full bg-[#111] border border-white/10 text-white px-3 py-2 text-xs focus:outline-none focus:border-[#d4af37] transition-colors"
+                            className="w-full bg-[#111] border border-white/10 text-white px-3 py-2 text-xs focus:outline-none focus:border-[#c5a485] transition-colors"
                             placeholder="oder Bild-URL eingeben" />
                         </div>
                       )}
@@ -567,7 +567,7 @@ export default function Admin() {
                     <p className="text-xs text-zinc-400 leading-snug line-clamp-2">{dish.desc}</p>
                     <div className="flex gap-2 mt-4">
                       <button onClick={() => openEditForm(dish)}
-                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-[#d4af37]/40 text-[#d4af37] hover:bg-[#d4af37]/10 transition-colors">
+                        className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-[#c5a485]/40 text-[#c5a485] hover:bg-[#c5a485]/10 transition-colors">
                         <Pencil className="w-3 h-3" />Bearbeiten
                       </button>
                       <button onClick={() => handleDishDelete(dish.id)}
@@ -624,7 +624,7 @@ export default function Admin() {
                 </div>
                 <button
                   onClick={() => setSoundEnabled(s => !s)}
-                  className={`flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-widest border transition-colors shrink-0 ${soundEnabled ? "border-[#d4af37]/40 text-[#d4af37]" : "border-white/10 text-zinc-500"}`}>
+                  className={`flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold uppercase tracking-widest border transition-colors shrink-0 ${soundEnabled ? "border-[#c5a485]/40 text-[#c5a485]" : "border-white/10 text-zinc-500"}`}>
                   {soundEnabled ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
                   {soundEnabled ? "Ton an" : "Ton aus"}
                 </button>
@@ -671,7 +671,7 @@ export default function Admin() {
                         key={i}
                         onClick={() => setSelectedDay(prev => prev === dateStr ? null : dateStr)}
                         className={`relative aspect-square flex flex-col items-center justify-center rounded-lg transition-all text-xs font-medium
-                          ${isSelected ? "ring-2 ring-[#d4af37] bg-[#d4af37]/15 text-white"
+                          ${isSelected ? "ring-2 ring-[#c5a485] bg-[#c5a485]/15 text-white"
                             : isToday ? "bg-white/6 text-white"
                             : counts ? "hover:bg-white/6 text-zinc-200"
                             : "hover:bg-white/4 text-zinc-600"}`}
@@ -707,7 +707,7 @@ export default function Admin() {
                   </span>
                   {selectedDay && (
                     <button onClick={() => setSelectedDay(null)}
-                      className="ml-auto flex items-center gap-1 text-[#d4af37] hover:text-white transition-colors">
+                      className="ml-auto flex items-center gap-1 text-[#c5a485] hover:text-white transition-colors">
                       <X className="w-3 h-3" />Filter aufheben
                     </button>
                   )}
@@ -741,7 +741,7 @@ export default function Admin() {
                       layout
                       initial={{ opacity: 0, y: -8 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`bg-[#1a1a1a] border p-4 sm:p-5 transition-colors rounded-xl ${!r.seen ? "border-[#d4af37]/40" : "border-white/8"}`}
+                      className={`bg-[#1a1a1a] border p-4 sm:p-5 transition-colors rounded-xl ${!r.seen ? "border-[#c5a485]/40" : "border-white/8"}`}
                     >
                       <div className="flex items-center gap-2 flex-wrap mb-3">
                         {!r.seen && (
@@ -771,10 +771,10 @@ export default function Admin() {
                           <span className="flex items-center gap-1.5">
                             <User className="w-3 h-3 shrink-0" />{r.firstName} {r.lastName}
                           </span>
-                          <a href={`tel:${r.phone}`} className="flex items-center gap-1.5 hover:text-[#d4af37] transition-colors">
+                          <a href={`tel:${r.phone}`} className="flex items-center gap-1.5 hover:text-[#c5a485] transition-colors">
                             <Phone className="w-3 h-3 shrink-0" />{r.phone}
                           </a>
-                          <a href={`mailto:${r.email}`} className="flex items-center gap-1.5 hover:text-[#d4af37] transition-colors break-all">
+                          <a href={`mailto:${r.email}`} className="flex items-center gap-1.5 hover:text-[#c5a485] transition-colors break-all">
                             <Mail className="w-3 h-3 shrink-0" />{r.email}
                           </a>
                         </div>
@@ -855,7 +855,7 @@ export default function Admin() {
                 onDragLeave={() => setDragOver(false)}
                 onDrop={e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("image/")) setFile(f); }}
                 onClick={() => fileRef.current?.click()}
-                className={`cursor-pointer border-2 border-dashed transition-colors ${dragOver ? "border-[#d4af37] bg-[#d4af37]/5" : "border-white/15 hover:border-white/30"} flex flex-col items-center justify-center p-6 text-center`}>
+                className={`cursor-pointer border-2 border-dashed transition-colors ${dragOver ? "border-[#c5a485] bg-[#c5a485]/5" : "border-white/15 hover:border-white/30"} flex flex-col items-center justify-center p-6 text-center`}>
                 <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) setFile(f); }} />
                 {file ? (
                   <div className="flex flex-col items-center gap-2">
@@ -879,7 +879,7 @@ export default function Admin() {
                 <div>
                   <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">oder URL</label>
                   <input value={form.imageUrl} onChange={e => setForm((p: any) => ({ ...p, imageUrl: e.target.value }))}
-                    className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600" placeholder="https://..." />
+                    className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#c5a485] focus:outline-none placeholder-zinc-600" placeholder="https://..." />
                 </div>
               )}
               <div>
@@ -887,7 +887,7 @@ export default function Admin() {
                 <input
                   value={labelField ? (form.label ?? "") : (form.title ?? "")}
                   onChange={e => setForm((p: any) => labelField ? { ...p, label: e.target.value } : { ...p, title: e.target.value })}
-                  className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#d4af37] focus:outline-none placeholder-zinc-600"
+                  className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#c5a485] focus:outline-none placeholder-zinc-600"
                   placeholder={labelField ? "z. B. Margherita" : "z. B. Restauranteingang"} />
               </div>
               <div className="flex items-center gap-3 pt-1">
@@ -965,7 +965,7 @@ export default function Admin() {
                         <ChevronDown className="w-3.5 h-3.5" />
                       </button>
                       <button onClick={() => openEditP(item)}
-                        className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-300 hover:border-[#d4af37] hover:text-[#d4af37] transition-colors">
+                        className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-300 hover:border-[#c5a485] hover:text-[#c5a485] transition-colors">
                         <Pencil className="w-3 h-3" /> Bearbeiten
                       </button>
                       <button onClick={() => deletePizza(item.id)}

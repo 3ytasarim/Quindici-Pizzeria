@@ -40,7 +40,7 @@ export default function StickyActions() {
           label="Tisch reservieren"
           icon={<CalendarCheck className="w-3.5 h-3.5" />}
           bgClass="hover:brightness-90"
-          bgStyle={{ backgroundColor: "#d4af37" }}
+          bgStyle={{ backgroundColor: "#c5a485" }}
           delay={0.3}
           paddingY="py-7"
         />

@@ -60,9 +60,9 @@ export default function HeroSection() {
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
             className="block h-px w-16 origin-left"
-            style={{ backgroundColor: "#d4af37" }}
+            style={{ backgroundColor: "#c5a485" }}
           />
-          <h2 className="font-serif italic text-3xl md:text-4xl tracking-wide drop-shadow-md" style={{ color: "#d4af37" }}>
+          <h2 className="font-serif italic text-3xl md:text-4xl tracking-wide drop-shadow-md" style={{ color: "#c5a485" }}>
             Trattoria Pizzeria
           </h2>
           <motion.span
@@ -70,7 +70,7 @@ export default function HeroSection() {
             animate={{ scaleX: 1 }}
             transition={{ duration: 0.7, delay: 0.55, ease: "easeOut" }}
             className="block h-px w-16 origin-right"
-            style={{ backgroundColor: "#d4af37" }}
+            style={{ backgroundColor: "#c5a485" }}
           />
         </motion.div>
 
@@ -95,15 +95,15 @@ export default function HeroSection() {
             whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(212,175,55,0.35)" }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="inline-flex items-center gap-2.5 px-7 py-3 border border-[#d4af37]/70 bg-black/30 backdrop-blur-sm text-sm font-semibold shadow-sm hover:bg-[#d4af37]/10 transition-colors"
-            style={{ color: "#d4af37" }}
+            className="inline-flex items-center gap-2.5 px-7 py-3 border border-[#c5a485]/70 bg-black/30 backdrop-blur-sm text-sm font-semibold shadow-sm hover:bg-[#c5a485]/10 transition-colors"
+            style={{ color: "#c5a485" }}
             data-testid="button-mittagstisch-der-woche"
           >
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ backgroundColor: "#d4af37" }} />
-              <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: "#d4af37" }} />
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ backgroundColor: "#c5a485" }} />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: "#c5a485" }} />
             </span>
-            <UtensilsCrossed className="w-3.5 h-3.5" style={{ color: "#d4af37" }} />
+            <UtensilsCrossed className="w-3.5 h-3.5" style={{ color: "#c5a485" }} />
             Mittagstisch der Woche
           </motion.a>
         </motion.div>

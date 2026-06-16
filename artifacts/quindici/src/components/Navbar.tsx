@@ -55,8 +55,8 @@ export default function Navbar() {
             <Button
               variant="outline"
               className="uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 transition-all"
-              style={{ borderColor: "#d4af37", color: "#d4af37", backgroundColor: "transparent" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d4af3712"; }}
+              style={{ borderColor: "#c5a485", color: "#c5a485", backgroundColor: "transparent" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a48512"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
               data-testid="button-tisch-reservieren"
             >
@@ -66,9 +66,9 @@ export default function Navbar() {
           <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
             <Button
               className="text-white uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
-              style={{ backgroundColor: "#d4af37" }}
+              style={{ backgroundColor: "#c5a485" }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#b8962e"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d4af37"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a485"; }}
               data-testid="button-jetzt-bestellen"
             >
               Jetzt bestellen
@@ -109,7 +109,7 @@ export default function Navbar() {
                     <Button
                       variant="outline"
                       className="w-full uppercase tracking-widest text-[11px] font-semibold rounded-none"
-                      style={{ borderColor: "#d4af37", color: "#d4af37" }}
+                      style={{ borderColor: "#c5a485", color: "#c5a485" }}
                       data-testid="mobile-button-tisch-reservieren"
                     >
                       Tisch reservieren
@@ -118,7 +118,7 @@ export default function Navbar() {
                   <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer" className="w-full">
                     <Button
                       className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
-                      style={{ backgroundColor: "#d4af37" }}
+                      style={{ backgroundColor: "#c5a485" }}
                       data-testid="mobile-button-jetzt-bestellen"
                     >
                       Jetzt bestellen

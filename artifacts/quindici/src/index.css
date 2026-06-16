@@ -12,6 +12,21 @@ img {
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  /* Override amber scale → #c5a485 warm tan family */
+  --color-amber-50:  #f8f4f0;
+  --color-amber-100: #f0e6d8;
+  --color-amber-200: #e2ceb8;
+  --color-amber-300: #d4b698;
+  --color-amber-400: #ceac8d;
+  --color-amber-500: #caa98a;
+  --color-amber-600: #bc9675;
+  --color-amber-700: #c5a485;
+  --color-amber-800: #8c6e50;
+  --color-amber-900: #63503a;
+  --color-amber-950: #3d3022;
+}
+
 @theme inline {
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));

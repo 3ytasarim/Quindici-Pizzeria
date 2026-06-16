@@ -50,7 +50,7 @@ export default function GalerieSlider() {
     <section className="py-16 md:py-24" style={{ backgroundColor: "#fdf8f2" }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 mb-10">
         <div className="text-center">
-          <p className="text-xs tracking-[0.25em] uppercase mb-3" style={{ color: "#d4af37" }}>
+          <p className="text-xs tracking-[0.25em] uppercase mb-3" style={{ color: "#c5a485" }}>
             Quindici Trattoria Pizzeria
           </p>
           <h2 className="font-serif text-3xl md:text-4xl text-stone-800">Galerie</h2>

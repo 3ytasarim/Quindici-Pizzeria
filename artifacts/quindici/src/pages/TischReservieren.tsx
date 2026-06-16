@@ -7,7 +7,7 @@ import {
   Timer, Bell, AlertCircle,
 } from "lucide-react";
 
-const GOLD = "#d4af37";
+const GOLD = "#c5a485";
 const BG = "#fdf8f2";
 
 /* ── Animated gold starfield ── */
