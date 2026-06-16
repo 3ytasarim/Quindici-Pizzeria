@@ -374,8 +374,8 @@ export default function Admin() {
             {(
               [
                 ["mittagstisch", "PDF", "Mittagstisch PDF", FileText, 0],
-                ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
                 ["reservierungen", "Reserv.", "Reservierungen", CalendarCheck, newBadge],
+                ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
                 ["galerie", "Galerie", "Galerie", GalleryHorizontal, 0],
               ] as const
             ).map(([id, shortLabel, fullLabel, Icon, badge]) => (
@@ -944,9 +944,9 @@ export default function Admin() {
               {/* Pizza list — all visible, with reorder + edit + delete */}
               <div className="space-y-2">
                 {pizzaItems.map((item, i) => (
-                  <div key={item.id} className="flex items-center gap-4 border border-white/8 bg-[#111] p-3">
+                  <div key={item.id} className="flex items-center gap-3 border border-white/8 bg-[#111] p-3">
                     {/* Thumbnail */}
-                    <div className="w-14 h-14 shrink-0 rounded-full overflow-hidden border border-amber-700/30">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full overflow-hidden border border-amber-700/30">
                       <img src={item.imageUrl} alt={item.label} className="w-full h-full object-cover" />
                     </div>
                     {/* Name */}
@@ -955,21 +955,27 @@ export default function Admin() {
                       <p className="text-[11px] text-zinc-600 mt-0.5">Position {i + 1}</p>
                     </div>
                     {/* Actions */}
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <button onClick={() => movePizza(item.id, "up")} disabled={i === 0}
-                        className="p-1.5 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors border border-white/8 hover:border-white/20">
-                        <ChevronUp className="w-3.5 h-3.5" />
-                      </button>
-                      <button onClick={() => movePizza(item.id, "down")} disabled={i === pizzaItems.length - 1}
-                        className="p-1.5 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors border border-white/8 hover:border-white/20">
-                        <ChevronDown className="w-3.5 h-3.5" />
-                      </button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {/* Reorder */}
+                      <div className="flex flex-col gap-0.5">
+                        <button onClick={() => movePizza(item.id, "up")} disabled={i === 0}
+                          className="p-1 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors border border-white/8 hover:border-white/20">
+                          <ChevronUp className="w-3 h-3" />
+                        </button>
+                        <button onClick={() => movePizza(item.id, "down")} disabled={i === pizzaItems.length - 1}
+                          className="p-1 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors border border-white/8 hover:border-white/20">
+                          <ChevronDown className="w-3 h-3" />
+                        </button>
+                      </div>
+                      {/* Edit */}
                       <button onClick={() => openEditP(item)}
-                        className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-300 hover:border-[#c5a485] hover:text-[#c5a485] transition-colors">
-                        <Pencil className="w-3 h-3" /> Bearbeiten
+                        className="flex items-center gap-1 text-xs px-2 py-1.5 border border-white/10 text-zinc-300 hover:border-[#c5a485] hover:text-[#c5a485] transition-colors">
+                        <Pencil className="w-3 h-3" />
+                        <span className="hidden sm:inline">Bearbeiten</span>
                       </button>
+                      {/* Delete */}
                       <button onClick={() => deletePizza(item.id)}
-                        className="flex items-center gap-1 text-xs px-2.5 py-1.5 border border-white/10 text-zinc-500 hover:border-red-500/40 hover:text-red-400 transition-colors">
+                        className="flex items-center gap-1 text-xs px-2 py-1.5 border border-white/10 text-zinc-500 hover:border-red-500/40 hover:text-red-400 transition-colors">
                         <Trash2 className="w-3 h-3" />
                       </button>
                     </div>
