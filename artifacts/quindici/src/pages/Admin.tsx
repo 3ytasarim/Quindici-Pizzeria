@@ -135,6 +135,18 @@ export default function Admin() {
 
   const authHeaders = useCallback(() => ({ Authorization: `Bearer ${token}` }), [token]);
 
+  // Wrapper: otomatik çıkış on 401
+  const authedFetch = useCallback(async (url: string, opts: RequestInit = {}): Promise<Response> => {
+    const t = tokenRef.current;
+    const headers = { ...(opts.headers as Record<string, string> ?? {}), Authorization: `Bearer ${t}` };
+    const r = await fetch(url, { ...opts, headers });
+    if (r.status === 401) {
+      sessionStorage.removeItem("admin_token");
+      setToken("");
+    }
+    return r;
+  }, []);
+
   const fetchPdfStatus = useCallback(async (t: string) => {
     const r = await fetch(`${API}/mittagstisch`, { headers: { Authorization: `Bearer ${t}` } });
     if (r.ok) { const d = await r.json(); setPdfAvailable(d.available); setUploadedAt(d.uploadedAt); }
@@ -160,6 +172,7 @@ export default function Admin() {
     if (!t) return;
     try {
       const r = await fetch(`${API}/admin/reservations`, { headers: { Authorization: `Bearer ${t}` } });
+      if (r.status === 401) { sessionStorage.removeItem("admin_token"); setToken(""); return; }
       if (!r.ok) return;
       const data: Reservation[] = await r.json();
       setReservations(data);
@@ -208,9 +221,9 @@ export default function Admin() {
     if (t === "reservierungen" && newBadge > 0) {
       const unseen = reservations.filter(r => !r.seen);
       await Promise.all(unseen.map(r =>
-        fetch(`${API}/admin/reservations/${r.id}`, {
+        authedFetch(`${API}/admin/reservations/${r.id}`, {
           method: "PATCH",
-          headers: { ...authHeaders(), "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ seen: true }),
         })
       ));
@@ -221,9 +234,9 @@ export default function Admin() {
   };
 
   const updateReservationStatus = async (id: string, status: Reservation["status"]) => {
-    await fetch(`${API}/admin/reservations/${id}`, {
+    await authedFetch(`${API}/admin/reservations/${id}`, {
       method: "PATCH",
-      headers: { ...authHeaders(), "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
     setReservations(prev => prev.map(r => r.id === id ? { ...r, status } : r));
@@ -231,7 +244,7 @@ export default function Admin() {
 
   const deleteReservation = async (id: string) => {
     if (!confirm("Reservierung löschen?")) return;
-    await fetch(`${API}/admin/reservations/${id}`, { method: "DELETE", headers: authHeaders() });
+    await authedFetch(`${API}/admin/reservations/${id}`, { method: "DELETE" });
     setReservations(prev => prev.filter(r => r.id !== id));
   };
 
@@ -240,7 +253,7 @@ export default function Admin() {
     setUploading(true); setPdfStatus(null);
     const form = new FormData(); form.append("pdf", file);
     try {
-      const r = await fetch(`${API}/admin/mittagstisch`, { method: "POST", headers: authHeaders(), body: form });
+      const r = await authedFetch(`${API}/admin/mittagstisch`, { method: "POST", body: form });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error ?? "Upload fehlgeschlagen");
       setPdfStatus({ type: "success", msg: "PDF erfolgreich hochgeladen!" });
@@ -251,7 +264,7 @@ export default function Admin() {
 
   const handlePdfDelete = async () => {
     if (!confirm("Aktuelles PDF löschen?")) return;
-    await fetch(`${API}/admin/mittagstisch`, { method: "DELETE", headers: authHeaders() });
+    await authedFetch(`${API}/admin/mittagstisch`, { method: "DELETE" });
     setPdfStatus({ type: "success", msg: "PDF gelöscht." }); fetchPdfStatus(token);
   };
 
@@ -273,7 +286,7 @@ export default function Admin() {
     try {
       const url = editingDish ? `${API}/dishes/${editingDish.id}` : `${API}/dishes`;
       const method = editingDish ? "PUT" : "POST";
-      const r = await fetch(url, { method, headers: authHeaders(), body: form });
+      const r = await authedFetch(url, { method, body: form });
       const d = await r.json();
       if (!r.ok) throw new Error(d.error ?? "Fehler");
       setDishStatus({ type: "success", msg: editingDish ? "Gericht aktualisiert." : "Gericht hinzugefügt." });
@@ -283,7 +296,7 @@ export default function Admin() {
   };
   const handleDishDelete = async (id: string) => {
     if (!confirm("Dieses Gericht löschen?")) return;
-    await fetch(`${API}/dishes/${id}`, { method: "DELETE", headers: authHeaders() });
+    await authedFetch(`${API}/dishes/${id}`, { method: "DELETE" });
     fetchDishes();
   };
 
@@ -810,7 +823,7 @@ export default function Admin() {
               if (pizzaFile) fd.append("image", pizzaFile);
               else if (pizzaForm.imageUrl) fd.append("imageUrl", pizzaForm.imageUrl);
               const url = editingPizza ? `${API}/admin/pizza/${editingPizza.id}` : `${API}/admin/pizza`;
-              const r = await fetch(url, { method: editingPizza ? "PUT" : "POST", headers: { Authorization: `Bearer ${token}` }, body: fd });
+              const r = await authedFetch(url, { method: editingPizza ? "PUT" : "POST", body: fd });
               if (!r.ok) throw new Error((await r.json()).error ?? "Fehler");
               setPizzaStatus({ type: "success", msg: editingPizza ? "Gespeichert" : "Hinzugefügt" });
               fetchPizza(); closeP();
@@ -819,11 +832,11 @@ export default function Admin() {
           };
           const deletePizza = async (id: string) => {
             if (!confirm("Bild löschen?")) return;
-            await fetch(`${API}/admin/pizza/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+            await authedFetch(`${API}/admin/pizza/${id}`, { method: "DELETE" });
             fetchPizza();
           };
           const movePizza = async (id: string, direction: "up" | "down") => {
-            await fetch(`${API}/admin/pizza/${id}/move`, { method: "PATCH", headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, body: JSON.stringify({ direction }) });
+            await authedFetch(`${API}/admin/pizza/${id}/move`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ direction }) });
             fetchPizza();
           };
 
