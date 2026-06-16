@@ -42,7 +42,7 @@ const router = Router();
 router.post("/admin/login", (req, res) => {
   const { username, password } = req.body ?? {};
   if (username === ADMIN_USER && password === ADMIN_PASS) {
-    const token = jwt.sign({ sub: "admin" }, JWT_SECRET, { expiresIn: "12h" });
+    const token = jwt.sign({ sub: "admin" }, JWT_SECRET, { expiresIn: "7d" });
     res.json({ token });
   } else {
     res.status(401).json({ error: "Ungültige Zugangsdaten" });
