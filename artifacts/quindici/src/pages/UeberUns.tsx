@@ -147,70 +147,6 @@ export default function UeberUns() {
         </motion.div>
       </section>
 
-      {/* Team — Teil der Familie */}
-      <section className="relative overflow-hidden py-20 md:py-28" style={{ backgroundColor: "#fdf8f2" }}>
-
-        <div className="container mx-auto px-6 relative z-10">
-
-          {/* Heading — only title, animated */}
-          <div style={{ overflow: "hidden" }} className="mb-14 md:mb-18">
-            <motion.h2
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold"
-              style={{ fontFamily: "'Playfair Display', serif", color: "#b45309" }}
-            >
-              Teil der Familie
-            </motion.h2>
-          </div>
-
-          {/* Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-5">
-            {[
-              { name: "Lorem Ipsum", photo: "/about-photo-1.png" },
-              { name: "Lorem Ipsum", photo: "/about-photo-2.png" },
-              { name: "Lorem Ipsum", photo: "/about-photo-1.png" },
-              { name: "Lorem Ipsum", photo: "/about-photo-2.png" },
-              { name: "Lorem Ipsum", photo: "/about-photo-1.png" },
-              { name: "Lorem Ipsum", photo: "/about-photo-2.png" },
-            ].map((member, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className="group cursor-default"
-              >
-                {/* Photo */}
-                <div className="relative w-full aspect-[3/4] overflow-hidden mb-3">
-                  <img
-                    src={member.photo}
-                    alt={member.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  {/* Subtle gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-                  {/* Amber line on hover bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-amber-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
-                </div>
-
-                {/* Name */}
-                <p
-                  className="text-[13px] font-medium transition-colors duration-300"
-                  style={{ color: "#b45309", fontFamily: "'Quicksand', sans-serif" }}
-                >
-                  {member.name}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-
-        </div>
-      </section>
-
       {/* Text + Two Photos Section */}
       <section className="py-20 md:py-28 overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
         <div className="container mx-auto px-6">
@@ -307,6 +243,62 @@ export default function UeberUns() {
 
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Team — Teil der Familie */}
+      <section className="relative overflow-hidden py-20 md:py-28" style={{ backgroundColor: "#fdf8f2" }}>
+        <div className="container mx-auto px-6 relative z-10">
+
+          <div style={{ overflow: "hidden" }} className="mb-14 md:mb-18">
+            <motion.h2
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
+              className="text-5xl md:text-6xl lg:text-7xl font-bold"
+              style={{ fontFamily: "'Playfair Display', serif", color: "#c5a485" }}
+            >
+              Teil der Familie
+            </motion.h2>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-5">
+            {[
+              { name: "Lorem Ipsum", photo: "/about-photo-1.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-2.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-1.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-2.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-1.png" },
+              { name: "Lorem Ipsum", photo: "/about-photo-2.png" },
+            ].map((member, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
+                className="group cursor-default"
+              >
+                <div className="relative w-full aspect-[3/4] overflow-hidden mb-3">
+                  <img
+                    src={member.photo}
+                    alt={member.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-amber-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
+                </div>
+                <p
+                  className="text-[13px] font-medium transition-colors duration-300"
+                  style={{ color: "#c5a485", fontFamily: "'Quicksand', sans-serif" }}
+                >
+                  {member.name}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+
         </div>
       </section>
 
