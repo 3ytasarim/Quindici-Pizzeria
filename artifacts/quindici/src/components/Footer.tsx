@@ -1,9 +1,9 @@
 import { Instagram, Facebook, Phone, CalendarCheck } from "lucide-react";
+import { useReservationModal } from "@/components/ReservationModal";
 
 const navLinks = [
   { label: "Startseite",        href: "/" },
   { label: "Speisekarte",       href: "/speisekarte" },
-  { label: "Tisch reservieren", href: "/tisch-reservieren" },
   { label: "Mittagstisch",      href: "/speisekarte" },
   { label: "Lieferservice",     href: "https://www.lieferando.de/speisekarte/quindici-pizza#kategorie_b4ba0961-8497-4427-8381-2610b9040620", external: true },
   { label: "Kontakt",           href: "/kontakt" },
@@ -12,6 +12,8 @@ const navLinks = [
 ];
 
 export default function Footer() {
+  const { open: openReservation } = useReservationModal();
+
   return (
     <footer className="relative overflow-hidden bg-stone-900 text-white">
       {/* Watermark image — centered */}
@@ -71,19 +73,25 @@ export default function Footer() {
               <Phone className="w-4 h-4 text-amber-500 shrink-0" />
               07141 4732887
             </a>
-            <a
-              href="#"
-              className="flex items-center justify-center gap-2 text-stone-300 hover:text-white transition-colors text-sm"
+            <button
+              onClick={openReservation}
+              className="flex items-center justify-center gap-2 text-stone-300 hover:text-white transition-colors text-sm w-full"
             >
               <CalendarCheck className="w-4 h-4 text-amber-500 shrink-0" />
               Tisch reservieren
-            </a>
+            </button>
           </div>
         </div>
 
         {/* RIGHT — navigation */}
         <div className="text-center md:text-right">
           <nav className="flex flex-col gap-2.5 items-center md:items-end">
+            <button
+              onClick={openReservation}
+              className="text-xs font-semibold tracking-[0.2em] uppercase text-stone-400 hover:text-white transition-colors"
+            >
+              Tisch reservieren
+            </button>
             {navLinks.map((link) => (
               <a
                 key={link.label}
