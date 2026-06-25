@@ -54,7 +54,7 @@ export default function Kontakt() {
       <section className="relative min-h-[52vh] flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url(/hero-bg.jpg)", opacity: 0.55 }}
+          style={{ backgroundImage: "url(/speisekarte-bg.jpg)", opacity: 0.55 }}
         />
         <div
           className="absolute inset-0 z-0 pointer-events-none"
