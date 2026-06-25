@@ -154,7 +154,7 @@ export default function UeberUns() {
                 transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
               >
                 <motion.img
-                  src="/ueberuns-interior.jpg"
+                  src="/ueberuns-large.jpg"
                   alt="Quindici Restaurant"
                   className="w-full h-full object-cover"
                   whileHover={{ scale: 1.04 }}
