@@ -4,7 +4,7 @@ import { CalendarCheck, ShoppingBag } from "lucide-react";
 
 export default function StickyActions() {
   return (
-    <div className="hidden lg:flex fixed right-0 top-1/2 -translate-y-1/2 z-40 flex-col gap-2">
+    <div className="flex fixed right-0 top-1/2 -translate-y-1/2 z-40 flex-col gap-2">
 
       {/* Tisch reservieren */}
       <Link href="/tisch-reservieren">
@@ -12,14 +12,16 @@ export default function StickyActions() {
           initial={{ x: 160 }}
           animate={{ x: 0 }}
           transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          whileHover={{ x: -8, scale: 1.03 }}
-          className="group flex items-center gap-3 pl-4 pr-3 cursor-pointer shadow-xl"
+          whileHover={{ x: -6, scale: 1.03 }}
+          className="flex items-center gap-2 cursor-pointer shadow-xl"
           style={{
             backgroundColor: "#c5a485",
             borderRadius: "10px 0 0 10px",
-            paddingTop: "18px",
-            paddingBottom: "18px",
-            boxShadow: "0 8px 30px rgba(197,164,133,0.45)",
+            paddingTop: "14px",
+            paddingBottom: "14px",
+            paddingLeft: "10px",
+            paddingRight: "8px",
+            boxShadow: "0 6px 24px rgba(197,164,133,0.45)",
           }}
         >
           <motion.div
@@ -27,10 +29,11 @@ export default function StickyActions() {
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             className="shrink-0 text-white"
           >
-            <CalendarCheck className="w-5 h-5" />
+            <CalendarCheck className="w-4 h-4" />
           </motion.div>
+          {/* Text — hidden on very small screens */}
           <span
-            className="text-[11px] font-bold tracking-[0.22em] uppercase text-white whitespace-nowrap select-none"
+            className="hidden sm:block text-[10px] font-bold tracking-[0.2em] uppercase text-white whitespace-nowrap select-none"
             style={{ writingMode: "vertical-rl", textOrientation: "mixed", transform: "rotate(180deg)" }}
           >
             Tisch reservieren
@@ -44,14 +47,16 @@ export default function StickyActions() {
           initial={{ x: 160 }}
           animate={{ x: 0 }}
           transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          whileHover={{ x: -8, scale: 1.03 }}
-          className="group flex items-center gap-3 pl-4 pr-3 cursor-pointer"
+          whileHover={{ x: -6, scale: 1.03 }}
+          className="flex items-center gap-2 cursor-pointer"
           style={{
             backgroundColor: "#1c1c1c",
             borderRadius: "10px 0 0 10px",
-            paddingTop: "14px",
-            paddingBottom: "14px",
-            boxShadow: "0 8px 30px rgba(0,0,0,0.4)",
+            paddingTop: "12px",
+            paddingBottom: "12px",
+            paddingLeft: "10px",
+            paddingRight: "8px",
+            boxShadow: "0 6px 24px rgba(0,0,0,0.4)",
           }}
         >
           <motion.div
@@ -59,10 +64,10 @@ export default function StickyActions() {
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
             className="shrink-0 text-white"
           >
-            <ShoppingBag className="w-5 h-5" />
+            <ShoppingBag className="w-4 h-4" />
           </motion.div>
           <span
-            className="text-[11px] font-bold tracking-[0.22em] uppercase text-white whitespace-nowrap select-none"
+            className="hidden sm:block text-[10px] font-bold tracking-[0.2em] uppercase text-white whitespace-nowrap select-none"
             style={{ writingMode: "vertical-rl", textOrientation: "mixed", transform: "rotate(180deg)" }}
           >
             Jetzt bestellen
