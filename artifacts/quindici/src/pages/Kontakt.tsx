@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { MapPin, Phone, Clock, Car, Train, Mail } from "lucide-react";
+import { MapPin, Phone, Clock, Car, Train, Bus, Mail } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -306,25 +306,7 @@ export default function Kontakt() {
                       Mit dem Auto
                     </h4>
                     <p className="text-stone-500 text-sm leading-relaxed">
-                      Über die A81 Ausfahrt Ludwigsburg-Mitte oder Ludwigsburg-Süd, dann Richtung Stadtmitte. Die Bahnhofstraße liegt zentrumsnah in direkter Nähe zum Hauptbahnhof. Parkmöglichkeiten befinden sich im Parkhaus Bahnhof sowie in den umliegenden Straßen.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Mit der Bahn */}
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 flex items-center justify-center bg-amber-700/10 shrink-0 mt-0.5">
-                    <Train className="w-5 h-5 text-amber-700" />
-                  </div>
-                  <div>
-                    <h4
-                      className="text-stone-800 font-bold text-[16px] mb-2"
-                      style={{ fontFamily: "'Playfair Display', serif" }}
-                    >
-                      Mit der Bahn
-                    </h4>
-                    <p className="text-stone-500 text-sm leading-relaxed">
-                      S-Bahn Linie S4 oder S5 bis Ludwigsburg Hauptbahnhof. Von dort nur wenige Gehminuten entfernt – die Bahnhofstraße 17 liegt direkt vor dem Bahnhof.
+                      Über die A81 Ausfahrt Ludwigsburg-Mitte oder Ludwigsburg-Süd, dann Richtung Stadtmitte. Die Bahnhofstraße liegt zentrumsnah in direkter Nähe zum Hauptbahnhof.
                     </p>
                   </div>
                 </div>
@@ -343,6 +325,24 @@ export default function Kontakt() {
                     </h4>
                     <p className="text-stone-500 text-sm leading-relaxed">
                       Parkhaus Bahnhof Ludwigsburg direkt in der Nähe. Außerdem Parkplätze am Arsenalplatz und am Rathaus verfügbar.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Öffentliche Verkehrsmittel */}
+                <div className="flex gap-4">
+                  <div className="w-10 h-10 flex items-center justify-center bg-amber-700/10 shrink-0 mt-0.5">
+                    <Train className="w-5 h-5 text-amber-700" />
+                  </div>
+                  <div>
+                    <h4
+                      className="text-stone-800 font-bold text-[16px] mb-2"
+                      style={{ fontFamily: "'Playfair Display', serif" }}
+                    >
+                      Mit Bahn & Bus
+                    </h4>
+                    <p className="text-stone-500 text-sm leading-relaxed">
+                      S-Bahn Linie S4 oder S5 bis Ludwigsburg Hauptbahnhof – die Bahnhofstraße 17 liegt direkt vor dem Bahnhof. Der Busbahnhof (ZOB) befindet sich ebenfalls in unmittelbarer Nähe und ist fußläufig in wenigen Minuten erreichbar.
                     </p>
                   </div>
                 </div>
