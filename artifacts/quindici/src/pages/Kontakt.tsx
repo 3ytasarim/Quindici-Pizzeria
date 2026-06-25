@@ -227,7 +227,7 @@ export default function Kontakt() {
                   className="text-4xl md:text-5xl font-bold text-stone-800 mb-3"
                   style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                  Wann wir für Sie da sind
+                  Öffnungszeiten
                 </motion.h2>
               </div>
               <motion.div
@@ -283,7 +283,7 @@ export default function Kontakt() {
                   className="text-4xl md:text-5xl font-bold text-stone-800 mb-3"
                   style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                  Den Weg zu uns
+                  Anfahrt
                 </motion.h2>
               </div>
               <motion.div
