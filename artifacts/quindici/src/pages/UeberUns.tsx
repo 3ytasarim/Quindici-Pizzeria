@@ -40,7 +40,18 @@ export default function UeberUns() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative flex items-center justify-center overflow-hidden py-16 md:py-24" style={{ backgroundColor: "#fdf8f2" }}>
+      <section className="relative min-h-[52vh] flex items-center justify-center overflow-hidden">
+        <div
+          className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url(/ueberuns-hero.jpg)", opacity: 0.55 }}
+        />
+        <div
+          className="absolute inset-0 z-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(253,248,242,0.78) 0%, rgba(253,248,242,0.52) 50%, rgba(253,248,242,0.78) 100%)",
+          }}
+        />
 
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
           {/* Eyebrow */}
