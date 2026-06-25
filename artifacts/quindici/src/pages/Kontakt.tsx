@@ -103,7 +103,7 @@ export default function Kontakt() {
                   className="text-xl font-bold text-stone-800 mb-3"
                   style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                  So finden Sie uns
+                  So findest Du uns
                 </h3>
                 <p className="text-stone-600 text-sm leading-relaxed">
                   Quindici Trattoria Pizzeria<br />
@@ -141,7 +141,7 @@ export default function Kontakt() {
                   className="text-xl font-bold text-stone-800 mb-3"
                   style={{ fontFamily: "'Playfair Display', serif" }}
                 >
-                  Rufen Sie uns an
+                  Ruf uns an
                 </h3>
                 <div className="space-y-2 text-sm text-stone-600">
                   <p>
@@ -192,7 +192,7 @@ export default function Kontakt() {
                   Tisch reservieren
                 </h3>
                 <p className="text-amber-100 text-sm leading-relaxed">
-                  Wir freuen uns auf Ihren Besuch. Reservierungen nehmen wir telefonisch oder per E-Mail entgegen.
+                  Wir freuen uns auf Deinen Besuch. Reservierungen nehmen wir auch telefonisch oder per E-Mail entgegen.
                 </p>
               </div>
               <a
