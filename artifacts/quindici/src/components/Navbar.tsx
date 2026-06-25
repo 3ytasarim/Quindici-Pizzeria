@@ -54,7 +54,7 @@ export default function Navbar() {
           <Link href="/tisch-reservieren">
             <Button
               variant="outline"
-              className="uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 transition-all"
+              className="uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 transition-all"
               style={{ borderColor: "#c5a485", color: "#c5a485", backgroundColor: "transparent" }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a48512"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
@@ -65,7 +65,7 @@ export default function Navbar() {
           </Link>
           <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
             <Button
-              className="text-white uppercase tracking-widest text-[11px] font-semibold rounded-none px-5 h-9 shadow-sm transition-all"
+              className="text-white uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 shadow-sm transition-all"
               style={{ backgroundColor: "#c5a485" }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#b8962e"; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a485"; }}
