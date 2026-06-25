@@ -120,8 +120,8 @@ export default function BenvenutilSection() {
             className="relative overflow-hidden shadow-xl min-h-[260px]"
           >
             <img
-              src="/restaurant-entrance.jpg"
-              alt="Quindici Trattoria Pizzeria – Eingang"
+              src="/restaurant-exterior.jpg"
+              alt="Quindici Trattoria Pizzeria Ludwigsburg"
               className="absolute inset-0 w-full h-full object-cover object-bottom"
             />
             <div className="absolute inset-0 ring-1 ring-inset ring-amber-200/40 pointer-events-none" />
