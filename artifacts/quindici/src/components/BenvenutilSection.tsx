@@ -129,8 +129,8 @@ export default function BenvenutilSection() {
         </div>
       </div>
 
-      {/* Infinite pizza band */}
-      <div
+      {/* Infinite pizza band — gizlendi */}
+      {/* <div
         className="w-full overflow-hidden" style={{ marginTop: "170px" }}
         onMouseEnter={() => { pausedRef.current = true; }}
         onMouseLeave={() => { pausedRef.current = false; }}
@@ -155,7 +155,7 @@ export default function BenvenutilSection() {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
     </section>
   );
 }
