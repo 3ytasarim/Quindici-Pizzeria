@@ -129,16 +129,14 @@ export default function BenvenutilSection() {
         </div>
       </div>
 
-      {/* Restoran fotoğrafı – tam genişlik, parallax */}
-      <div
-        className="w-full h-56 sm:h-80 md:h-[420px] lg:h-[480px]"
-        style={{
-          backgroundImage: "url('/mittagstisch-bg.jpg')",
-          backgroundAttachment: "fixed",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-        }}
-      />
+      {/* Restoran fotoğrafı – tam genişlik */}
+      <div className="w-full h-56 sm:h-80 md:h-[420px] lg:h-[480px] overflow-hidden">
+        <img
+          src="/mittagstisch-bg.jpg"
+          alt="Quindici Trattoria Pizzeria – Restaurantinnenraum"
+          className="w-full h-full object-cover object-center"
+        />
+      </div>
 
       {/* Infinite pizza band — gizlendi */}
       {/* <div
