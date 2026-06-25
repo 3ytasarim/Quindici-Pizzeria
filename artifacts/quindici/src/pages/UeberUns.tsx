@@ -222,13 +222,17 @@ export default function UeberUns() {
                 transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
                 className="group cursor-default"
               >
-                <div className="relative w-full aspect-[3/4] overflow-hidden mb-3">
-                  <img
-                    src={member.photo}
-                    alt={member.name}
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <div className="relative w-full aspect-[3/4] overflow-hidden mb-3 flex items-end justify-center" style={{ backgroundColor: "#ede8e0" }}>
+                  <svg
+                    viewBox="0 0 160 213"
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="w-full h-full transition-transform duration-700 group-hover:scale-105"
+                    preserveAspectRatio="xMidYMax meet"
+                  >
+                    <circle cx="80" cy="62" r="36" fill="#c5a485" opacity="0.45" />
+                    <ellipse cx="80" cy="190" rx="62" ry="52" fill="#c5a485" opacity="0.35" />
+                  </svg>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-amber-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
                 </div>
                 <p
