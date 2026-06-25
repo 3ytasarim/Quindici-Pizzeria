@@ -9,6 +9,7 @@ import Kontakt from "@/pages/Kontakt";
 import UeberUns from "@/pages/UeberUns";
 import Admin from "@/pages/Admin";
 import TischReservieren from "@/pages/TischReservieren";
+import { ReservationModalProvider } from "@/components/ReservationModal";
 
 const queryClient = new QueryClient();
 
@@ -30,10 +31,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
+        <ReservationModalProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </ReservationModalProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );

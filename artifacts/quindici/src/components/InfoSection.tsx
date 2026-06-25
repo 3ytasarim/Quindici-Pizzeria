@@ -1,8 +1,8 @@
 import { useRef } from "react";
-import { Link } from "wouter";
 import { motion, useInView } from "framer-motion";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import MenuCard from "@/components/MenuCard";
+import { useReservationModal } from "@/components/ReservationModal";
 
 const hours = [
   { day: "Mo – Fr",  time: "12:00 – 23:00 Uhr" },
@@ -13,6 +13,7 @@ const hours = [
 export default function InfoSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
+  const { open: openReservation } = useReservationModal();
 
   const fadeUp = (delay = 0) => ({
     initial: { opacity: 0, y: 24 },
@@ -86,12 +87,12 @@ export default function InfoSection() {
               </li>
             </ul>
             <div className="flex justify-center mt-6">
-              <Link
-                href="/tisch-reservieren"
+              <button
+                onClick={openReservation}
                 className="inline-flex items-center gap-2 bg-amber-700 text-white text-sm font-medium px-5 py-2.5 hover:bg-amber-800 transition-colors duration-200"
               >
                 Tisch reservieren
-              </Link>
+              </button>
             </div>
           </motion.div>
 

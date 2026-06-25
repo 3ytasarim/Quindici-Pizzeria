@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { MapPin, Phone, Clock, Car, Train, Bus, Mail } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useReservationModal } from "@/components/ReservationModal";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -44,6 +45,7 @@ const hours = [
 ];
 
 export default function Kontakt() {
+  const { open: openReservation } = useReservationModal();
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#fdf8f2" }}>
       <Navbar />
@@ -195,12 +197,12 @@ export default function Kontakt() {
                   Wir freuen uns auf Deinen Besuch. Reservierungen nehmen wir auch telefonisch oder per E-Mail entgegen.
                 </p>
               </div>
-              <a
-                href="/tisch-reservieren"
+              <button
+                onClick={openReservation}
                 className="mt-auto inline-block bg-white text-amber-700 text-xs font-bold uppercase tracking-[0.18em] px-5 py-3 text-center hover:bg-amber-50 transition-colors"
               >
                 Jetzt reservieren
-              </a>
+              </button>
             </motion.div>
           </div>
         </div>
