@@ -767,21 +767,21 @@ export default function Admin() {
                             {r.guests} {r.guests === "1" ? "Person" : "Personen"}
                           </span>
                         </div>
-                        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-zinc-400">
+                        <div className="flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-zinc-300">
                           <span className="flex items-center gap-1.5">
-                            <User className="w-3 h-3 shrink-0" />{r.firstName} {r.lastName}
+                            <User className="w-3.5 h-3.5 shrink-0" />{r.firstName} {r.lastName}
                           </span>
                           <a href={`tel:${r.phone}`} className="flex items-center gap-1.5 hover:text-[#c5a485] transition-colors">
-                            <Phone className="w-3 h-3 shrink-0" />{r.phone}
+                            <Phone className="w-3.5 h-3.5 shrink-0" />{r.phone}
                           </a>
                           <a href={`mailto:${r.email}`} className="flex items-center gap-1.5 hover:text-[#c5a485] transition-colors break-all">
-                            <Mail className="w-3 h-3 shrink-0" />{r.email}
+                            <Mail className="w-3.5 h-3.5 shrink-0" />{r.email}
                           </a>
                         </div>
                       </div>
 
-                      {r.notes && <p className="text-xs text-zinc-500 italic mb-2">"{r.notes}"</p>}
-                      <p className="text-[10px] text-zinc-700 mb-3">Eingegangen: {formatDate(r.createdAt)}</p>
+                      {r.notes && <p className="text-sm text-zinc-400 italic mb-2">"{r.notes}"</p>}
+                      <p className="text-xs text-zinc-500 mb-3">Eingegangen: {formatDate(r.createdAt)}</p>
 
                       <div className="flex flex-wrap gap-2 pt-3 border-t border-white/6">
                         {r.status !== "bestätigt" && (
