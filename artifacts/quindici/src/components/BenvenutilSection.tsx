@@ -131,7 +131,7 @@ export default function BenvenutilSection() {
 
       {/* Restoran fotoğrafı */}
       <div className="px-4 sm:px-8 pb-16">
-        <div className="max-w-6xl mx-auto overflow-hidden rounded-2xl shadow-lg" style={{ height: 380 }}>
+        <div className="max-w-6xl mx-auto overflow-hidden rounded-2xl shadow-lg h-56 sm:h-80 md:h-[480px] lg:h-[560px]">
           <img
             src="/mittagstisch-bg.jpg"
             alt="Quindici Trattoria Pizzeria – Restaurantinnenraum"
