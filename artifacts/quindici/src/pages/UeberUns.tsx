@@ -142,7 +142,7 @@ export default function UeberUns() {
             </motion.div>
 
             {/* Right: Collage — big photo right, small photo left overlapping */}
-            <div className="w-full lg:w-[48%] shrink-0 relative" style={{ height: "520px" }}>
+            <div className="w-full lg:w-[48%] shrink-0 relative overflow-hidden" style={{ height: "520px" }}>
 
               {/* Large photo — right side, full height */}
               <motion.div
