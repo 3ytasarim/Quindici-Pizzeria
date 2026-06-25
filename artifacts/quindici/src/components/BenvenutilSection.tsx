@@ -129,14 +129,20 @@ export default function BenvenutilSection() {
         </div>
       </div>
 
-      {/* Restoran fotoğrafı – tam genişlik */}
-      <div className="w-full h-56 sm:h-80 md:h-[420px] lg:h-[480px] overflow-hidden">
-        <img
-          src="/pizza-oven.jpg"
-          alt="Quindici Trattoria Pizzeria – Holzofenpizza"
-          className="w-full h-full object-cover object-center"
+      {/* Pizza fırını – tam genişlik, MittagstischBanner ile aynı yükseklik ve animasyon */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.7 }}
+        className="relative w-full overflow-hidden"
+        style={{ minHeight: 340 }}
+      >
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-fixed"
+          style={{ backgroundImage: "url('/pizza-oven.jpg')" }}
         />
-      </div>
+      </motion.div>
 
       {/* Infinite pizza band — gizlendi */}
       {/* <div
