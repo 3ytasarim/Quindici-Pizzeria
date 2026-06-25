@@ -4,7 +4,7 @@ import {
   Upload, LogOut, FileText, CheckCircle, AlertCircle,
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
-  RefreshCw, ChevronLeft, ChevronRight, GalleryHorizontal,
+  RefreshCw, ChevronLeft, ChevronRight,
   ChevronUp, ChevronDown,
 } from "lucide-react";
 
@@ -57,7 +57,7 @@ interface Reservation {
   status: "neu" | "bestätigt" | "storniert";
 }
 
-type Tab = "mittagstisch" | "gerichte" | "reservierungen" | "galerie";
+type Tab = "mittagstisch" | "gerichte" | "reservierungen";
 
 const STATUS_LABELS: Record<Reservation["status"], string> = {
   neu: "Neu", bestätigt: "Bestätigt", storniert: "Storniert",
@@ -101,29 +101,6 @@ export default function Admin() {
   const [calendarDate, setCalendarDate] = useState(() => { const d = new Date(); d.setDate(1); return d; });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
-  // — Galerie —
-  interface GalleryItem { id: string; title: string; imageUrl: string; }
-  const [gallery, setGallery] = useState<GalleryItem[]>([]);
-  const [galleryStatus, setGalleryStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
-  const [showGalleryForm, setShowGalleryForm] = useState(false);
-  const [editingGallery, setEditingGallery] = useState<GalleryItem | null>(null);
-  const [galleryForm, setGalleryForm] = useState({ title: "", imageUrl: "" });
-  const [galleryFile, setGalleryFile] = useState<File | null>(null);
-  const [galleryDragOver, setGalleryDragOver] = useState(false);
-  const [galleryUploading, setGalleryUploading] = useState(false);
-  const galleryFileRef = useRef<HTMLInputElement>(null);
-
-  // — Pizza Carousel —
-  interface PizzaItem { id: string; label: string; imageUrl: string; }
-  const [pizzaItems, setPizzaItems] = useState<PizzaItem[]>([]);
-  const [pizzaStatus, setPizzaStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
-  const [showPizzaForm, setShowPizzaForm] = useState(false);
-  const [editingPizza, setEditingPizza] = useState<PizzaItem | null>(null);
-  const [pizzaForm, setPizzaForm] = useState({ label: "", imageUrl: "" });
-  const [pizzaFile, setPizzaFile] = useState<File | null>(null);
-  const [pizzaDragOver, setPizzaDragOver] = useState(false);
-  const [pizzaUploading, setPizzaUploading] = useState(false);
-  const pizzaFileRef = useRef<HTMLInputElement>(null);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const tokenRef = useRef(token);
@@ -157,15 +134,6 @@ export default function Admin() {
     if (r.ok) setDishes(await r.json());
   }, []);
 
-  const fetchGallery = useCallback(async () => {
-    const r = await fetch(`${API}/gallery`);
-    if (r.ok) setGallery(await r.json());
-  }, []);
-
-  const fetchPizza = useCallback(async () => {
-    const r = await fetch(`${API}/pizza`);
-    if (r.ok) setPizzaItems(await r.json());
-  }, []);
 
   const fetchReservations = useCallback(async (silent = false) => {
     const t = tokenRef.current;
@@ -205,8 +173,8 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    if (token) { fetchPdfStatus(token); fetchDishes(); fetchReservations(); fetchGallery(); fetchPizza(); }
-  }, [token, fetchPdfStatus, fetchDishes, fetchReservations, fetchGallery, fetchPizza]);
+    if (token) { fetchPdfStatus(token); fetchDishes(); fetchReservations(); }
+  }, [token, fetchPdfStatus, fetchDishes, fetchReservations]);
 
   useEffect(() => {
     if (!token) return;
@@ -376,7 +344,6 @@ export default function Admin() {
                 ["mittagstisch", "PDF", "Mittagstisch PDF", FileText, 0],
                 ["reservierungen", "Reserv.", "Reservierungen", CalendarCheck, newBadge],
                 ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
-                ["galerie", "Galerie", "Galerie", GalleryHorizontal, 0],
               ] as const
             ).map(([id, shortLabel, fullLabel, Icon, badge]) => (
               <button key={id} onClick={() => handleTabChange(id as Tab)}
@@ -809,183 +776,6 @@ export default function Admin() {
           );
         })()}
 
-        {/* ── GALERIE ── */}
-        {tab === "galerie" && (() => {
-          // ── Pizza helpers ──
-          const openAddP = () => { setEditingPizza(null); setPizzaForm({ label: "", imageUrl: "" }); setPizzaFile(null); setPizzaStatus(null); setShowPizzaForm(true); };
-          const openEditP = (item: PizzaItem) => { setEditingPizza(item); setPizzaForm({ label: item.label, imageUrl: item.imageUrl }); setPizzaFile(null); setPizzaStatus(null); setShowPizzaForm(true); };
-          const closeP = () => { setShowPizzaForm(false); setEditingPizza(null); setPizzaFile(null); };
-          const submitPizza = async (e: React.FormEvent) => {
-            e.preventDefault(); setPizzaUploading(true); setPizzaStatus(null);
-            try {
-              const fd = new FormData();
-              if (pizzaForm.label) fd.append("label", pizzaForm.label);
-              if (pizzaFile) fd.append("image", pizzaFile);
-              else if (pizzaForm.imageUrl) fd.append("imageUrl", pizzaForm.imageUrl);
-              const url = editingPizza ? `${API}/admin/pizza/${editingPizza.id}` : `${API}/admin/pizza`;
-              const r = await authedFetch(url, { method: editingPizza ? "PUT" : "POST", body: fd });
-              if (!r.ok) throw new Error((await r.json()).error ?? "Fehler");
-              setPizzaStatus({ type: "success", msg: editingPizza ? "Gespeichert" : "Hinzugefügt" });
-              fetchPizza(); closeP();
-            } catch (err: unknown) { setPizzaStatus({ type: "error", msg: err instanceof Error ? err.message : "Fehler" }); }
-            finally { setPizzaUploading(false); }
-          };
-          const deletePizza = async (id: string) => {
-            if (!confirm("Bild löschen?")) return;
-            await authedFetch(`${API}/admin/pizza/${id}`, { method: "DELETE" });
-            fetchPizza();
-          };
-          const movePizza = async (id: string, direction: "up" | "down") => {
-            await authedFetch(`${API}/admin/pizza/${id}/move`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ direction }) });
-            fetchPizza();
-          };
-
-          // Reusable image form
-          const ImageForm = ({ file, setFile, fileRef, dragOver, setDragOver, form, setForm, uploading, onSubmit, onCancel, isEdit, labelField = false }: {
-            file: File | null; setFile: (f: File | null) => void; fileRef: React.RefObject<HTMLInputElement | null>;
-            dragOver: boolean; setDragOver: (v: boolean) => void;
-            form: { title?: string; label?: string; imageUrl: string };
-            setForm: (fn: (p: any) => any) => void;
-            uploading: boolean; onSubmit: (e: React.FormEvent) => void; onCancel: () => void;
-            isEdit: boolean; labelField?: boolean;
-          }) => (
-            <form onSubmit={onSubmit} className="space-y-4">
-              <div
-                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("image/")) setFile(f); }}
-                onClick={() => fileRef.current?.click()}
-                className={`cursor-pointer border-2 border-dashed transition-colors ${dragOver ? "border-[#c5a485] bg-[#c5a485]/5" : "border-white/15 hover:border-white/30"} flex flex-col items-center justify-center p-6 text-center`}>
-                <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) setFile(f); }} />
-                {file ? (
-                  <div className="flex flex-col items-center gap-2">
-                    <img src={URL.createObjectURL(file)} alt="Vorschau" className={`h-28 object-cover ${labelField ? "w-28 rounded-full" : "w-auto rounded"}`} />
-                    <span className="text-xs text-zinc-400">{file.name}</span>
-                  </div>
-                ) : form.imageUrl ? (
-                  <div className="flex flex-col items-center gap-2">
-                    <img src={form.imageUrl} alt="Aktuell" className={`h-28 object-cover opacity-60 ${labelField ? "w-28 rounded-full" : "w-auto rounded"}`} />
-                    <span className="text-xs text-zinc-500">Zum Ersetzen klicken oder ziehen</span>
-                  </div>
-                ) : (
-                  <>
-                    <Image className="w-7 h-7 text-zinc-600 mb-2" />
-                    <p className="text-sm text-zinc-400">Klicken oder Bild ziehen</p>
-                    <p className="text-xs text-zinc-600 mt-1">JPG, PNG, WEBP · max. 10 MB</p>
-                  </>
-                )}
-              </div>
-              {!file && (
-                <div>
-                  <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">oder URL</label>
-                  <input value={form.imageUrl} onChange={e => setForm((p: any) => ({ ...p, imageUrl: e.target.value }))}
-                    className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#c5a485] focus:outline-none placeholder-zinc-600" placeholder="https://..." />
-                </div>
-              )}
-              <div>
-                <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-1.5">{labelField ? "Bezeichnung" : "Bildunterschrift"} (optional)</label>
-                <input
-                  value={labelField ? (form.label ?? "") : (form.title ?? "")}
-                  onChange={e => setForm((p: any) => labelField ? { ...p, label: e.target.value } : { ...p, title: e.target.value })}
-                  className="w-full bg-[#111] border border-white/10 text-sm text-white px-3 py-2.5 focus:border-[#c5a485] focus:outline-none placeholder-zinc-600"
-                  placeholder={labelField ? "z. B. Margherita" : "z. B. Restauranteingang"} />
-              </div>
-              <div className="flex items-center gap-3 pt-1">
-                <button type="submit" disabled={uploading || (!file && !form.imageUrl && !isEdit)}
-                  className="flex items-center gap-2 text-xs px-5 py-2.5 font-semibold uppercase tracking-widest disabled:opacity-40"
-                  style={{ backgroundColor: GOLD, color: "#000" }}>
-                  {uploading ? "Lädt…" : isEdit ? "Speichern" : "Hinzufügen"}
-                </button>
-                <button type="button" onClick={onCancel}
-                  className="text-xs px-4 py-2.5 border border-white/10 text-zinc-400 hover:text-white transition-colors uppercase tracking-widest">
-                  Abbrechen
-                </button>
-              </div>
-            </form>
-          );
-
-          return (
-            <>
-              {/* ═══════════════ PIZZA BAND ═══════════════ */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div>
-                  <h2 className="text-lg font-semibold text-white">Pizza Band</h2>
-                  <p className="text-xs text-zinc-500 mt-0.5">{pizzaItems.length} Bild{pizzaItems.length !== 1 ? "er" : ""} · rollendes Kreisband auf der Homepage</p>
-                </div>
-                <button onClick={openAddP} className="flex items-center gap-2 text-xs px-4 py-2.5 font-semibold uppercase tracking-widest shrink-0" style={{ backgroundColor: GOLD, color: "#000" }}>
-                  <Plus className="w-3.5 h-3.5" /> Bild hinzufügen
-                </button>
-              </div>
-
-              {pizzaStatus && (
-                <div className={`mb-4 flex items-center gap-2 text-sm px-4 py-3 ${pizzaStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
-                  {pizzaStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0" /> : <AlertCircle className="w-4 h-4 shrink-0" />}
-                  {pizzaStatus.msg}
-                </div>
-              )}
-
-              <AnimatePresence>
-                {showPizzaForm && (
-                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                    className="mb-6 border border-white/10 bg-[#1a1a1a] p-5 sm:p-6">
-                    <div className="flex items-center justify-between mb-5">
-                      <h3 className="text-sm font-semibold text-white uppercase tracking-widest">{editingPizza ? "Bild bearbeiten" : "Neues Bild"}</h3>
-                      <button onClick={closeP} className="text-zinc-500 hover:text-white"><X className="w-4 h-4" /></button>
-                    </div>
-                    <ImageForm file={pizzaFile} setFile={setPizzaFile} fileRef={pizzaFileRef}
-                      dragOver={pizzaDragOver} setDragOver={setPizzaDragOver}
-                      form={pizzaForm} setForm={setPizzaForm}
-                      uploading={pizzaUploading} onSubmit={submitPizza} onCancel={closeP}
-                      isEdit={!!editingPizza} labelField />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Pizza list — all visible, with reorder + edit + delete */}
-              <div className="space-y-2">
-                {pizzaItems.map((item, i) => (
-                  <div key={item.id} className="flex items-center gap-3 border border-white/8 bg-[#111] p-3">
-                    {/* Thumbnail */}
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 shrink-0 rounded-full overflow-hidden border border-amber-700/30">
-                      <img src={item.imageUrl} alt={item.label} className="w-full h-full object-cover" />
-                    </div>
-                    {/* Name */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-white truncate">{item.label || <span className="text-zinc-500 italic">Kein Name</span>}</p>
-                      <p className="text-[11px] text-zinc-600 mt-0.5">Position {i + 1}</p>
-                    </div>
-                    {/* Actions */}
-                    <div className="flex items-center gap-1 shrink-0">
-                      {/* Reorder */}
-                      <div className="flex flex-col gap-0.5">
-                        <button onClick={() => movePizza(item.id, "up")} disabled={i === 0}
-                          className="p-1 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors border border-white/8 hover:border-white/20">
-                          <ChevronUp className="w-3 h-3" />
-                        </button>
-                        <button onClick={() => movePizza(item.id, "down")} disabled={i === pizzaItems.length - 1}
-                          className="p-1 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors border border-white/8 hover:border-white/20">
-                          <ChevronDown className="w-3 h-3" />
-                        </button>
-                      </div>
-                      {/* Edit */}
-                      <button onClick={() => openEditP(item)}
-                        className="flex items-center gap-1 text-xs px-2 py-1.5 border border-white/10 text-zinc-300 hover:border-[#c5a485] hover:text-[#c5a485] transition-colors">
-                        <Pencil className="w-3 h-3" />
-                        <span className="hidden sm:inline">Bearbeiten</span>
-                      </button>
-                      {/* Delete */}
-                      <button onClick={() => deletePizza(item.id)}
-                        className="flex items-center gap-1 text-xs px-2 py-1.5 border border-white/10 text-zinc-500 hover:border-red-500/40 hover:text-red-400 transition-colors">
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-            </>
-          );
-        })()}
       </div>
     </div>
   );
