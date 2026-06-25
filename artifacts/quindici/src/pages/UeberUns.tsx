@@ -42,51 +42,6 @@ export default function UeberUns() {
       {/* Hero */}
       <section className="relative min-h-[72vh] flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
 
-        {/* Floating pizza icons — rise from bottom, fade out at top */}
-        {[
-          { src: "/icon-pizza-1.png",     left: "5%",  size: 36, duration: 10, delay: 0    },
-          { src: "/icon-pizza-slice.png", left: "12%", size: 28, duration: 13, delay: 1.5  },
-          { src: "/icon-pizza-2.png",     left: "22%", size: 44, duration: 9,  delay: 3    },
-          { src: "/icon-pizza-cutter.png",left: "32%", size: 32, duration: 14, delay: 0.8  },
-          { src: "/icon-pizza-3.png",     left: "43%", size: 40, duration: 11, delay: 5    },
-          { src: "/icon-pizza-4.png",     left: "55%", size: 30, duration: 12, delay: 2    },
-          { src: "/icon-pizza-5.png",     left: "64%", size: 46, duration: 10, delay: 4    },
-          { src: "/icon-pizza-6.png",     left: "74%", size: 28, duration: 13, delay: 1    },
-          { src: "/icon-pizza-7.png",     left: "83%", size: 38, duration: 11, delay: 6    },
-          { src: "/icon-pizza-8.png",     left: "91%", size: 32, duration: 9,  delay: 2.5  },
-          { src: "/icon-pizza-1.png",     left: "18%", size: 24, duration: 15, delay: 7    },
-          { src: "/icon-pizza-slice.png", left: "48%", size: 50, duration: 8,  delay: 3.5  },
-          { src: "/icon-pizza-2.png",     left: "70%", size: 26, duration: 12, delay: 8    },
-          { src: "/icon-pizza-3.png",     left: "38%", size: 34, duration: 14, delay: 9    },
-        ].map((p, i) => (
-          <motion.img
-            key={i}
-            src={p.src}
-            alt=""
-            aria-hidden="true"
-            className="absolute pointer-events-none select-none"
-            style={{
-              left: p.left,
-              bottom: 0,
-              width: p.size,
-              height: p.size,
-              objectFit: "contain",
-              zIndex: 0,
-            }}
-            animate={{
-              y: [0, -(window.innerHeight * 1.4)],
-              opacity: [0, 0.22, 0.22, 0],
-              rotate: [0, i % 2 === 0 ? 20 : -20],
-            }}
-            transition={{
-              duration: p.duration,
-              delay: p.delay,
-              repeat: Infinity,
-              ease: "linear",
-              times: [0, 0.15, 0.8, 1],
-            }}
-          />
-        ))}
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
           {/* Eyebrow */}
           <motion.p
