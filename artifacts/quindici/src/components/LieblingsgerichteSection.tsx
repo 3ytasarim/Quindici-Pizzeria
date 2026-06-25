@@ -47,8 +47,7 @@ export default function LieblingsgerichteSection() {
           transition={{ duration: 0.7, delay: 0.3 }}
           className="text-stone-500 text-base leading-relaxed max-w-2xl"
         >
-          Entdecken Sie eine Auswahl unserer beliebtesten Gerichte – frisch
-          zubereitet, voller Geschmack und mit dem besonderen Quindici-Gefühl.
+          Entdecke eine Auswahl unserer beliebtesten Gerichte – frisch zubereitet, voller Geschmack und mit dem besonderen Quindici-Gefühl.
         </motion.p>
       </div>
 
