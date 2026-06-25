@@ -21,7 +21,7 @@ export default function InfoSection() {
   });
 
   return (
-    <section ref={ref} className="bg-[#fdf8f2] py-20 px-4 sm:px-6 overflow-hidden">
+    <section ref={ref} className="bg-[#fdf8f2] pt-10 pb-20 px-4 sm:px-6 overflow-hidden">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8 items-stretch">
 
         {/* LEFT — Interactive menu card */}
