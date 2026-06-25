@@ -82,7 +82,7 @@ export default function BenvenutilSection() {
             className="relative z-10 pt-16"
           >
             <h2 className="font-serif text-3xl md:text-4xl text-stone-800 leading-snug">
-              In der Trattoria Pizzeria in Ludwigsburg
+              im Quindici in Ludwigsburg
             </h2>
           </motion.div>
         </div>
@@ -96,7 +96,7 @@ export default function BenvenutilSection() {
             className="space-y-5 text-stone-600 text-base leading-relaxed"
           >
             <p>
-              Bei Quindici Trattoria Pizzeria erwartet Sie italienische Küche mit Herz. Von
+              Bei Quindici Trattoria Pizzeria erwartet Dich italienische Küche mit Herz. Von
               knuspriger Pizza über hausgemachte Pasta, frische Salate, Antipasti,
               Fleischgerichte und Fischspezialitäten bis hin zu ausgewählten saisonalen
               Empfehlungen bereiten wir unsere Speisen mit viel Leidenschaft, frischen
@@ -104,7 +104,7 @@ export default function BenvenutilSection() {
             </p>
             <p>
               Ob gemütliches Abendessen, entspannte Mittagspause, Familienessen, Treffen mit
-              Freunden oder ein besonderer Anlass – bei Quindici sollen Sie sich vom ersten
+              Freunden oder ein besonderer Anlass – bei Quindici sollst Du dich vom ersten
               Moment an willkommen fühlen.
             </p>
             <p>
