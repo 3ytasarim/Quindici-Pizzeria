@@ -222,46 +222,13 @@ export default function UeberUns() {
                 transition={{ duration: 0.6, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
                 className="group cursor-default"
               >
-                <div className="relative w-full aspect-[3/4] overflow-hidden mb-3 flex items-end justify-center" style={{ background: "linear-gradient(160deg, #e8e0d5 0%, #d6cbbe 60%, #c9bfb0 100%)" }}>
-                  <svg
-                    viewBox="0 0 160 213"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-full h-full transition-transform duration-700 group-hover:scale-105"
-                    preserveAspectRatio="xMidYMax meet"
-                  >
-                    <defs>
-                      <radialGradient id={`headGrad${i}`} cx="40%" cy="35%" r="60%">
-                        <stop offset="0%" stopColor="#d4b896" />
-                        <stop offset="55%" stopColor="#b8956e" />
-                        <stop offset="100%" stopColor="#7a5c3e" />
-                      </radialGradient>
-                      <radialGradient id={`bodyGrad${i}`} cx="35%" cy="30%" r="70%">
-                        <stop offset="0%" stopColor="#c9a87c" />
-                        <stop offset="50%" stopColor="#a07850" />
-                        <stop offset="100%" stopColor="#5e3d22" />
-                      </radialGradient>
-                      <radialGradient id={`shadowGrad${i}`} cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor="#000" stopOpacity="0.18" />
-                        <stop offset="100%" stopColor="#000" stopOpacity="0" />
-                      </radialGradient>
-                      <filter id={`blur${i}`}>
-                        <feGaussianBlur stdDeviation="3" />
-                      </filter>
-                    </defs>
-                    {/* drop shadow */}
-                    <ellipse cx="80" cy="208" rx="48" ry="8" fill="#00000030" filter={`url(#blur${i})`} />
-                    {/* neck */}
-                    <rect x="70" y="90" width="20" height="22" rx="6" fill={`url(#headGrad${i})`} />
-                    {/* head */}
-                    <ellipse cx="80" cy="70" rx="30" ry="34" fill={`url(#headGrad${i})`} />
-                    {/* head highlight */}
-                    <ellipse cx="68" cy="56" rx="10" ry="14" fill="#fff" opacity="0.12" />
-                    {/* shoulders / torso */}
-                    <path d="M18 213 Q18 148 80 138 Q142 148 142 213 Z" fill={`url(#bodyGrad${i})`} />
-                    {/* torso highlight */}
-                    <path d="M42 155 Q58 145 80 142 Q72 160 55 175 Z" fill="#fff" opacity="0.10" />
-                  </svg>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                <div className="relative w-full aspect-[3/4] overflow-hidden mb-3">
+                  <img
+                    src="/team-silhouette.png"
+                    alt="Team Mitglied"
+                    className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-amber-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left" />
                 </div>
                 <p
