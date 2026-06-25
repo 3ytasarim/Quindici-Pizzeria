@@ -81,8 +81,8 @@ export default function InfoSection() {
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-amber-700 shrink-0" />
-                <a href="mailto:info@trattoria-pizzeria.de" className="hover:text-amber-700 transition-colors">
-                  info@trattoria-pizzeria.de
+                <a href="mailto:info@trattoria-quindici.de" className="hover:text-amber-700 transition-colors">
+                  info@trattoria-quindici.de
                 </a>
               </li>
             </ul>

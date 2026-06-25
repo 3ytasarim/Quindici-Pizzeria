@@ -1,0 +1,221 @@
+# Datenschutzerklärung
+
+## 1. Datenschutz auf einen Blick
+
+Der Schutz Ihrer personenbezogenen Daten ist uns ein wichtiges Anliegen. Wir behandeln Ihre Daten vertraulich und entsprechend den gesetzlichen Datenschutzvorschriften, insbesondere der Datenschutz-Grundverordnung (DSGVO) sowie den geltenden nationalen Datenschutzgesetzen.
+
+Diese Datenschutzerklärung informiert Sie darüber, welche personenbezogenen Daten wir auf unserer Website erheben, zu welchem Zweck diese verarbeitet werden und welche Rechte Sie als betroffene Person haben.
+
+---
+
+# 2. Verantwortlicher
+
+**Quindici Trattoria Pizzeria**
+Bahnhofstraße 17 
+71638 Ludwigsburg
+
+Telefon: 07141 4732887
+
+E-Mail: info@trattoria-quindici.de
+
+Verantwortlich für die Datenverarbeitung ist der Betreiber der oben genannten Einrichtung.
+
+---
+
+# 3. Hosting
+
+Unsere Website wird bei einem externen Hosting-Dienstleister betrieben. Beim Besuch unserer Website werden automatisch Informationen erhoben und in sogenannten Server-Logfiles gespeichert.
+
+Hierzu gehören insbesondere:
+
+* IP-Adresse
+* Datum und Uhrzeit des Zugriffs
+* Browsertyp und Browserversion
+* Betriebssystem
+* Referrer-URL
+* Name der aufgerufenen Datei
+* übertragene Datenmenge
+
+Die Verarbeitung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt in der sicheren Bereitstellung und dem störungsfreien Betrieb unserer Website.
+
+Server-Logfiles werden nur so lange gespeichert, wie dies technisch erforderlich oder gesetzlich vorgeschrieben ist.
+
+---
+
+# 4. Kontaktaufnahme
+
+Wenn Sie uns per Telefon, E-Mail oder über ein Kontaktformular kontaktieren, werden die von Ihnen angegebenen personenbezogenen Daten verarbeitet.
+
+Hierzu gehören insbesondere:
+
+* Name
+* E-Mail-Adresse
+* Telefonnummer
+* Inhalt Ihrer Nachricht
+
+Die Verarbeitung erfolgt ausschließlich zur Bearbeitung Ihrer Anfrage.
+
+Rechtsgrundlage:
+
+Art. 6 Abs. 1 lit. b DSGVO (Vertragsanbahnung)
+
+bzw.
+
+Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an der Bearbeitung Ihrer Anfrage).
+
+---
+
+# 5. Tischreservierung
+
+Auf unserer Website haben Sie die Möglichkeit, einen Tisch online zu reservieren.
+
+Dabei können insbesondere folgende Daten erhoben werden:
+
+* Vorname
+* Nachname
+* Telefonnummer
+* E-Mail-Adresse
+* gewünschtes Reservierungsdatum
+* Uhrzeit
+* Anzahl der Personen
+* optionale Bemerkungen
+
+Diese Daten werden ausschließlich verwendet, um Ihre Reservierung entgegenzunehmen, zu verwalten und gegebenenfalls Rückfragen zu Ihrer Reservierung stellen zu können.
+
+Ohne diese Daten ist eine Reservierung leider nicht möglich.
+
+Rechtsgrundlage der Verarbeitung ist Art. 6 Abs. 1 lit. b DSGVO.
+
+Die Daten werden nur solange gespeichert, wie sie für die Durchführung der Reservierung erforderlich sind oder gesetzliche Aufbewahrungspflichten bestehen.
+
+---
+
+# 6. Online-Bestellungen / Lieferservice
+
+Über unsere Website können Speisen zur Lieferung oder Abholung bestellt werden.
+
+Hierbei werden unter anderem folgende personenbezogene Daten verarbeitet:
+
+* Vorname
+* Nachname
+* Lieferadresse
+* Telefonnummer
+* E-Mail-Adresse
+* Bestellinformationen
+* Zahlungsinformationen (sofern erforderlich)
+
+Diese Daten werden ausschließlich verarbeitet, um Ihre Bestellung entgegenzunehmen, auszuliefern und abzurechnen.
+
+Rechtsgrundlage:
+
+Art. 6 Abs. 1 lit. b DSGVO.
+
+Ihre Daten werden nicht für Werbezwecke verwendet, sofern Sie hierzu keine ausdrückliche Einwilligung erteilt haben.
+
+---
+
+# 7. Weiterleitung zu Lieferando
+
+Sofern Sie über unsere Website auf Lieferando weitergeleitet werden, verlassen Sie unsere Website.
+
+Für die Verarbeitung personenbezogener Daten auf den Seiten von Lieferando ist ausschließlich der jeweilige Anbieter verantwortlich.
+
+Es gelten die Datenschutzbestimmungen des jeweiligen Anbieters.
+
+---
+
+# 8. Cookies
+
+Unsere Website verwendet Cookies.
+
+Cookies sind kleine Textdateien, die auf Ihrem Endgerät gespeichert werden.
+
+Einige Cookies sind technisch notwendig, damit die Website ordnungsgemäß funktioniert.
+
+Andere Cookies dienen ausschließlich der Verbesserung der Benutzerfreundlichkeit.
+
+Sie können Ihren Browser jederzeit so einstellen, dass Cookies gelöscht oder blockiert werden.
+
+Rechtsgrundlage:
+
+Art. 6 Abs. 1 lit. f DSGVO
+
+bzw.
+
+Art. 6 Abs. 1 lit. a DSGVO, sofern eine Einwilligung erforderlich ist.
+
+---
+
+# 9. SSL- bzw. TLS-Verschlüsselung
+
+Zum Schutz Ihrer personenbezogenen Daten verwendet unsere Website eine SSL-/TLS-Verschlüsselung.
+
+Eine verschlüsselte Verbindung erkennen Sie an „https://" sowie dem Schloss-Symbol in Ihrem Browser.
+
+Dadurch können übermittelte Daten nicht von Dritten mitgelesen werden.
+
+---
+
+# 10. Google Maps
+
+Unsere Website kann Kartenmaterial von Google Maps einbinden.
+
+Beim Aufruf einer entsprechenden Seite können personenbezogene Daten, insbesondere Ihre IP-Adresse, an Google übermittelt werden.
+
+Weitere Informationen finden Sie in der Datenschutzerklärung von Google.
+
+Rechtsgrundlage:
+
+Art. 6 Abs. 1 lit. a DSGVO (Einwilligung)
+
+oder
+
+Art. 6 Abs. 1 lit. f DSGVO, sofern technisch erforderlich.
+
+---
+
+# 11. Social Media
+
+Unsere Website enthält Verlinkungen zu unseren Profilen auf sozialen Netzwerken (z. B. Instagram oder Facebook).
+
+Beim Anklicken dieser Links verlassen Sie unsere Website.
+
+Für die Datenverarbeitung auf den jeweiligen Plattformen sind ausschließlich deren Betreiber verantwortlich.
+
+---
+
+# 12. Speicherdauer
+
+Personenbezogene Daten werden nur solange gespeichert, wie dies für die jeweiligen Verarbeitungszwecke erforderlich ist oder gesetzliche Aufbewahrungspflichten bestehen.
+
+Anschließend werden die Daten gelöscht oder gesetzeskonform gesperrt.
+
+---
+
+# 13. Ihre Rechte
+
+Sie haben jederzeit das Recht auf:
+
+* Auskunft über Ihre gespeicherten Daten (Art. 15 DSGVO)
+* Berichtigung unrichtiger Daten (Art. 16 DSGVO)
+* Löschung Ihrer Daten (Art. 17 DSGVO)
+* Einschränkung der Verarbeitung (Art. 18 DSGVO)
+* Datenübertragbarkeit (Art. 20 DSGVO)
+* Widerspruch gegen die Verarbeitung (Art. 21 DSGVO)
+* Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft.
+
+---
+
+# 14. Beschwerderecht
+
+Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde über die Verarbeitung Ihrer personenbezogenen Daten zu beschweren.
+
+---
+
+# 15. Änderungen dieser Datenschutzerklärung
+
+Wir behalten uns vor, diese Datenschutzerklärung anzupassen, wenn dies aufgrund gesetzlicher Änderungen oder technischer Weiterentwicklungen erforderlich wird.
+
+Es gilt jeweils die auf unserer Website veröffentlichte aktuelle Fassung.
+
+**Stand:** Juni 2026

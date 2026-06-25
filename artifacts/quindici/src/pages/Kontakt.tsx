@@ -155,10 +155,10 @@ export default function Kontakt() {
                   <p>
                     <span className="font-medium text-stone-700">E-Mail:</span>{" "}
                     <a
-                      href="mailto:info@quindici-ludwigsburg.de"
+                      href="mailto:info@trattoria-quindici.de"
                       className="hover:text-amber-700 transition-colors"
                     >
-                      info@quindici-ludwigsburg.de
+                      info@trattoria-quindici.de
                     </a>
                   </p>
                 </div>
