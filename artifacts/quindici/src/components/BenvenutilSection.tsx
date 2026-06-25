@@ -132,8 +132,8 @@ export default function BenvenutilSection() {
       {/* Restoran fotoğrafı – tam genişlik */}
       <div className="w-full h-56 sm:h-80 md:h-[420px] lg:h-[480px] overflow-hidden">
         <img
-          src="/mittagstisch-bg.jpg"
-          alt="Quindici Trattoria Pizzeria – Restaurantinnenraum"
+          src="/pizza-oven.jpg"
+          alt="Quindici Trattoria Pizzeria – Holzofenpizza"
           className="w-full h-full object-cover object-center"
         />
       </div>
