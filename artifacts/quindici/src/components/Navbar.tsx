@@ -94,7 +94,7 @@ export default function Navbar() {
           >
             Tisch reservieren
           </Button>
-          <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.lieferando.de/speisekarte/quindici-pizza#kategorie_b4ba0961-8497-4427-8381-2610b9040620" target="_blank" rel="noopener noreferrer">
             <Button
               className="text-white uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 shadow-sm transition-all"
               style={{ backgroundColor: "#c5a485" }}
@@ -169,7 +169,7 @@ export default function Navbar() {
                         Tisch reservieren
                       </Button>
                       <a
-                        href="https://quindici.lieferservice.3ytasarim.com/"
+                        href="https://www.lieferando.de/speisekarte/quindici-pizza#kategorie_b4ba0961-8497-4427-8381-2610b9040620"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="w-full"
