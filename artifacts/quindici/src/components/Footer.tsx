@@ -49,7 +49,7 @@ export default function Footer() {
 
           <div className="border-t border-stone-700 pt-6 space-y-1">
             <p className="font-semibold text-white text-sm">Quindici Trattoria Pizzeria</p>
-            <p className="text-stone-400 text-sm italic">passione in cucina e vino</p>
+            <p className="text-stone-400 text-sm italic">Einfach genießen</p>
             <p className="text-stone-400 text-sm pt-2 leading-relaxed">
               Bahnhofstraße 17<br />
               71638 Ludwigsburg
