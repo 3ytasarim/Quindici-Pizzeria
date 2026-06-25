@@ -129,6 +129,17 @@ export default function BenvenutilSection() {
         </div>
       </div>
 
+      {/* Restoran fotoğrafı */}
+      <div className="px-4 sm:px-8 pb-16">
+        <div className="max-w-6xl mx-auto overflow-hidden rounded-2xl shadow-lg" style={{ height: 380 }}>
+          <img
+            src="/mittagstisch-bg.jpg"
+            alt="Quindici Trattoria Pizzeria – Restaurantinnenraum"
+            className="w-full h-full object-cover"
+          />
+        </div>
+      </div>
+
       {/* Infinite pizza band — gizlendi */}
       {/* <div
         className="w-full overflow-hidden" style={{ marginTop: "170px" }}
