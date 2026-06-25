@@ -1,4 +1,4 @@
-import { Instagram, Facebook, Phone, CalendarCheck } from "lucide-react";
+import { Instagram, Phone, CalendarCheck } from "lucide-react";
 import { useReservationModal } from "@/components/ReservationModal";
 
 const navLinks = [
@@ -34,14 +34,9 @@ export default function Footer() {
           </p>
           <div className="flex gap-4 mb-6 justify-center md:justify-start">
             <a
-              href="#"
-              className="w-9 h-9 flex items-center justify-center border border-stone-600 text-stone-400 hover:text-white hover:border-white transition-colors"
-              aria-label="Facebook"
-            >
-              <Facebook className="w-4 h-4" />
-            </a>
-            <a
-              href="#"
+              href="https://www.instagram.com/quindicipizza/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="w-9 h-9 flex items-center justify-center border border-stone-600 text-stone-400 hover:text-white hover:border-white transition-colors"
               aria-label="Instagram"
             >
