@@ -1,11 +1,40 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+
+function AnimatedBurger({ open }: { open: boolean }) {
+  return (
+    <div className="w-6 h-5 flex flex-col justify-between relative">
+      {/* Top bar */}
+      <motion.span
+        className="block h-[2px] rounded-full origin-center"
+        style={{ backgroundColor: "#1c1c1c" }}
+        animate={open ? { rotate: 45, y: 9 } : { rotate: 0, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      />
+      {/* Middle bar */}
+      <motion.span
+        className="block h-[2px] rounded-full"
+        style={{ backgroundColor: "#1c1c1c" }}
+        animate={open ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
+        transition={{ duration: 0.2, ease: "easeInOut" }}
+      />
+      {/* Bottom bar */}
+      <motion.span
+        className="block h-[2px] rounded-full origin-center"
+        style={{ backgroundColor: "#1c1c1c" }}
+        animate={open ? { rotate: -45, y: -9 } : { rotate: 0, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      />
+    </div>
+  );
+}
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -28,13 +57,14 @@ export default function Navbar() {
           : "bg-background/80 backdrop-blur-md border-b border-transparent"
       }`}
     >
-      <div className="container mx-auto px-6 flex h-20 items-center">
+      <div className="container mx-auto px-6 flex h-20 items-center justify-between">
+
         {/* Logo — left */}
         <Link href="/" className="flex items-center gap-3 shrink-0">
           <img src="/logo.png" alt="Quindici Logo" className="h-[72px] w-auto" />
         </Link>
 
-        {/* Desktop Nav — right-aligned toward buttons */}
+        {/* Desktop Nav — center-right */}
         <nav className="hidden lg:flex flex-1 items-center justify-end gap-1 mr-6">
           {navLinks.map((link) => (
             <Link
@@ -49,7 +79,7 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Buttons — right */}
+        {/* Desktop Buttons — right */}
         <div className="hidden lg:flex items-center gap-3 shrink-0">
           <Link href="/tisch-reservieren">
             <Button
@@ -76,59 +106,91 @@ export default function Navbar() {
           </a>
         </div>
 
-        {/* Mobile Nav */}
+        {/* Mobile Hamburger — far right */}
         <div className="lg:hidden">
-          <Sheet>
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 text-stone-700"
+              <button
+                className="flex items-center justify-center w-11 h-11 rounded-full transition-colors hover:bg-amber-50 focus:outline-none"
+                aria-label="Menü öffnen"
                 data-testid="button-mobile-menu"
               >
-                <Menu className="h-5 w-5" />
-              </Button>
+                <AnimatedBurger open={menuOpen} />
+              </button>
             </SheetTrigger>
-            <SheetContent side="right" className="bg-white border-l border-amber-100 w-72">
-              <div className="flex flex-col pt-10">
-                <img src="/logo.png" alt="Quindici Logo" className="h-16 w-auto mx-auto mb-10" />
-                <div className="flex flex-col">
-                  {navLinks.map((link) => (
-                    <Link
-                      key={link.name}
-                      href={link.href}
-                      className="text-base font-medium text-stone-700 hover:text-amber-700 transition-colors py-3 px-2 border-b border-stone-100"
-                      data-testid={`mobile-nav-${link.name.toLowerCase().replace(/\s+/g, "-")}`}
+
+            <SheetContent side="right" className="bg-white border-l border-amber-100 w-72 p-0">
+              <AnimatePresence>
+                {menuOpen && (
+                  <motion.div
+                    key="mobile-menu"
+                    initial={{ opacity: 0, x: 40 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 40 }}
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    className="flex flex-col h-full pt-10 px-6 pb-8"
+                  >
+                    <img src="/logo.png" alt="Quindici Logo" className="h-16 w-auto mx-auto mb-10" />
+
+                    <nav className="flex flex-col">
+                      {navLinks.map((link, i) => (
+                        <motion.div
+                          key={link.name}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.08 + i * 0.06, duration: 0.3, ease: "easeOut" }}
+                        >
+                          <Link
+                            href={link.href}
+                            onClick={() => setMenuOpen(false)}
+                            className="block text-base font-medium text-stone-700 hover:text-amber-700 transition-colors py-3 border-b border-stone-100"
+                            data-testid={`mobile-nav-${link.name.toLowerCase().replace(/\s+/g, "-")}`}
+                          >
+                            {link.name}
+                          </Link>
+                        </motion.div>
+                      ))}
+                    </nav>
+
+                    <motion.div
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.36, duration: 0.3, ease: "easeOut" }}
+                      className="flex flex-col gap-3 mt-8"
                     >
-                      {link.name}
-                    </Link>
-                  ))}
-                </div>
-                <div className="flex flex-col gap-3 mt-8 px-2">
-                  <Link href="/tisch-reservieren" className="w-full">
-                    <Button
-                      variant="outline"
-                      className="w-full uppercase tracking-widest text-[11px] font-semibold rounded-none"
-                      style={{ borderColor: "#c5a485", color: "#c5a485" }}
-                      data-testid="mobile-button-tisch-reservieren"
-                    >
-                      Tisch reservieren
-                    </Button>
-                  </Link>
-                  <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer" className="w-full">
-                    <Button
-                      className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
-                      style={{ backgroundColor: "#c5a485" }}
-                      data-testid="mobile-button-jetzt-bestellen"
-                    >
-                      Jetzt bestellen
-                    </Button>
-                  </a>
-                </div>
-              </div>
+                      <Link href="/tisch-reservieren" className="w-full" onClick={() => setMenuOpen(false)}>
+                        <Button
+                          variant="outline"
+                          className="w-full uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                          style={{ borderColor: "#c5a485", color: "#c5a485" }}
+                          data-testid="mobile-button-tisch-reservieren"
+                        >
+                          Tisch reservieren
+                        </Button>
+                      </Link>
+                      <a
+                        href="https://quindici.lieferservice.3ytasarim.com/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <Button
+                          className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                          style={{ backgroundColor: "#c5a485" }}
+                          data-testid="mobile-button-jetzt-bestellen"
+                        >
+                          Jetzt bestellen
+                        </Button>
+                      </a>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </SheetContent>
           </Sheet>
         </div>
+
       </div>
     </header>
   );
