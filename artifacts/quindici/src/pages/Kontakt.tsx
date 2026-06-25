@@ -218,9 +218,6 @@ export default function Kontakt() {
               whileInView="visible"
               viewport={{ once: true, margin: "-60px" }}
             >
-              <motion.p variants={tagLine} className="text-amber-700 uppercase tracking-[0.25em] text-xs font-semibold mb-2">
-                Öffnungszeiten
-              </motion.p>
               <div style={{ overflow: "hidden" }}>
                 <motion.h2
                   variants={titleReveal}
@@ -274,9 +271,6 @@ export default function Kontakt() {
               whileInView="visible"
               viewport={{ once: true, margin: "-60px" }}
             >
-              <motion.p variants={tagLine} className="text-amber-700 uppercase tracking-[0.25em] text-xs font-semibold mb-2">
-                Anfahrt
-              </motion.p>
               <div style={{ overflow: "hidden" }}>
                 <motion.h2
                   variants={titleReveal}
