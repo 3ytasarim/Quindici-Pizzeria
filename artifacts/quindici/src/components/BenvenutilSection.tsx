@@ -55,8 +55,8 @@ export default function BenvenutilSection() {
   const displayed = [...pizzas, ...pizzas, ...pizzas];
 
   return (
-    <section ref={ref} className="relative overflow-hidden bg-[#fdf8f2] py-24 px-6">
-      <div className="max-w-6xl mx-auto">
+    <section ref={ref} className="relative bg-[#fdf8f2] pt-24">
+      <div className="max-w-6xl mx-auto px-6">
         {/* Heading */}
         <div className="relative mb-10">
           <motion.span
@@ -129,16 +129,16 @@ export default function BenvenutilSection() {
         </div>
       </div>
 
-      {/* Restoran fotoğrafı */}
-      <div className="px-4 sm:px-8 pb-0">
-        <div className="max-w-6xl mx-auto overflow-hidden rounded-2xl shadow-lg h-56 sm:h-80 md:h-[480px] lg:h-[560px]">
-          <img
-            src="/mittagstisch-bg.jpg"
-            alt="Quindici Trattoria Pizzeria – Restaurantinnenraum"
-            className="w-full h-full object-cover"
-          />
-        </div>
-      </div>
+      {/* Restoran fotoğrafı – tam genişlik, parallax */}
+      <div
+        className="w-full h-56 sm:h-80 md:h-[420px] lg:h-[480px]"
+        style={{
+          backgroundImage: "url('/mittagstisch-bg.jpg')",
+          backgroundAttachment: "fixed",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      />
 
       {/* Infinite pizza band — gizlendi */}
       {/* <div
