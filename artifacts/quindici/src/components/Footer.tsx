@@ -26,11 +26,11 @@ export default function Footer() {
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
 
         {/* LEFT — contact / social */}
-        <div>
+        <div className="text-center md:text-left">
           <p className="text-xs font-semibold tracking-[0.25em] uppercase text-stone-400 mb-5">
             In Verbindung bleiben
           </p>
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-4 mb-6 justify-center md:justify-start">
             <a
               href="#"
               className="w-9 h-9 flex items-center justify-center border border-stone-600 text-stone-400 hover:text-white hover:border-white transition-colors"
@@ -51,8 +51,7 @@ export default function Footer() {
             <p className="font-semibold text-white text-sm">Quindici Trattoria Pizzeria</p>
             <p className="text-stone-400 text-sm italic">Einfach genießen</p>
             <p className="text-stone-400 text-sm pt-2 leading-relaxed">
-              Bahnhofstraße 17<br />
-              71638 Ludwigsburg
+              Bahnhofstraße 17<br />71638 Ludwigsburg
             </p>
           </div>
         </div>
@@ -83,8 +82,8 @@ export default function Footer() {
         </div>
 
         {/* RIGHT — navigation */}
-        <div className="md:text-right">
-          <nav className="flex flex-col gap-2.5">
+        <div className="text-center md:text-right">
+          <nav className="flex flex-col gap-2.5 items-center md:items-end">
             {navLinks.map((link) => (
               <a
                 key={link.label}
