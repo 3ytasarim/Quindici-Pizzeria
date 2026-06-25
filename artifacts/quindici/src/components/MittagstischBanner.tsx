@@ -47,8 +47,8 @@ export default function MittagstischBanner() {
             transition={{ duration: 0.7, delay: 0.35 }}
             className="text-stone-300 text-base leading-relaxed max-w-lg"
           >
-            Entdecken Sie unseren aktuellen Mittagstisch – frisch zubereitet,
-            abwechslungsreich und ideal für Ihre Mittagspause in Ludwigsburg!
+            Entdecke unseren aktuellen Mittagstisch – frisch zubereitet,
+            abwechslungsreich und ideal für Deine Mittagspause!
           </motion.p>
         </div>
 
