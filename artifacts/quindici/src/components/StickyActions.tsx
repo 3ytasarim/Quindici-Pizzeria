@@ -4,12 +4,12 @@ import { CalendarCheck, ShoppingBag } from "lucide-react";
 
 export default function StickyActions() {
   return (
-    <div className="fixed right-0 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-2">
+    <div className="hidden lg:flex fixed right-0 top-1/2 -translate-y-1/2 z-40 flex-col gap-2">
 
       {/* Tisch reservieren */}
       <Link href="/tisch-reservieren">
         <motion.div
-          initial={{ x: "110%" }}
+          initial={{ x: 160 }}
           animate={{ x: 0 }}
           transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
           whileHover={{ x: -8, scale: 1.03 }}
@@ -41,7 +41,7 @@ export default function StickyActions() {
       {/* Jetzt bestellen */}
       <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
         <motion.div
-          initial={{ x: "110%" }}
+          initial={{ x: 160 }}
           animate={{ x: 0 }}
           transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
           whileHover={{ x: -8, scale: 1.03 }}
