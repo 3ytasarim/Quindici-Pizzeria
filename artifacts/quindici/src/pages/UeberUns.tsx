@@ -190,7 +190,7 @@ export default function UeberUns() {
               className="text-5xl md:text-6xl lg:text-7xl font-bold"
               style={{ fontFamily: "'Playfair Display', serif", color: "#c5a485" }}
             >
-              Teil der Familie
+              Teil der Quindici Familie
             </motion.h2>
           </div>
 
