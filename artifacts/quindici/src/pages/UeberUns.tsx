@@ -40,7 +40,7 @@ export default function UeberUns() {
       <Navbar />
 
       {/* Hero */}
-      <section className="relative min-h-[72vh] flex items-center justify-center overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
+      <section className="relative flex items-center justify-center overflow-hidden py-16 md:py-24" style={{ backgroundColor: "#fdf8f2" }}>
 
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
           {/* Eyebrow */}
