@@ -1,10 +1,12 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import { ArrowRight, CalendarCheck } from "lucide-react";
+import { useReservationModal } from "@/components/ReservationModal";
 
 export default function MittagstischBanner() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
+  const { open: openReservation } = useReservationModal();
 
   return (
     <section
@@ -68,13 +70,13 @@ export default function MittagstischBanner() {
             <ArrowRight className="w-4 h-4" />
             Jetzt ansehen
           </a>
-          <a
-            href="/tisch-reservieren"
+          <button
+            onClick={openReservation}
             className="inline-flex items-center justify-center gap-2 border border-white/50 hover:border-white text-white text-sm font-medium px-7 py-3.5 transition-colors duration-200 hover:bg-white/10"
           >
             <CalendarCheck className="w-4 h-4" />
             Jetzt reservieren
-          </a>
+          </button>
         </motion.div>
 
       </div>

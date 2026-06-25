@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useReservationModal } from "@/components/ReservationModal";
 
 function AnimatedBurger({ open }: { open: boolean }) {
   return (
@@ -35,6 +36,7 @@ function AnimatedBurger({ open }: { open: boolean }) {
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { open: openReservation } = useReservationModal();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -81,18 +83,17 @@ export default function Navbar() {
 
         {/* Desktop Buttons — right */}
         <div className="hidden lg:flex items-center gap-3 shrink-0">
-          <Link href="/tisch-reservieren">
-            <Button
-              variant="outline"
-              className="uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 transition-all"
-              style={{ borderColor: "#c5a485", color: "#c5a485", backgroundColor: "transparent" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a48512"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
-              data-testid="button-tisch-reservieren"
-            >
-              Tisch reservieren
-            </Button>
-          </Link>
+          <Button
+            variant="outline"
+            className="uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 transition-all"
+            style={{ borderColor: "#c5a485", color: "#c5a485", backgroundColor: "transparent" }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a48512"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent"; }}
+            data-testid="button-tisch-reservieren"
+            onClick={openReservation}
+          >
+            Tisch reservieren
+          </Button>
           <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
             <Button
               className="text-white uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 shadow-sm transition-all"
@@ -158,16 +159,15 @@ export default function Navbar() {
                       transition={{ delay: 0.36, duration: 0.3, ease: "easeOut" }}
                       className="flex flex-col gap-3 mt-8"
                     >
-                      <Link href="/tisch-reservieren" className="w-full" onClick={() => setMenuOpen(false)}>
-                        <Button
-                          variant="outline"
-                          className="w-full uppercase tracking-widest text-[11px] font-semibold rounded-none"
-                          style={{ borderColor: "#c5a485", color: "#c5a485" }}
-                          data-testid="mobile-button-tisch-reservieren"
-                        >
-                          Tisch reservieren
-                        </Button>
-                      </Link>
+                      <Button
+                        variant="outline"
+                        className="w-full uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                        style={{ borderColor: "#c5a485", color: "#c5a485" }}
+                        data-testid="mobile-button-tisch-reservieren"
+                        onClick={() => { setMenuOpen(false); openReservation(); }}
+                      >
+                        Tisch reservieren
+                      </Button>
                       <a
                         href="https://quindici.lieferservice.3ytasarim.com/"
                         target="_blank"

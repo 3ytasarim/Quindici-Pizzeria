@@ -1,13 +1,14 @@
 import { motion } from "framer-motion";
-import { Link } from "wouter";
 import { CalendarCheck, ShoppingBag } from "lucide-react";
+import { useReservationModal } from "@/components/ReservationModal";
 
 export default function StickyActions() {
+  const { open: openReservation } = useReservationModal();
   return (
     <div className="flex fixed right-0 top-1/2 -translate-y-1/2 z-40 flex-col gap-2">
 
       {/* Tisch reservieren */}
-      <Link href="/tisch-reservieren">
+      <button onClick={openReservation} className="block bg-transparent border-0 p-0">
         <motion.div
           initial={{ x: 160 }}
           animate={{ x: 0 }}
@@ -39,7 +40,7 @@ export default function StickyActions() {
             Tisch reservieren
           </span>
         </motion.div>
-      </Link>
+      </button>
 
       {/* Jetzt bestellen */}
       <a href="https://quindici.lieferservice.3ytasarim.com/" target="_blank" rel="noopener noreferrer">
