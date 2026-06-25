@@ -1,14 +1,14 @@
 import { Instagram, Facebook, Phone, CalendarCheck } from "lucide-react";
 
 const navLinks = [
-  { label: "Startseite",        href: "#" },
-  { label: "Speisekarte",       href: "#" },
-  { label: "Tisch reservieren", href: "#" },
-  { label: "Mittagstisch",      href: "#" },
-  { label: "Lieferservice",     href: "#" },
-  { label: "Kontakt",           href: "#" },
+  { label: "Startseite",        href: "/" },
+  { label: "Speisekarte",       href: "/speisekarte" },
+  { label: "Tisch reservieren", href: "/tisch-reservieren" },
+  { label: "Mittagstisch",      href: "/speisekarte" },
+  { label: "Lieferservice",     href: "https://www.lieferando.de/speisekarte/quindici-pizza#kategorie_b4ba0961-8497-4427-8381-2610b9040620", external: true },
+  { label: "Kontakt",           href: "/kontakt" },
   { label: "Impressum",         href: "#" },
-  { label: "Datenschutz",       href: "#" },
+  { label: "Datenschutz",       href: "/datenschutz" },
 ];
 
 export default function Footer() {
@@ -88,6 +88,7 @@ export default function Footer() {
               <a
                 key={link.label}
                 href={link.href}
+                {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                 className="text-xs font-semibold tracking-[0.2em] uppercase text-stone-400 hover:text-white transition-colors"
               >
                 {link.label}
