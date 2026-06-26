@@ -5,7 +5,7 @@ import {
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
   RefreshCw, ChevronLeft, ChevronRight,
-  ChevronUp, ChevronDown, Instagram, Copy, ExternalLink,
+  ChevronUp, ChevronDown,
 } from "lucide-react";
 
 const API = "/api";
@@ -57,7 +57,7 @@ interface Reservation {
   status: "neu" | "bestätigt" | "storniert";
 }
 
-type Tab = "mittagstisch" | "gerichte" | "reservierungen" | "instagram";
+type Tab = "mittagstisch" | "gerichte" | "reservierungen";
 
 const STATUS_LABELS: Record<Reservation["status"], string> = {
   neu: "Neu", bestätigt: "Bestätigt", storniert: "Storniert",
@@ -344,7 +344,6 @@ export default function Admin() {
                 ["mittagstisch", "PDF", "Mittagstisch PDF", FileText, 0],
                 ["reservierungen", "Reserv.", "Reservierungen", CalendarCheck, newBadge],
                 ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
-                ["instagram", "Insta", "Instagram", Instagram, 0],
               ] as const
             ).map(([id, shortLabel, fullLabel, Icon, badge]) => (
               <button key={id} onClick={() => handleTabChange(id as Tab)}
@@ -777,124 +776,8 @@ export default function Admin() {
           );
         })()}
 
-        {/* ── INSTAGRAM ── */}
-        {tab === "instagram" && <InstagramTokenPanel token={sessionStorage.getItem("admin_token") ?? ""} />}
-
       </div>
     </div>
   );
 }
 
-/* ─────────────────────────── Instagram Token Panel ─────────────────────── */
-function InstagramTokenPanel({ token }: { token: string }) {
-  const [configured, setConfigured] = useState(false);
-  const [savedAt, setSavedAt] = useState<string | null>(null);
-  const [expiresInDays, setExpiresInDays] = useState<number | null>(null);
-  const [statusLoading, setStatusLoading] = useState(true);
-
-  // Check for success/error redirect from OAuth callback
-  const params = new URLSearchParams(window.location.search);
-  const oauthResult = params.get("instagram");
-
-  function loadStatus() {
-    setStatusLoading(true);
-    fetch("/api/admin/instagram/status", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((r) => r.json())
-      .then((d) => {
-        setConfigured(d.configured ?? false);
-        setSavedAt(d.savedAt ?? null);
-        setExpiresInDays(d.expiresInDays ?? null);
-      })
-      .catch(() => {})
-      .finally(() => setStatusLoading(false));
-  }
-
-  useEffect(() => {
-    loadStatus();
-    // Clean up URL params after reading
-    if (oauthResult) {
-      const url = new URL(window.location.href);
-      url.searchParams.delete("instagram");
-      url.searchParams.delete("reason");
-      window.history.replaceState({}, "", url.toString());
-    }
-  }, []);
-
-  function handleConnect() {
-    // Navigate to backend OAuth initiation (JWT in query for redirect flow)
-    const url = `/api/admin/instagram/auth`;
-    // Pass token via sessionStorage so backend can verify
-    sessionStorage.setItem("instagram_oauth_pending", "1");
-    // Open as full-page redirect (simplest approach)
-    window.location.href = url + `?t=${encodeURIComponent(token)}`;
-  }
-
-  return (
-    <div className="max-w-xl mx-auto space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-white mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
-          Instagram-Verbindung
-        </h2>
-        <p className="text-sm text-zinc-400">
-          Verbinden Sie Ihr Instagram-Konto — ein Klick, fertig.
-        </p>
-      </div>
-
-      {/* OAuth success banner */}
-      {oauthResult === "success" && (
-        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 px-4 py-3 rounded border border-green-800/50 bg-green-900/20 text-green-400 text-sm">
-          <CheckCircle className="w-4 h-4 shrink-0" />
-          Instagram erfolgreich verbunden! Die Website zeigt jetzt Ihre echten Beiträge an.
-        </motion.div>
-      )}
-      {oauthResult === "error" && (
-        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 px-4 py-3 rounded border border-red-800/40 bg-red-900/20 text-red-400 text-sm">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          Verbindung fehlgeschlagen. Bitte erneut versuchen.
-        </motion.div>
-      )}
-
-      {/* Status */}
-      <div className={`flex items-center gap-3 px-4 py-3 rounded border text-sm ${configured ? "border-green-800/50 bg-green-900/20 text-green-400" : "border-zinc-700 bg-zinc-900/50 text-zinc-400"}`}>
-        <Instagram className="w-4 h-4 shrink-0" />
-        {statusLoading
-          ? "Prüfe Verbindung…"
-          : configured
-            ? `✓ Verbunden${savedAt ? ` · ${new Date(savedAt).toLocaleDateString("de-DE")}` : ""}${expiresInDays ? ` · noch ca. ${expiresInDays} Tage gültig` : ""}`
-            : "Noch nicht verbunden"}
-      </div>
-
-      {/* Connect button */}
-      <div className="border border-white/8 rounded-lg p-6 space-y-4 text-center">
-        <Instagram className="w-10 h-10 mx-auto opacity-40" style={{ color: "#c5a485" }} />
-        <p className="text-sm text-zinc-400">
-          {configured
-            ? 'Token erneuern: Klicken Sie auf "Neu verbinden" und melden Sie sich erneut an.'
-            : "Klicken Sie auf den Button, melden Sie sich bei Facebook/Instagram an und bestätigen Sie den Zugriff."}
-        </p>
-        <button
-          onClick={handleConnect}
-          className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold uppercase tracking-widest rounded transition-opacity"
-          style={{ backgroundColor: "#c5a485", color: "#1c1917" }}
-        >
-          <Instagram className="w-4 h-4" />
-          {configured ? "Neu verbinden" : "Mit Instagram verbinden"}
-        </button>
-        <p className="text-xs text-zinc-600">
-          Sie werden zu Facebook weitergeleitet und danach automatisch zurückgebracht.
-        </p>
-      </div>
-
-      {/* Reconnect info */}
-      {configured && (
-        <p className="text-xs text-zinc-600 text-center">
-          Instagram-Token sind ca. 60 Tage gültig. Nach Ablauf einfach erneut verbinden.
-        </p>
-      )}
-    </div>
-  );
-}
