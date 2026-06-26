@@ -5,7 +5,7 @@ import {
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
   RefreshCw, ChevronLeft, ChevronRight,
-  ChevronUp, ChevronDown,
+  ChevronUp, ChevronDown, Instagram, Copy, ExternalLink,
 } from "lucide-react";
 
 const API = "/api";
@@ -57,7 +57,7 @@ interface Reservation {
   status: "neu" | "bestätigt" | "storniert";
 }
 
-type Tab = "mittagstisch" | "gerichte" | "reservierungen";
+type Tab = "mittagstisch" | "gerichte" | "reservierungen" | "instagram";
 
 const STATUS_LABELS: Record<Reservation["status"], string> = {
   neu: "Neu", bestätigt: "Bestätigt", storniert: "Storniert",
@@ -344,6 +344,7 @@ export default function Admin() {
                 ["mittagstisch", "PDF", "Mittagstisch PDF", FileText, 0],
                 ["reservierungen", "Reserv.", "Reservierungen", CalendarCheck, newBadge],
                 ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
+                ["instagram", "Insta", "Instagram", Instagram, 0],
               ] as const
             ).map(([id, shortLabel, fullLabel, Icon, badge]) => (
               <button key={id} onClick={() => handleTabChange(id as Tab)}
@@ -776,7 +777,156 @@ export default function Admin() {
           );
         })()}
 
+        {/* ── INSTAGRAM ── */}
+        {tab === "instagram" && <InstagramTokenPanel token={sessionStorage.getItem("admin_token") ?? ""} />}
+
       </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────── Instagram Token Panel ─────────────────────── */
+function InstagramTokenPanel({ token }: { token: string }) {
+  const [shortToken, setShortToken] = useState("");
+  const [longToken, setLongToken] = useState<string | null>(null);
+  const [expiresInDays, setExpiresInDays] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const [status, setStatus] = useState<"idle" | "checking">("checking");
+  const [configured, setConfigured] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/instagram/posts")
+      .then((r) => r.json())
+      .then((d) => { setConfigured(d.configured ?? false); setStatus("idle"); })
+      .catch(() => setStatus("idle"));
+  }, []);
+
+  async function handleExchange() {
+    if (!shortToken.trim()) return;
+    setLoading(true);
+    setError(null);
+    setLongToken(null);
+    try {
+      const res = await fetch("/api/admin/instagram/exchange-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ shortToken: shortToken.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Fehler");
+      setLongToken(data.longLivedToken);
+      setExpiresInDays(data.expiresInDays);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function copyToken() {
+    if (!longToken) return;
+    navigator.clipboard.writeText(longToken);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  }
+
+  return (
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div>
+        <h2 className="text-xl font-bold text-white mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+          Instagram-Verbindung
+        </h2>
+        <p className="text-sm text-zinc-400">
+          Verbinden Sie Ihr Instagram-Konto, um echte Beiträge auf der Website anzuzeigen.
+        </p>
+      </div>
+
+      {/* Status */}
+      <div className={`flex items-center gap-3 px-4 py-3 rounded border text-sm ${configured ? "border-green-800/50 bg-green-900/20 text-green-400" : "border-zinc-700 bg-zinc-900/50 text-zinc-400"}`}>
+        <Instagram className="w-4 h-4 shrink-0" />
+        {status === "checking"
+          ? "Prüfe Verbindung…"
+          : configured
+            ? "Instagram ist verbunden — Beiträge werden live geladen."
+            : "Instagram ist noch nicht verbunden — Placeholder werden angezeigt."}
+      </div>
+
+      {/* Step 1 */}
+      <div className="border border-white/8 rounded-lg p-5 space-y-3">
+        <p className="text-xs font-bold tracking-widest uppercase text-zinc-400">Schritt 1 — Kurzfristigen Token holen</p>
+        <p className="text-sm text-zinc-300">
+          Öffnen Sie den{" "}
+          <a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noopener noreferrer"
+            className="underline inline-flex items-center gap-1" style={{ color: "#c5a485" }}>
+            Graph API Explorer <ExternalLink className="w-3 h-3" />
+          </a>{" "}
+          und wählen Sie Ihre App{" "}
+          <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">991212943916020</code>.<br />
+          Fügen Sie die Berechtigung{" "}
+          <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">instagram_basic</code> hinzu,
+          klicken Sie auf <strong className="text-white">„Token generieren"</strong> und kopieren Sie den Token.
+        </p>
+      </div>
+
+      {/* Step 2 */}
+      <div className="border border-white/8 rounded-lg p-5 space-y-4">
+        <p className="text-xs font-bold tracking-widest uppercase text-zinc-400">Schritt 2 — Token hier einfügen</p>
+        <textarea
+          value={shortToken}
+          onChange={(e) => setShortToken(e.target.value)}
+          placeholder="IGAA… (kurzfristiger Token vom Graph API Explorer)"
+          rows={3}
+          className="w-full bg-zinc-900 border border-white/10 rounded px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#c5a485] resize-none font-mono"
+        />
+        <button
+          onClick={handleExchange}
+          disabled={loading || !shortToken.trim()}
+          className="flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest rounded transition-opacity disabled:opacity-40"
+          style={{ backgroundColor: "#c5a485", color: "#1c1917" }}
+        >
+          {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Instagram className="w-4 h-4" />}
+          {loading ? "Wird verarbeitet…" : "In langfristigen Token umwandeln"}
+        </button>
+
+        {error && (
+          <div className="flex items-center gap-2 text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded px-3 py-2">
+            <AlertCircle className="w-4 h-4 shrink-0" /> {error}
+          </div>
+        )}
+      </div>
+
+      {/* Result */}
+      {longToken && (
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+          className="border border-green-800/50 bg-green-900/10 rounded-lg p-5 space-y-4">
+          <div className="flex items-center gap-2 text-green-400 text-sm font-semibold">
+            <CheckCircle className="w-4 h-4" />
+            Langfristiger Token erstellt — gültig ca. {expiresInDays} Tage
+          </div>
+          <div className="relative">
+            <div className="bg-zinc-900 border border-white/10 rounded px-3 py-2 text-xs font-mono text-zinc-400 break-all pr-16 select-all">
+              {longToken}
+            </div>
+            <button onClick={copyToken}
+              className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors"
+              style={{ color: copied ? "#4ade80" : "#c5a485" }}>
+              <Copy className="w-3.5 h-3.5" />
+              {copied ? "Kopiert!" : "Kopieren"}
+            </button>
+          </div>
+          <div className="text-sm text-zinc-400 space-y-1.5">
+            <p className="font-semibold text-zinc-300">Nächster Schritt:</p>
+            <ol className="list-decimal list-inside space-y-1 text-zinc-400">
+              <li>Kopieren Sie den Token oben</li>
+              <li>Öffnen Sie in Replit: <strong className="text-zinc-300">Secrets (Umgebungsvariablen)</strong></li>
+              <li>Neuen Secret erstellen: Schlüssel <code className="text-xs bg-zinc-800 px-1 py-0.5 rounded">INSTAGRAM_ACCESS_TOKEN</code></li>
+              <li>Token einfügen → Speichern → Server neu starten</li>
+            </ol>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
