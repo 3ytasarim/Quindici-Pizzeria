@@ -787,14 +787,14 @@ export default function Admin() {
 
 /* ─────────────────────────── Instagram Token Panel ─────────────────────── */
 function InstagramTokenPanel({ token }: { token: string }) {
-  const [shortToken, setShortToken] = useState("");
-  const [success, setSuccess] = useState(false);
-  const [expiresInDays, setExpiresInDays] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [configured, setConfigured] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [expiresInDays, setExpiresInDays] = useState<number | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
+
+  // Check for success/error redirect from OAuth callback
+  const params = new URLSearchParams(window.location.search);
+  const oauthResult = params.get("instagram");
 
   function loadStatus() {
     setStatusLoading(true);
@@ -811,41 +811,52 @@ function InstagramTokenPanel({ token }: { token: string }) {
       .finally(() => setStatusLoading(false));
   }
 
-  useEffect(() => { loadStatus(); }, []);
-
-  async function handleExchange() {
-    if (!shortToken.trim()) return;
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
-    try {
-      const res = await fetch("/api/admin/instagram/exchange-token", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ shortToken: shortToken.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Fehler");
-      setSuccess(true);
-      setShortToken("");
-      loadStatus();
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    loadStatus();
+    // Clean up URL params after reading
+    if (oauthResult) {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("instagram");
+      url.searchParams.delete("reason");
+      window.history.replaceState({}, "", url.toString());
     }
+  }, []);
+
+  function handleConnect() {
+    // Navigate to backend OAuth initiation (JWT in query for redirect flow)
+    const url = `/api/admin/instagram/auth`;
+    // Pass token via sessionStorage so backend can verify
+    sessionStorage.setItem("instagram_oauth_pending", "1");
+    // Open as full-page redirect (simplest approach)
+    window.location.href = url + `?t=${encodeURIComponent(token)}`;
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-xl mx-auto space-y-6">
       <div>
         <h2 className="text-xl font-bold text-white mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
           Instagram-Verbindung
         </h2>
         <p className="text-sm text-zinc-400">
-          Verbinden Sie Ihr Instagram-Konto, um echte Beiträge auf der Website anzuzeigen.
+          Verbinden Sie Ihr Instagram-Konto — ein Klick, fertig.
         </p>
       </div>
+
+      {/* OAuth success banner */}
+      {oauthResult === "success" && (
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 px-4 py-3 rounded border border-green-800/50 bg-green-900/20 text-green-400 text-sm">
+          <CheckCircle className="w-4 h-4 shrink-0" />
+          Instagram erfolgreich verbunden! Die Website zeigt jetzt Ihre echten Beiträge an.
+        </motion.div>
+      )}
+      {oauthResult === "error" && (
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 px-4 py-3 rounded border border-red-800/40 bg-red-900/20 text-red-400 text-sm">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          Verbindung fehlgeschlagen. Bitte erneut versuchen.
+        </motion.div>
+      )}
 
       {/* Status */}
       <div className={`flex items-center gap-3 px-4 py-3 rounded border text-sm ${configured ? "border-green-800/50 bg-green-900/20 text-green-400" : "border-zinc-700 bg-zinc-900/50 text-zinc-400"}`}>
@@ -853,63 +864,37 @@ function InstagramTokenPanel({ token }: { token: string }) {
         {statusLoading
           ? "Prüfe Verbindung…"
           : configured
-            ? `✓ Instagram verbunden${savedAt ? ` · gespeichert am ${new Date(savedAt).toLocaleDateString("de-DE")}` : ""}${expiresInDays ? ` · gültig ca. ${expiresInDays} Tage` : ""}`
-            : "Noch nicht verbunden — Bitte Token unten einfügen."}
+            ? `✓ Verbunden${savedAt ? ` · ${new Date(savedAt).toLocaleDateString("de-DE")}` : ""}${expiresInDays ? ` · noch ca. ${expiresInDays} Tage gültig` : ""}`
+            : "Noch nicht verbunden"}
       </div>
 
-      {/* Success */}
-      {success && (
-        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-3 px-4 py-3 rounded border border-green-800/50 bg-green-900/20 text-green-400 text-sm">
-          <CheckCircle className="w-4 h-4 shrink-0" />
-          Instagram erfolgreich verbunden! Die Website zeigt jetzt Ihre echten Beiträge an.
-        </motion.div>
-      )}
-
-      {/* Step 1 */}
-      <div className="border border-white/8 rounded-lg p-5 space-y-3">
-        <p className="text-xs font-bold tracking-widest uppercase text-zinc-400">Schritt 1 — Kurzfristigen Token holen</p>
-        <p className="text-sm text-zinc-300 leading-relaxed">
-          Öffnen Sie den{" "}
-          <a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noopener noreferrer"
-            className="underline inline-flex items-center gap-1" style={{ color: "#c5a485" }}>
-            Graph API Explorer <ExternalLink className="w-3 h-3" />
-          </a>
-          , wählen Sie Ihre App <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">991212943916020</code>,
-          fügen Sie die Berechtigung <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">instagram_basic</code> hinzu
-          und klicken Sie auf <strong className="text-white">„Token generieren"</strong>. Token kopieren und unten einfügen.
+      {/* Connect button */}
+      <div className="border border-white/8 rounded-lg p-6 space-y-4 text-center">
+        <Instagram className="w-10 h-10 mx-auto opacity-40" style={{ color: "#c5a485" }} />
+        <p className="text-sm text-zinc-400">
+          {configured
+            ? 'Token erneuern: Klicken Sie auf "Neu verbinden" und melden Sie sich erneut an.'
+            : "Klicken Sie auf den Button, melden Sie sich bei Facebook/Instagram an und bestätigen Sie den Zugriff."}
         </p>
-      </div>
-
-      {/* Step 2 */}
-      <div className="border border-white/8 rounded-lg p-5 space-y-4">
-        <p className="text-xs font-bold tracking-widest uppercase text-zinc-400">Schritt 2 — Token einfügen &amp; verbinden</p>
-        <textarea
-          value={shortToken}
-          onChange={(e) => setShortToken(e.target.value)}
-          placeholder="IGAA… (kurzfristiger Token vom Graph API Explorer)"
-          rows={3}
-          className="w-full bg-zinc-900 border border-white/10 rounded px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#c5a485] resize-none font-mono"
-        />
         <button
-          onClick={handleExchange}
-          disabled={loading || !shortToken.trim()}
-          className="flex items-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-widest rounded transition-opacity disabled:opacity-40"
+          onClick={handleConnect}
+          className="inline-flex items-center gap-2 px-6 py-3 text-sm font-bold uppercase tracking-widest rounded transition-opacity"
           style={{ backgroundColor: "#c5a485", color: "#1c1917" }}
         >
-          {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Instagram className="w-4 h-4" />}
-          {loading ? "Wird gespeichert…" : "Verbinden & automatisch speichern"}
+          <Instagram className="w-4 h-4" />
+          {configured ? "Neu verbinden" : "Mit Instagram verbinden"}
         </button>
-
-        {error && (
-          <div className="flex items-center gap-2 text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded px-3 py-2">
-            <AlertCircle className="w-4 h-4 shrink-0" /> {error}
-          </div>
-        )}
         <p className="text-xs text-zinc-600">
-          Der Token wird sicher auf dem Server gespeichert — kein manueller Schritt erforderlich.
+          Sie werden zu Facebook weitergeleitet und danach automatisch zurückgebracht.
         </p>
       </div>
+
+      {/* Reconnect info */}
+      {configured && (
+        <p className="text-xs text-zinc-600 text-center">
+          Instagram-Token sind ca. 60 Tage gültig. Nach Ablauf einfach erneut verbinden.
+        </p>
+      )}
     </div>
   );
 }
