@@ -788,26 +788,36 @@ export default function Admin() {
 /* ─────────────────────────── Instagram Token Panel ─────────────────────── */
 function InstagramTokenPanel({ token }: { token: string }) {
   const [shortToken, setShortToken] = useState("");
-  const [longToken, setLongToken] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const [expiresInDays, setExpiresInDays] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-  const [status, setStatus] = useState<"idle" | "checking">("checking");
   const [configured, setConfigured] = useState(false);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [statusLoading, setStatusLoading] = useState(true);
 
-  useEffect(() => {
-    fetch("/api/instagram/posts")
+  function loadStatus() {
+    setStatusLoading(true);
+    fetch("/api/admin/instagram/status", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((r) => r.json())
-      .then((d) => { setConfigured(d.configured ?? false); setStatus("idle"); })
-      .catch(() => setStatus("idle"));
-  }, []);
+      .then((d) => {
+        setConfigured(d.configured ?? false);
+        setSavedAt(d.savedAt ?? null);
+        setExpiresInDays(d.expiresInDays ?? null);
+      })
+      .catch(() => {})
+      .finally(() => setStatusLoading(false));
+  }
+
+  useEffect(() => { loadStatus(); }, []);
 
   async function handleExchange() {
     if (!shortToken.trim()) return;
     setLoading(true);
     setError(null);
-    setLongToken(null);
+    setSuccess(false);
     try {
       const res = await fetch("/api/admin/instagram/exchange-token", {
         method: "POST",
@@ -816,20 +826,14 @@ function InstagramTokenPanel({ token }: { token: string }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Fehler");
-      setLongToken(data.longLivedToken);
-      setExpiresInDays(data.expiresInDays);
+      setSuccess(true);
+      setShortToken("");
+      loadStatus();
     } catch (e: any) {
       setError(e.message);
     } finally {
       setLoading(false);
     }
-  }
-
-  function copyToken() {
-    if (!longToken) return;
-    navigator.clipboard.writeText(longToken);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2500);
   }
 
   return (
@@ -846,33 +850,40 @@ function InstagramTokenPanel({ token }: { token: string }) {
       {/* Status */}
       <div className={`flex items-center gap-3 px-4 py-3 rounded border text-sm ${configured ? "border-green-800/50 bg-green-900/20 text-green-400" : "border-zinc-700 bg-zinc-900/50 text-zinc-400"}`}>
         <Instagram className="w-4 h-4 shrink-0" />
-        {status === "checking"
+        {statusLoading
           ? "Prüfe Verbindung…"
           : configured
-            ? "Instagram ist verbunden — Beiträge werden live geladen."
-            : "Instagram ist noch nicht verbunden — Placeholder werden angezeigt."}
+            ? `✓ Instagram verbunden${savedAt ? ` · gespeichert am ${new Date(savedAt).toLocaleDateString("de-DE")}` : ""}${expiresInDays ? ` · gültig ca. ${expiresInDays} Tage` : ""}`
+            : "Noch nicht verbunden — Bitte Token unten einfügen."}
       </div>
+
+      {/* Success */}
+      {success && (
+        <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-3 px-4 py-3 rounded border border-green-800/50 bg-green-900/20 text-green-400 text-sm">
+          <CheckCircle className="w-4 h-4 shrink-0" />
+          Instagram erfolgreich verbunden! Die Website zeigt jetzt Ihre echten Beiträge an.
+        </motion.div>
+      )}
 
       {/* Step 1 */}
       <div className="border border-white/8 rounded-lg p-5 space-y-3">
         <p className="text-xs font-bold tracking-widest uppercase text-zinc-400">Schritt 1 — Kurzfristigen Token holen</p>
-        <p className="text-sm text-zinc-300">
+        <p className="text-sm text-zinc-300 leading-relaxed">
           Öffnen Sie den{" "}
           <a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noopener noreferrer"
             className="underline inline-flex items-center gap-1" style={{ color: "#c5a485" }}>
             Graph API Explorer <ExternalLink className="w-3 h-3" />
-          </a>{" "}
-          und wählen Sie Ihre App{" "}
-          <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">991212943916020</code>.<br />
-          Fügen Sie die Berechtigung{" "}
-          <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">instagram_basic</code> hinzu,
-          klicken Sie auf <strong className="text-white">„Token generieren"</strong> und kopieren Sie den Token.
+          </a>
+          , wählen Sie Ihre App <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">991212943916020</code>,
+          fügen Sie die Berechtigung <code className="text-xs bg-zinc-800 px-1.5 py-0.5 rounded text-zinc-300">instagram_basic</code> hinzu
+          und klicken Sie auf <strong className="text-white">„Token generieren"</strong>. Token kopieren und unten einfügen.
         </p>
       </div>
 
       {/* Step 2 */}
       <div className="border border-white/8 rounded-lg p-5 space-y-4">
-        <p className="text-xs font-bold tracking-widest uppercase text-zinc-400">Schritt 2 — Token hier einfügen</p>
+        <p className="text-xs font-bold tracking-widest uppercase text-zinc-400">Schritt 2 — Token einfügen &amp; verbinden</p>
         <textarea
           value={shortToken}
           onChange={(e) => setShortToken(e.target.value)}
@@ -887,7 +898,7 @@ function InstagramTokenPanel({ token }: { token: string }) {
           style={{ backgroundColor: "#c5a485", color: "#1c1917" }}
         >
           {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Instagram className="w-4 h-4" />}
-          {loading ? "Wird verarbeitet…" : "In langfristigen Token umwandeln"}
+          {loading ? "Wird gespeichert…" : "Verbinden & automatisch speichern"}
         </button>
 
         {error && (
@@ -895,38 +906,10 @@ function InstagramTokenPanel({ token }: { token: string }) {
             <AlertCircle className="w-4 h-4 shrink-0" /> {error}
           </div>
         )}
+        <p className="text-xs text-zinc-600">
+          Der Token wird sicher auf dem Server gespeichert — kein manueller Schritt erforderlich.
+        </p>
       </div>
-
-      {/* Result */}
-      {longToken && (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
-          className="border border-green-800/50 bg-green-900/10 rounded-lg p-5 space-y-4">
-          <div className="flex items-center gap-2 text-green-400 text-sm font-semibold">
-            <CheckCircle className="w-4 h-4" />
-            Langfristiger Token erstellt — gültig ca. {expiresInDays} Tage
-          </div>
-          <div className="relative">
-            <div className="bg-zinc-900 border border-white/10 rounded px-3 py-2 text-xs font-mono text-zinc-400 break-all pr-16 select-all">
-              {longToken}
-            </div>
-            <button onClick={copyToken}
-              className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors"
-              style={{ color: copied ? "#4ade80" : "#c5a485" }}>
-              <Copy className="w-3.5 h-3.5" />
-              {copied ? "Kopiert!" : "Kopieren"}
-            </button>
-          </div>
-          <div className="text-sm text-zinc-400 space-y-1.5">
-            <p className="font-semibold text-zinc-300">Nächster Schritt:</p>
-            <ol className="list-decimal list-inside space-y-1 text-zinc-400">
-              <li>Kopieren Sie den Token oben</li>
-              <li>Öffnen Sie in Replit: <strong className="text-zinc-300">Secrets (Umgebungsvariablen)</strong></li>
-              <li>Neuen Secret erstellen: Schlüssel <code className="text-xs bg-zinc-800 px-1 py-0.5 rounded">INSTAGRAM_ACCESS_TOKEN</code></li>
-              <li>Token einfügen → Speichern → Server neu starten</li>
-            </ol>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }

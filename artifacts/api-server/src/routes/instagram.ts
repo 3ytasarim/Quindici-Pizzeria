@@ -1,7 +1,15 @@
 import { Router } from "express";
 import jwt from "jsonwebtoken";
+import { readJSON, writeJSON } from "../lib/gcs";
 
 const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
+const CONFIG_PATH = "config/instagram.json";
+
+interface InstagramConfig {
+  accessToken: string;
+  savedAt: string;
+  expiresInDays: number;
+}
 
 function authMiddleware(req: any, res: any, next: any) {
   const token = req.headers["authorization"]?.replace("Bearer ", "");
@@ -10,10 +18,20 @@ function authMiddleware(req: any, res: any, next: any) {
   catch { res.status(401).json({ error: "Token ungültig" }); }
 }
 
+async function getAccessToken(): Promise<string | null> {
+  // 1. Try GCS config first (set via admin panel)
+  try {
+    const cfg = await readJSON<InstagramConfig>(CONFIG_PATH);
+    if (cfg?.accessToken) return cfg.accessToken;
+  } catch (_) {}
+  // 2. Fallback to env var
+  return process.env.INSTAGRAM_ACCESS_TOKEN ?? null;
+}
+
 const router = Router();
 
 router.get("/instagram/posts", async (req, res) => {
-  const token = process.env.INSTAGRAM_ACCESS_TOKEN;
+  const token = await getAccessToken();
   if (!token) return res.json({ posts: [], configured: false });
 
   try {
@@ -54,18 +72,36 @@ router.post("/admin/instagram/exchange-token", authMiddleware, async (req, res) 
       req.log.error({ data }, "Token exchange failed");
       return res.status(400).json({
         error: data?.error?.message ?? "Token-Austausch fehlgeschlagen",
-        fbtrace: data?.error?.fbtrace_id,
       });
     }
 
-    return res.json({
-      longLivedToken: data.access_token,
-      tokenType: data.token_type,
-      expiresInDays: Math.round((data.expires_in ?? 5184000) / 86400),
-    });
+    const expiresInDays = Math.round((data.expires_in ?? 5184000) / 86400);
+
+    // Save directly to GCS — no Replit Secrets needed
+    const cfg: InstagramConfig = {
+      accessToken: data.access_token,
+      savedAt: new Date().toISOString(),
+      expiresInDays,
+    };
+    await writeJSON(CONFIG_PATH, cfg);
+
+    return res.json({ success: true, expiresInDays });
   } catch (err) {
     req.log.error({ err }, "Token exchange error");
     return res.status(500).json({ error: "Serverfehler beim Token-Austausch" });
+  }
+});
+
+router.get("/admin/instagram/status", authMiddleware, async (req, res) => {
+  try {
+    const cfg = await readJSON<InstagramConfig>(CONFIG_PATH);
+    if (cfg?.accessToken) {
+      return res.json({ configured: true, savedAt: cfg.savedAt, expiresInDays: cfg.expiresInDays });
+    }
+    const envToken = process.env.INSTAGRAM_ACCESS_TOKEN;
+    return res.json({ configured: !!envToken, savedAt: null, expiresInDays: null });
+  } catch (_) {
+    return res.json({ configured: false });
   }
 });
 
