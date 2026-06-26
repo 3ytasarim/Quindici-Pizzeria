@@ -5,7 +5,7 @@ import {
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
   RefreshCw, ChevronLeft, ChevronRight,
-  ChevronUp, ChevronDown,
+  ChevronUp, ChevronDown, Settings, Instagram, Copy,
 } from "lucide-react";
 
 const API = "/api";
@@ -57,7 +57,7 @@ interface Reservation {
   status: "neu" | "bestätigt" | "storniert";
 }
 
-type Tab = "mittagstisch" | "gerichte" | "reservierungen";
+type Tab = "mittagstisch" | "gerichte" | "reservierungen" | "einstellungen";
 
 const STATUS_LABELS: Record<Reservation["status"], string> = {
   neu: "Neu", bestätigt: "Bestätigt", storniert: "Storniert",
@@ -344,6 +344,7 @@ export default function Admin() {
                 ["mittagstisch", "PDF", "Mittagstisch PDF", FileText, 0],
                 ["reservierungen", "Reserv.", "Reservierungen", CalendarCheck, newBadge],
                 ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
+                ["einstellungen", "Einst.", "Einstellungen", Settings, 0],
               ] as const
             ).map(([id, shortLabel, fullLabel, Icon, badge]) => (
               <button key={id} onClick={() => handleTabChange(id as Tab)}
@@ -776,8 +777,202 @@ export default function Admin() {
           );
         })()}
 
+        {/* ── EINSTELLUNGEN ── */}
+        {tab === "einstellungen" && (
+          <SettingsPanel adminToken={sessionStorage.getItem("admin_token") ?? ""} />
+        )}
+
       </div>
     </div>
   );
 }
 
+/* ═══════════════════════════ SETTINGS PANEL ═══════════════════════════════ */
+function SettingsPanel({ adminToken }: { adminToken: string }) {
+  return (
+    <div className="max-w-2xl mx-auto space-y-3">
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-white mb-1" style={{ fontFamily: "'Playfair Display', serif" }}>
+          Einstellungen
+        </h2>
+        <p className="text-sm text-zinc-500">Website-Konfiguration und Integrationen verwalten.</p>
+      </div>
+      <InstagramSettings adminToken={adminToken} />
+    </div>
+  );
+}
+
+/* ─────────────────────── Instagram Settings Card ──────────────────────── */
+function InstagramSettings({ adminToken }: { adminToken: string }) {
+  const [open, setOpen] = useState(false);
+  const [token, setToken] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<{ configured: boolean; savedAt: string | null; expiresInDays: number | null } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/instagram/status", { headers: { Authorization: `Bearer ${adminToken}` } })
+      .then((r) => r.json())
+      .then((d) => setStatus(d))
+      .catch(() => {});
+  }, [saved]);
+
+  async function handleSave() {
+    if (!token.trim()) return;
+    setLoading(true); setError(null); setSaved(false);
+    try {
+      const res = await fetch("/api/admin/instagram/save-token", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ shortToken: token.trim() }),
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error ?? "Fehler beim Speichern");
+      setSaved(true);
+      setToken("");
+      setTimeout(() => setSaved(false), 4000);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const daysLeft = status?.expiresInDays ?? null;
+  const isExpiringSoon = daysLeft !== null && daysLeft < 10;
+
+  return (
+    <div className="border border-white/8 rounded-xl overflow-hidden bg-[#111]">
+      {/* Card Header */}
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "rgba(197,164,133,0.15)" }}>
+            <Instagram className="w-4 h-4" style={{ color: "#c5a485" }} />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-white">Instagram-Feed</p>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              {status === null
+                ? "Wird geladen…"
+                : status.configured
+                  ? `Verbunden · ${daysLeft !== null ? `noch ${daysLeft} Tage gültig` : "aktiv"}`
+                  : "Nicht verbunden"}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 shrink-0">
+          {status?.configured && (
+            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${isExpiringSoon ? "bg-amber-900/40 text-amber-400" : "bg-green-900/40 text-green-400"}`}>
+              {isExpiringSoon ? "Bald ablaufend" : "Aktiv"}
+            </span>
+          )}
+          <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+        </div>
+      </button>
+
+      {/* Expanded Content */}
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden"
+          >
+            <div className="px-5 pb-5 pt-1 space-y-5 border-t border-white/8">
+
+              {/* Current status detail */}
+              {status?.configured && status.savedAt && (
+                <div className="flex items-start gap-3 bg-white/[0.03] rounded-lg px-4 py-3 text-xs text-zinc-400">
+                  <CheckCircle className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />
+                  <div>
+                    <p>Token aktiv seit <span className="text-zinc-200">{new Date(status.savedAt).toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" })}</span></p>
+                    {daysLeft !== null && (
+                      <p className="mt-0.5">
+                        Gültig noch ca. <span className={isExpiringSoon ? "text-amber-400 font-semibold" : "text-zinc-200"}>{daysLeft} Tage</span>
+                        {isExpiringSoon && " — Bitte Token erneuern!"}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Instructions */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Token erneuern</p>
+                <ol className="text-xs text-zinc-500 space-y-1.5 list-decimal list-inside leading-relaxed">
+                  <li>
+                    <a href="https://developers.facebook.com/tools/explorer" target="_blank" rel="noopener noreferrer"
+                      className="underline hover:text-zinc-300 transition-colors" style={{ color: "#c5a485" }}>
+                      Graph API Explorer
+                    </a>
+                    {" "}öffnen → App auswählen
+                  </li>
+                  <li>Berechtigung <code className="bg-zinc-800 px-1 rounded">instagram_basic</code> hinzufügen</li>
+                  <li><strong className="text-zinc-300">Token generieren</strong> → kopieren → unten einfügen</li>
+                </ol>
+              </div>
+
+              {/* Token input */}
+              <div className="space-y-2">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={token}
+                    onChange={(e) => setToken(e.target.value)}
+                    placeholder="IGAA… Token hier einfügen"
+                    className="w-full bg-zinc-900 border border-white/10 rounded-lg px-4 py-2.5 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#c5a485] pr-10 font-mono"
+                  />
+                  {token && (
+                    <button onClick={() => { navigator.clipboard.writeText(token); setCopied(true); setTimeout(() => setCopied(false), 1500); }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  onClick={handleSave}
+                  disabled={loading || !token.trim()}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-opacity disabled:opacity-40"
+                  style={{ backgroundColor: "#c5a485", color: "#1c1917" }}
+                >
+                  {loading
+                    ? <><RefreshCw className="w-4 h-4 animate-spin" /> Wird gespeichert…</>
+                    : <><Instagram className="w-4 h-4" /> Token speichern & aktivieren</>}
+                </button>
+              </div>
+
+              {/* Feedback */}
+              {saved && (
+                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 text-xs text-green-400 bg-green-900/20 border border-green-800/30 rounded-lg px-3 py-2">
+                  <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                  Token erfolgreich gespeichert. Instagram-Feed ist jetzt aktiv.
+                </motion.div>
+              )}
+              {error && (
+                <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center gap-2 text-xs text-red-400 bg-red-900/20 border border-red-800/30 rounded-lg px-3 py-2">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  {error}
+                </motion.div>
+              )}
+
+              <p className="text-[11px] text-zinc-700 leading-relaxed">
+                Der Token wird sicher auf dem Server gespeichert und ist ca. 60 Tage gültig.
+                Nach Ablauf einfach einen neuen Token generieren und hier einfügen.
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
