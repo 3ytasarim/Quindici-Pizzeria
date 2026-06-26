@@ -42,6 +42,22 @@ router.get("/instagram/posts", async (req, res) => {
   }
 });
 
+router.get("/admin/instagram/status", auth, async (req, res) => {
+  try {
+    const cfg = await readJSON<InstagramConfig>(CONFIG_PATH);
+    if (!cfg?.accessToken) return res.json({ configured: false, savedAt: null, expiresInDays: null });
+    const savedAt = cfg.savedAt ?? null;
+    let expiresInDays: number | null = null;
+    if (savedAt && cfg.expiresInDays) {
+      const elapsed = (Date.now() - new Date(savedAt).getTime()) / 86400000;
+      expiresInDays = Math.max(0, Math.round(cfg.expiresInDays - elapsed));
+    }
+    return res.json({ configured: true, savedAt, expiresInDays });
+  } catch {
+    return res.json({ configured: false, savedAt: null, expiresInDays: null });
+  }
+});
+
 router.post("/admin/instagram/save-direct", auth, async (req, res) => {
   const { accessToken } = req.body as { accessToken?: string };
   if (!accessToken?.trim()) return res.status(400).json({ error: "Kein Token" });
