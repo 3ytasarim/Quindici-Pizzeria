@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MittagstischBanner from "@/components/MittagstischBanner";
+import InstagramFeed from "@/components/InstagramFeed";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 32 },
@@ -243,6 +244,9 @@ export default function UeberUns() {
 
         </div>
       </section>
+
+      {/* Instagram Feed */}
+      <InstagramFeed light />
 
       {/* Mittagstisch Banner */}
       <MittagstischBanner />

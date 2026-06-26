@@ -5,6 +5,7 @@ import InfoSection from "@/components/InfoSection";
 import MittagstischBanner from "@/components/MittagstischBanner";
 import LieblingsgerichteSection from "@/components/LieblingsgerichteSection";
 import GalerieSlider from "@/components/GalerieSlider";
+import InstagramFeed from "@/components/InstagramFeed";
 import Footer from "@/components/Footer";
 import StickyActions from "@/components/StickyActions";
 
@@ -19,6 +20,7 @@ export default function Home() {
         <MittagstischBanner />
         <LieblingsgerichteSection />
         <GalerieSlider />
+        <InstagramFeed />
       </main>
       <Footer />
       <StickyActions />
