@@ -7,6 +7,7 @@ import reservationsRouter from "./reservations";
 import galleryRouter from "./gallery";
 import pizzaRouter from "./pizza";
 import filesRouter from "./files";
+import instagramRouter from "./instagram";
 
 const router: IRouter = Router();
 
@@ -18,5 +19,6 @@ router.use(reservationsRouter);
 router.use(galleryRouter);
 router.use(pizzaRouter);
 router.use(filesRouter);
+router.use(instagramRouter);
 
 export default router;
