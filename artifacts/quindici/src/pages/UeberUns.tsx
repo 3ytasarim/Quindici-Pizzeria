@@ -60,8 +60,8 @@ export default function UeberUns() {
             initial={{ opacity: 0, letterSpacing: "0.15em" }}
             animate={{ opacity: 1, letterSpacing: "0.3em" }}
             transition={{ duration: 0.8 }}
-            className="text-amber-700 uppercase text-xs font-semibold mb-6"
-            style={{ letterSpacing: "0.3em" }}
+            className="uppercase text-sm font-bold mb-6"
+            style={{ letterSpacing: "0.3em", color: "#c5a485", textShadow: "0 1px 8px rgba(0,0,0,0.7)" }}
           >
             Trattoria Pizzeria · Ludwigsburg
           </motion.p>
