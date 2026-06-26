@@ -28,14 +28,17 @@ router.get("/instagram/posts", async (req, res) => {
   const token = await getAccessToken();
   if (!token) return res.json({ posts: [], configured: false });
   try {
-    const url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&limit=3&access_token=${token}`;
+    const url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&limit=12&access_token=${token}`;
     const response = await fetch(url);
     if (!response.ok) {
       req.log.error({ body: await response.json() }, "Instagram API error");
       return res.json({ posts: [], configured: true, error: "Fehler beim Laden" });
     }
-    const data = await response.json() as { data: unknown[] };
-    return res.json({ posts: data.data ?? [], configured: true });
+    const data = await response.json() as { data: { timestamp?: string }[] };
+    const sorted = (data.data ?? [])
+      .sort((a, b) => new Date(b.timestamp ?? 0).getTime() - new Date(a.timestamp ?? 0).getTime())
+      .slice(0, 3);
+    return res.json({ posts: sorted, configured: true });
   } catch (err) {
     req.log.error({ err }, "Instagram fetch failed");
     return res.json({ posts: [], configured: true, error: "Fehler beim Laden" });
