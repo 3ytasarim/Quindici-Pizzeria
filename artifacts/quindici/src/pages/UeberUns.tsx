@@ -246,7 +246,7 @@ export default function UeberUns() {
       </section>
 
       {/* Instagram Feed */}
-      <InstagramFeed light />
+      <InstagramFeed />
 
       {/* Mittagstisch Banner */}
       <MittagstischBanner />
