@@ -6,6 +6,7 @@ const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
 const CONFIG_PATH = "config/instagram.json";
 
 interface InstagramConfig { accessToken: string; savedAt: string; expiresInDays: number }
+const PINNED_PATH = "config/instagram-pinned.json";
 
 function auth(req: any, res: any, next: any) {
   const token = req.headers["authorization"]?.replace("Bearer ", "");
@@ -24,24 +25,57 @@ async function getAccessToken(): Promise<string | null> {
 
 const router = Router();
 
+async function fetchAllMedia(token: string) {
+  const url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&limit=20&access_token=${token}`;
+  const r = await fetch(url);
+  if (!r.ok) throw new Error("Instagram API error");
+  const d = await r.json() as { data: { id: string; timestamp?: string }[] };
+  return (d.data ?? []).sort((a, b) => new Date(b.timestamp ?? 0).getTime() - new Date(a.timestamp ?? 0).getTime());
+}
+
 router.get("/instagram/posts", async (req, res) => {
   const token = await getAccessToken();
   if (!token) return res.json({ posts: [], configured: false });
   try {
-    const url = `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,permalink,thumbnail_url,timestamp&limit=12&access_token=${token}`;
-    const response = await fetch(url);
-    if (!response.ok) {
-      req.log.error({ body: await response.json() }, "Instagram API error");
-      return res.json({ posts: [], configured: true, error: "Fehler beim Laden" });
-    }
-    const data = await response.json() as { data: { timestamp?: string }[] };
-    const sorted = (data.data ?? [])
-      .sort((a, b) => new Date(b.timestamp ?? 0).getTime() - new Date(a.timestamp ?? 0).getTime())
-      .slice(0, 3);
-    return res.json({ posts: sorted, configured: true });
+    const all = await fetchAllMedia(token);
+    // Check if admin has pinned specific posts
+    try {
+      const pinned = await readJSON<{ ids: string[] }>(PINNED_PATH);
+      if (pinned?.ids?.length) {
+        const map = new Map(all.map((p) => [p.id, p]));
+        const selected = pinned.ids.map((id) => map.get(id)).filter(Boolean);
+        if (selected.length > 0) return res.json({ posts: selected.slice(0, 3), configured: true });
+      }
+    } catch (_) {}
+    return res.json({ posts: all.slice(0, 3), configured: true });
   } catch (err) {
     req.log.error({ err }, "Instagram fetch failed");
     return res.json({ posts: [], configured: true, error: "Fehler beim Laden" });
+  }
+});
+
+router.get("/admin/instagram/all-posts", auth, async (req, res) => {
+  const token = await getAccessToken();
+  if (!token) return res.status(400).json({ error: "Kein Token konfiguriert" });
+  try {
+    const all = await fetchAllMedia(token);
+    const pinned = await readJSON<{ ids: string[] }>(PINNED_PATH).catch(() => null);
+    return res.json({ posts: all, pinnedIds: pinned?.ids ?? [] });
+  } catch (err) {
+    req.log.error({ err }, "Fetch all posts failed");
+    return res.status(500).json({ error: "Fehler beim Laden" });
+  }
+});
+
+router.post("/admin/instagram/pinned", auth, async (req, res) => {
+  const { ids } = req.body as { ids?: string[] };
+  if (!Array.isArray(ids)) return res.status(400).json({ error: "ids fehlt" });
+  try {
+    await writeJSON(PINNED_PATH, { ids: ids.slice(0, 3) });
+    return res.json({ success: true });
+  } catch (err) {
+    req.log.error({ err }, "Save pinned error");
+    return res.status(500).json({ error: "Serverfehler" });
   }
 });
 

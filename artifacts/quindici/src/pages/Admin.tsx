@@ -797,7 +797,170 @@ function SettingsPanel({ adminToken }: { adminToken: string }) {
         </h2>
         <p className="text-sm text-zinc-500">Website-Konfiguration und Integrationen verwalten.</p>
       </div>
+      <InstagramPostPicker adminToken={adminToken} />
       <InstagramSettings adminToken={adminToken} />
+    </div>
+  );
+}
+
+/* ─────────────────────── Instagram Post Picker ──────────────────────── */
+interface IGPost { id: string; media_type: string; media_url: string; thumbnail_url?: string; permalink: string; caption?: string; timestamp?: string }
+
+function InstagramPostPicker({ adminToken }: { adminToken: string }) {
+  const [open, setOpen] = useState(false);
+  const [posts, setPosts] = useState<IGPost[]>([]);
+  const [pinnedIds, setPinnedIds] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function load() {
+    if (posts.length > 0) return;
+    setLoading(true); setError(null);
+    try {
+      const r = await fetch("/api/admin/instagram/all-posts", { headers: { Authorization: `Bearer ${adminToken}` } });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error ?? "Fehler");
+      setPosts(d.posts ?? []);
+      setPinnedIds(d.pinnedIds ?? []);
+    } catch (e: any) { setError(e.message); }
+    finally { setLoading(false); }
+  }
+
+  function toggle(id: string) {
+    setPinnedIds((prev) => {
+      if (prev.includes(id)) return prev.filter((x) => x !== id);
+      if (prev.length >= 3) return [...prev.slice(1), id];
+      return [...prev, id];
+    });
+  }
+
+  async function save() {
+    setSaving(true); setSaved(false);
+    try {
+      const r = await fetch("/api/admin/instagram/pinned", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ ids: pinnedIds }),
+      });
+      if (!r.ok) throw new Error("Fehler beim Speichern");
+      setSaved(true); setTimeout(() => setSaved(false), 3000);
+    } catch (e: any) { setError(e.message); }
+    finally { setSaving(false); }
+  }
+
+  useEffect(() => { if (open) load(); }, [open]);
+
+  return (
+    <div className="border border-white/8 rounded-xl overflow-hidden bg-[#111]">
+      <button onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "rgba(197,164,133,0.15)" }}>
+            <Image className="w-4 h-4" style={{ color: "#c5a485" }} />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-white">Angezeigte Beiträge</p>
+            <p className="text-xs text-zinc-500 mt-0.5">
+              {pinnedIds.length > 0 ? `${pinnedIds.length} Beitrag${pinnedIds.length > 1 ? "e" : ""} ausgewählt` : "Automatisch (neueste 3)"}
+            </p>
+          </div>
+        </div>
+        <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+            <div className="px-5 pb-5 pt-1 border-t border-white/8 space-y-4">
+              <p className="text-xs text-zinc-500 leading-relaxed pt-2">
+                Wählen Sie bis zu <strong className="text-zinc-300">3 Beiträge</strong> aus, die auf der Website angezeigt werden sollen. Die Reihenfolge entspricht Ihrer Auswahl.
+              </p>
+
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <RefreshCw className="w-5 h-5 animate-spin text-zinc-500" />
+                  <span className="ml-2 text-sm text-zinc-500">Beiträge werden geladen…</span>
+                </div>
+              )}
+
+              {error && (
+                <div className="flex items-center gap-2 text-xs text-red-400 bg-red-900/20 border border-red-800/30 rounded-lg px-3 py-2">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                  {error}
+                </div>
+              )}
+
+              {!loading && posts.length > 0 && (
+                <>
+                  {/* Selection order indicator */}
+                  {pinnedIds.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      {pinnedIds.map((id, i) => {
+                        const p = posts.find((x) => x.id === id);
+                        const thumb = p?.media_type === "VIDEO" ? p.thumbnail_url : p?.media_url;
+                        return (
+                          <div key={id} className="relative">
+                            <div className="w-12 h-12 rounded-lg overflow-hidden border-2" style={{ borderColor: "#c5a485" }}>
+                              {thumb ? <img src={thumb} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full bg-zinc-800" />}
+                            </div>
+                            <span className="absolute -top-1.5 -left-1.5 w-4 h-4 rounded-full text-[9px] font-bold flex items-center justify-center text-black"
+                              style={{ backgroundColor: "#c5a485" }}>{i + 1}</span>
+                          </div>
+                        );
+                      })}
+                      <button onClick={() => setPinnedIds([])} className="text-xs text-zinc-600 hover:text-zinc-400 ml-1">Auswahl zurücksetzen</button>
+                    </div>
+                  )}
+
+                  {/* Grid of all posts */}
+                  <div className="grid grid-cols-4 gap-2">
+                    {posts.map((post) => {
+                      const thumb = post.media_type === "VIDEO" ? post.thumbnail_url : post.media_url;
+                      const idx = pinnedIds.indexOf(post.id);
+                      const selected = idx !== -1;
+                      return (
+                        <button key={post.id} onClick={() => toggle(post.id)}
+                          className="relative aspect-square rounded-lg overflow-hidden group"
+                          style={{ border: selected ? "2px solid #c5a485" : "2px solid transparent", outline: "none" }}>
+                          {thumb
+                            ? <img src={thumb} alt="" className="w-full h-full object-cover" />
+                            : <div className="w-full h-full bg-zinc-800 flex items-center justify-center"><Instagram className="w-4 h-4 text-zinc-600" /></div>}
+                          {/* overlay */}
+                          <div className={`absolute inset-0 transition-colors ${selected ? "bg-black/30" : "bg-black/0 group-hover:bg-black/20"}`} />
+                          {selected && (
+                            <span className="absolute top-1 left-1 w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center text-black z-10"
+                              style={{ backgroundColor: "#c5a485" }}>{idx + 1}</span>
+                          )}
+                          {post.media_type === "VIDEO" && (
+                            <span className="absolute bottom-1 right-1 text-[8px] bg-black/60 text-white px-1 rounded font-bold">REEL</span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <button onClick={save} disabled={saving}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-opacity disabled:opacity-40"
+                    style={{ backgroundColor: "#c5a485", color: "#1c1917" }}>
+                    {saving ? <><RefreshCw className="w-4 h-4 animate-spin" /> Wird gespeichert…</> : <><CheckCircle className="w-4 h-4" /> Auswahl speichern</>}
+                  </button>
+
+                  {saved && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="flex items-center gap-2 text-xs text-green-400 bg-green-900/20 border border-green-800/30 rounded-lg px-3 py-2">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      Auswahl gespeichert. Die Website zeigt jetzt Ihre ausgewählten Beiträge.
+                    </motion.div>
+                  )}
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
