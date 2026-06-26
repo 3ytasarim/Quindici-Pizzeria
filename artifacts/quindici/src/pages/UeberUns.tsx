@@ -56,15 +56,31 @@ export default function UeberUns() {
 
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
           {/* Eyebrow */}
-          <motion.p
-            initial={{ opacity: 0, letterSpacing: "0.15em" }}
-            animate={{ opacity: 1, letterSpacing: "0.3em" }}
-            transition={{ duration: 0.8 }}
-            className="uppercase text-sm font-bold mb-6"
-            style={{ letterSpacing: "0.3em", color: "#5c3d1e" }}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            className="relative inline-block mb-6"
           >
-            Trattoria Pizzeria · Ludwigsburg
-          </motion.p>
+            {/* Shine / lantern glow behind text */}
+            <span
+              className="absolute inset-0 -z-10 rounded-full"
+              style={{
+                background: "radial-gradient(ellipse 80% 60% at 50% 50%, rgba(210,160,90,0.55) 0%, rgba(210,160,90,0.18) 50%, transparent 100%)",
+                transform: "scaleX(1.6) scaleY(2.2)",
+                filter: "blur(8px)",
+              }}
+            />
+            <motion.p
+              initial={{ letterSpacing: "0.15em" }}
+              animate={{ letterSpacing: "0.3em" }}
+              transition={{ duration: 0.8 }}
+              className="uppercase text-sm font-bold relative"
+              style={{ letterSpacing: "0.3em", color: "#5c3d1e" }}
+            >
+              Trattoria Pizzeria · Ludwigsburg
+            </motion.p>
+          </motion.div>
 
           {/* Main title */}
           <div style={{ overflow: "hidden" }}>
