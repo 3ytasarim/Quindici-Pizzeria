@@ -1,47 +1,84 @@
 import { Instagram, Phone, CalendarCheck } from "lucide-react";
 import { useReservationModal } from "@/components/ReservationModal";
 import { motion, useAnimationControls } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const navLinks = [
-  { label: "Startseite",        href: "/" },
-  { label: "Speisekarte",       href: "/speisekarte" },
-  { label: "Mittagstisch",      href: "/speisekarte" },
-  { label: "Lieferservice",     href: "https://www.lieferando.de/speisekarte/quindici-pizza", external: true },
-  { label: "Kontakt",           href: "/kontakt" },
-  { label: "Impressum",         href: "/impressum" },
-  { label: "Datenschutz",       href: "/datenschutz" },
+  { label: "Startseite",    href: "/" },
+  { label: "Speisekarte",   href: "/speisekarte" },
+  { label: "Mittagstisch",  href: "/speisekarte" },
+  { label: "Lieferservice", href: "https://www.lieferando.de/speisekarte/quindici-pizza", external: true },
+  { label: "Kontakt",       href: "/kontakt" },
+  { label: "Impressum",     href: "/impressum" },
+  { label: "Datenschutz",   href: "/datenschutz" },
 ];
 
-function StarIcon() {
+function StarIcon({ trigger }: { trigger: number }) {
   const controls = useAnimationControls();
-  const [hovered, setHovered] = useState(false);
+
+  useEffect(() => {
+    controls.start({
+      rotate: [0, 72, 144, 216, 288, 360],
+      scale: [1, 1.5, 1.2, 1.5, 1.2, 1],
+      transition: { duration: 0.7, ease: "easeInOut" },
+    });
+  }, [trigger]);
 
   return (
     <motion.svg
-      width="13" height="13" viewBox="0 0 24 24" fill="currentColor"
-      className="inline-block"
+      width="13"
+      height="13"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className="inline-block shrink-0"
       animate={controls}
-      onMouseEnter={() => {
-        setHovered(true);
-        controls.start({
-          rotate: [0, 72, 144, 216, 288, 360],
-          scale: [1, 1.5, 1.2, 1.5, 1.2, 1],
-          transition: { duration: 0.7, ease: "easeInOut" },
-        });
-      }}
-      onMouseLeave={() => setHovered(false)}
-      style={{ color: hovered ? "#c5a485" : "#6b7280", transition: "color 0.3s" }}
+      style={{ color: "#c5a485" }}
     >
       <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
     </motion.svg>
   );
 }
 
-function DesignCredit() {
-  const [hovered, setHovered] = useState(false);
+function LetterSpan({
+  char,
+  index,
+  tick,
+}: {
+  char: string;
+  index: number;
+  tick: number;
+}) {
+  const controls = useAnimationControls();
 
+  useEffect(() => {
+    const t = setTimeout(() => {
+      controls.start({
+        y: [0, -4, 0],
+        color: ["#6b7280", index < 10 ? "#9ca3af" : "#c5a485", "#6b7280"],
+        transition: { duration: 0.4, ease: "easeOut" },
+      });
+    }, index * 30);
+    return () => clearTimeout(t);
+  }, [tick]);
+
+  return (
+    <motion.span
+      animate={controls}
+      style={{ display: "inline-block", whiteSpace: "pre", color: "#6b7280" }}
+    >
+      {char}
+    </motion.span>
+  );
+}
+
+function DesignCredit() {
+  const [tick, setTick] = useState(0);
   const letters = "Design by bleibsichtbar.com".split("");
+
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 3000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <motion.div
@@ -50,7 +87,6 @@ function DesignCredit() {
       animate={{ opacity: 1 }}
       transition={{ delay: 0.4, duration: 0.8 }}
     >
-      {/* left line */}
       <motion.div
         className="h-px bg-stone-700 hidden sm:block"
         initial={{ width: 0 }}
@@ -58,42 +94,22 @@ function DesignCredit() {
         transition={{ delay: 0.6, duration: 0.6 }}
       />
 
-      <StarIcon />
+      <StarIcon trigger={tick} />
 
       <a
         href="https://www.bleibsichtbar.com"
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-0 text-[10px] tracking-[0.18em] uppercase font-medium select-none"
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        className="flex items-center gap-0 text-[10px] tracking-[0.18em] uppercase font-medium"
         style={{ textDecoration: "none" }}
       >
         {letters.map((char, i) => (
-          <motion.span
-            key={i}
-            animate={hovered ? {
-              y: [0, -3, 0],
-              color: i < 10 ? "#9ca3af" : "#c5a485",
-            } : {
-              y: 0,
-              color: "#6b7280",
-            }}
-            transition={{
-              delay: hovered ? i * 0.03 : 0,
-              duration: 0.35,
-              ease: "easeOut",
-            }}
-            style={{ display: "inline-block", whiteSpace: "pre" }}
-          >
-            {char}
-          </motion.span>
+          <LetterSpan key={i} char={char} index={i} tick={tick} />
         ))}
       </a>
 
-      <StarIcon />
+      <StarIcon trigger={tick} />
 
-      {/* right line */}
       <motion.div
         className="h-px bg-stone-700 hidden sm:block"
         initial={{ width: 0 }}
@@ -109,7 +125,6 @@ export default function Footer() {
 
   return (
     <footer className="relative overflow-hidden bg-stone-900 text-white">
-      {/* Watermark image — centered */}
       <img
         src="/quindici-script.png"
         alt=""
@@ -120,7 +135,7 @@ export default function Footer() {
 
       <div className="relative z-10 max-w-6xl mx-auto px-6 py-16 grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
 
-        {/* LEFT — contact / social */}
+        {/* LEFT */}
         <div className="text-center md:text-left">
           <p className="text-xs font-semibold tracking-[0.25em] uppercase text-stone-400 mb-5">
             In Verbindung bleiben
@@ -136,7 +151,6 @@ export default function Footer() {
               <Instagram className="w-4 h-4" />
             </a>
           </div>
-
           <div className="border-t border-stone-700 pt-6 space-y-1">
             <p className="font-semibold text-white text-sm">Quindici Trattoria Pizzeria</p>
             <p className="text-stone-400 text-sm italic">Einfach genießen</p>
@@ -146,13 +160,9 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* CENTER — logo + CTA */}
+        {/* CENTER */}
         <div className="flex flex-col items-center gap-6">
-          <img
-            src="/logo-footer.png"
-            alt="Quindici Logo"
-            className="h-32 w-auto"
-          />
+          <img src="/logo-footer.png" alt="Quindici Logo" className="h-32 w-auto" />
           <div className="space-y-3 text-center">
             <a
               href="tel:+4971414732887"
@@ -171,7 +181,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* RIGHT — navigation */}
+        {/* RIGHT */}
         <div className="text-center md:text-right">
           <nav className="flex flex-col gap-2.5 items-center md:items-end">
             <button
@@ -202,7 +212,6 @@ export default function Footer() {
         </p>
       </div>
 
-      {/* Design credit */}
       <DesignCredit />
     </footer>
   );
