@@ -10,6 +10,7 @@ import UeberUns from "@/pages/UeberUns";
 import Admin from "@/pages/Admin";
 import TischReservieren from "@/pages/TischReservieren";
 import Datenschutz from "@/pages/Datenschutz";
+import Impressum from "@/pages/Impressum";
 import { ReservationModalProvider } from "@/components/ReservationModal";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ function Router() {
       <Route path="/admin" component={Admin} />
       <Route path="/tisch-reservieren" component={TischReservieren} />
       <Route path="/datenschutz" component={Datenschutz} />
+      <Route path="/impressum" component={Impressum} />
       <Route component={NotFound} />
     </Switch>
   );
