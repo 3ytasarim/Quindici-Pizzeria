@@ -261,7 +261,7 @@ export default function Kontakt() {
                 <div className="flex items-start gap-3">
                   <Clock className="w-4 h-4 text-amber-700 mt-0.5 shrink-0" />
                   <p className="text-stone-600 text-sm leading-relaxed">
-                    Küchenschluss ist jeweils 30 Minuten vor Schließung. Für Gruppen ab 8 Personen bitten wir um Reservierung.
+                    Küchenschluss ist jeweils 30 Minuten vor Schließung.
                   </p>
                 </div>
               </div>
