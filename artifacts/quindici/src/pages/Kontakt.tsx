@@ -320,7 +320,8 @@ export default function Kontakt() {
                       Parken
                     </h4>
                     <p className="text-stone-500 text-sm leading-relaxed">
-                      Parkhaus Bahnhof Ludwigsburg direkt in der Nähe. Außerdem Parkplätze am Arsenalplatz und am Rathaus verfügbar.
+                      <strong className="text-stone-700">Parkhaus Solitude</strong> – bequem und nah am Restaurant.<br />
+                      Alternativ: Der <strong className="text-stone-700">Ludwigsburg Hauptbahnhof</strong> verfügt ebenfalls über Parkmöglichkeiten in unmittelbarer Nähe.
                     </p>
                   </div>
                 </div>
