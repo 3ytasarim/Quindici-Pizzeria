@@ -1,5 +1,7 @@
 import { Instagram, Phone, CalendarCheck } from "lucide-react";
 import { useReservationModal } from "@/components/ReservationModal";
+import { motion, useAnimationControls } from "framer-motion";
+import { useState } from "react";
 
 const navLinks = [
   { label: "Startseite",        href: "/" },
@@ -10,6 +12,97 @@ const navLinks = [
   { label: "Impressum",         href: "/impressum" },
   { label: "Datenschutz",       href: "/datenschutz" },
 ];
+
+function StarIcon() {
+  const controls = useAnimationControls();
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <motion.svg
+      width="13" height="13" viewBox="0 0 24 24" fill="currentColor"
+      className="inline-block"
+      animate={controls}
+      onMouseEnter={() => {
+        setHovered(true);
+        controls.start({
+          rotate: [0, 72, 144, 216, 288, 360],
+          scale: [1, 1.5, 1.2, 1.5, 1.2, 1],
+          transition: { duration: 0.7, ease: "easeInOut" },
+        });
+      }}
+      onMouseLeave={() => setHovered(false)}
+      style={{ color: hovered ? "#c5a485" : "#6b7280", transition: "color 0.3s" }}
+    >
+      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+    </motion.svg>
+  );
+}
+
+function DesignCredit() {
+  const [hovered, setHovered] = useState(false);
+
+  const letters = "Design by bleibsichtbar.com".split("");
+
+  return (
+    <motion.div
+      className="relative z-10 border-t border-stone-800/60 py-3 px-6 flex items-center justify-center gap-2"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.4, duration: 0.8 }}
+    >
+      {/* left line */}
+      <motion.div
+        className="h-px bg-stone-700 hidden sm:block"
+        initial={{ width: 0 }}
+        animate={{ width: 40 }}
+        transition={{ delay: 0.6, duration: 0.6 }}
+      />
+
+      <StarIcon />
+
+      <a
+        href="https://www.bleibsichtbar.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-0 text-[10px] tracking-[0.18em] uppercase font-medium select-none"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{ textDecoration: "none" }}
+      >
+        {letters.map((char, i) => (
+          <motion.span
+            key={i}
+            animate={hovered ? {
+              y: [0, -3, 0],
+              color: i < 10 ? "#9ca3af" : "#c5a485",
+            } : {
+              y: 0,
+              color: "#6b7280",
+            }}
+            transition={{
+              delay: hovered ? i * 0.03 : 0,
+              duration: 0.35,
+              ease: "easeOut",
+            }}
+            style={{ display: "inline-block", whiteSpace: "pre" }}
+          >
+            {char}
+          </motion.span>
+        ))}
+      </a>
+
+      <StarIcon />
+
+      {/* right line */}
+      <motion.div
+        className="h-px bg-stone-700 hidden sm:block"
+        initial={{ width: 0 }}
+        animate={{ width: 40 }}
+        transition={{ delay: 0.6, duration: 0.6 }}
+      />
+    </motion.div>
+  );
+}
 
 export default function Footer() {
   const { open: openReservation } = useReservationModal();
@@ -108,6 +201,9 @@ export default function Footer() {
           © {new Date().getFullYear()} Quindici Trattoria Pizzeria · Alle Rechte vorbehalten
         </p>
       </div>
+
+      {/* Design credit */}
+      <DesignCredit />
     </footer>
   );
 }
