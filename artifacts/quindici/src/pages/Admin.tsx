@@ -783,6 +783,8 @@ export default function Admin() {
           <SettingsPanel adminToken={sessionStorage.getItem("admin_token") ?? ""} />
         )}
 
+        {tab === "seo" && <SeoTab authedFetch={authedFetch} />}
+
       </div>
     </div>
   );
@@ -1137,10 +1139,6 @@ function InstagramSettings({ adminToken }: { adminToken: string }) {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* ── SEO & ANALYTICS ── */}
-      {tab === "seo" && <SeoTab authedFetch={authedFetch} />}
-
     </div>
   );
 }
