@@ -41,7 +41,7 @@ export default function MittagstischBanner() {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="font-serif text-3xl md:text-4xl text-white mb-5 leading-snug"
           >
-            Unser Mittagstisch<br />der Woche!
+            Unser Mittagstisch
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 16 }}

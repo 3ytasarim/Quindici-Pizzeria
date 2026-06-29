@@ -14,7 +14,7 @@ export default function LunchMenuSection() {
     <section className="py-24 bg-secondary/40">
       <div className="container mx-auto px-4 md:px-6 max-w-5xl">
         <div className="text-center mb-16">
-          <h3 className="text-4xl md:text-5xl font-serif text-foreground">Mittagstisch der Woche</h3>
+          <h3 className="text-4xl md:text-5xl font-serif text-foreground">Unser Mittagstisch</h3>
         </div>
 
         <div className="grid gap-4">
