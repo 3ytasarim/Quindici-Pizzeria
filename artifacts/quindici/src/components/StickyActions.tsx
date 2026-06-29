@@ -43,7 +43,7 @@ export default function StickyActions() {
       </button>
 
       {/* Jetzt bestellen */}
-      <a href="https://www.lieferando.de/speisekarte/quindici-pizza#kategorie_b4ba0961-8497-4427-8381-2610b9040620" target="_blank" rel="noopener noreferrer">
+      <a href="https://www.lieferando.de/speisekarte/quindici-pizza" target="_blank" rel="noopener noreferrer">
         <motion.div
           initial={{ x: 160 }}
           animate={{ x: 0 }}
