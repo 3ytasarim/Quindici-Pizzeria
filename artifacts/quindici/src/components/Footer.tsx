@@ -206,7 +206,7 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="relative z-10 border-t border-stone-800 py-4 px-6 text-center">
+      <div className="relative z-10 border-t border-stone-800 py-4 px-6 flex justify-end">
         <p className="text-xs text-stone-600">
           © {new Date().getFullYear()} Quindici Trattoria Pizzeria · Alle Rechte vorbehalten
         </p>
