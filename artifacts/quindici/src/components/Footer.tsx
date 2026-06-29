@@ -82,7 +82,7 @@ function DesignCredit() {
 
   return (
     <motion.div
-      className="relative z-10 border-t border-stone-800/60 py-3 px-6 flex items-center justify-center gap-2"
+      className="flex items-center gap-2"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ delay: 0.4, duration: 0.8 }}
@@ -90,7 +90,7 @@ function DesignCredit() {
       <motion.div
         className="h-px bg-stone-700 hidden sm:block"
         initial={{ width: 0 }}
-        animate={{ width: 40 }}
+        animate={{ width: 32 }}
         transition={{ delay: 0.6, duration: 0.6 }}
       />
 
@@ -113,7 +113,7 @@ function DesignCredit() {
       <motion.div
         className="h-px bg-stone-700 hidden sm:block"
         initial={{ width: 0 }}
-        animate={{ width: 40 }}
+        animate={{ width: 32 }}
         transition={{ delay: 0.6, duration: 0.6 }}
       />
     </motion.div>
@@ -206,13 +206,12 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="relative z-10 border-t border-stone-800 py-4 px-6 flex justify-end">
-        <p className="text-xs text-stone-600">
+      <div className="relative z-10 border-t border-stone-800 py-3 px-6 flex items-center justify-between gap-4">
+        <p className="text-xs text-stone-600 shrink-0">
           © {new Date().getFullYear()} Quindici Trattoria Pizzeria · Alle Rechte vorbehalten
         </p>
+        <DesignCredit />
       </div>
-
-      <DesignCredit />
     </footer>
   );
 }
