@@ -110,6 +110,7 @@ export default function Kontakt() {
                 <p className="text-stone-600 text-sm leading-relaxed">
                   Quindici Trattoria Pizzeria<br />
                   Bahnhofstraße 17<br />
+                  Solitudeplatz<br />
                   71638 Ludwigsburg
                 </p>
               </div>
