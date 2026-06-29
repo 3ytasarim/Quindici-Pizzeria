@@ -7,7 +7,7 @@ const navLinks = [
   { label: "Mittagstisch",      href: "/speisekarte" },
   { label: "Lieferservice",     href: "https://www.lieferando.de/speisekarte/quindici-pizza#kategorie_b4ba0961-8497-4427-8381-2610b9040620", external: true },
   { label: "Kontakt",           href: "/kontakt" },
-  { label: "Impressum",         href: "#" },
+  { label: "Impressum",         href: "/impressum" },
   { label: "Datenschutz",       href: "/datenschutz" },
 ];
 
