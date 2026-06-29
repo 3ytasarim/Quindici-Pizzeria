@@ -104,7 +104,7 @@ export default function HeroSection() {
               <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: "#c5a485" }} />
             </span>
             <UtensilsCrossed className="w-3.5 h-3.5" style={{ color: "#c5a485" }} />
-            Mittagstisch der Woche
+            Mittagstisch
           </motion.a>
         </motion.div>
       </div>
