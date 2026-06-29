@@ -18,8 +18,8 @@ export default function StickyActions() {
           style={{
             backgroundColor: "#c5a485",
             borderRadius: "10px 0 0 10px",
-            paddingTop: "14px",
-            paddingBottom: "14px",
+            paddingTop: "12px",
+            paddingBottom: "12px",
             paddingLeft: "10px",
             paddingRight: "8px",
             boxShadow: "0 6px 24px rgba(197,164,133,0.45)",
