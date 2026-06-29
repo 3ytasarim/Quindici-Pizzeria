@@ -1,4 +1,4 @@
-import { Router, type IRouter } from "express";
+import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import healthRouter from "./health";
 import adminRouter from "./admin";
 import mittagstischRouter from "./mittagstisch";
@@ -10,6 +10,15 @@ import filesRouter from "./files";
 import instagramRouter from "./instagram";
 
 const router: IRouter = Router();
+
+router.use((req: Request, res: Response, next: NextFunction) => {
+  if (!req.path.startsWith("/files/")) {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+  }
+  next();
+});
 
 router.use(healthRouter);
 router.use(adminRouter);
