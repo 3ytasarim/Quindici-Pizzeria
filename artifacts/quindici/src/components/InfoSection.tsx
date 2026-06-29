@@ -62,13 +62,13 @@ export default function InfoSection() {
             {...fadeUp(0.4)}
             className="border border-amber-100 bg-white/60 backdrop-blur-sm p-7 shadow-sm"
           >
-            <h4 className="font-serif text-xl text-stone-800 tracking-wide mb-5 text-center">
+            <h4 className="font-serif text-xl text-stone-800 tracking-wide mb-5">
               Hier findet ihr uns
             </h4>
-            <ul className="space-y-3.5 text-sm text-stone-600 flex flex-col items-center">
+            <ul className="space-y-3.5 text-sm text-stone-600 flex flex-col">
               <li className="flex items-start gap-3">
                 <MapPin className="w-4 h-4 text-amber-700 mt-0.5 shrink-0" />
-                <span className="text-center">
+                <span>
                   Bahnhofstraße 17<br />
                   71638 Ludwigsburg
                 </span>
