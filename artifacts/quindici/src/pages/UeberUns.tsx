@@ -122,7 +122,7 @@ export default function UeberUns() {
               <motion.h2
                 variants={{ hidden: { opacity: 0, y: 24 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
                 className="text-4xl md:text-5xl font-bold text-stone-800 mb-1 leading-tight"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                style={{ fontFamily: "'Dancing Script', cursive", fontWeight: 400 }}
               >
                 Ein Stück Italien
               </motion.h2>
