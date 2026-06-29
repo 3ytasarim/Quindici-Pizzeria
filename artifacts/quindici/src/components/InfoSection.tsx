@@ -62,7 +62,7 @@ export default function InfoSection() {
             {...fadeUp(0.4)}
             className="border border-amber-100 bg-white/60 backdrop-blur-sm p-7 shadow-sm"
           >
-            <h4 className="font-serif text-xl text-stone-800 tracking-wide mb-5">
+            <h4 className="font-serif text-xl text-stone-800 tracking-wide mb-5 text-center">
               Hier findet ihr uns
             </h4>
             <ul className="space-y-3.5 text-sm text-stone-600 flex flex-col">
