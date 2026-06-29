@@ -291,8 +291,8 @@ export default function Kontakt() {
 
               <div className="space-y-8">
                 {/* Mit dem Auto */}
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 flex items-center justify-center bg-amber-700/10 shrink-0 mt-0.5">
+                <div className="flex gap-4 items-start">
+                  <div className="w-10 h-10 flex items-center justify-center bg-amber-700/10 shrink-0">
                     <Car className="w-5 h-5 text-amber-700" />
                   </div>
                   <div>
@@ -309,8 +309,8 @@ export default function Kontakt() {
                 </div>
 
                 {/* Parken */}
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 flex items-center justify-center bg-amber-700/10 shrink-0 mt-0.5">
+                <div className="flex gap-4 items-start">
+                  <div className="w-10 h-10 flex items-center justify-center bg-amber-700/10 shrink-0">
                     <MapPin className="w-5 h-5 text-amber-700" />
                   </div>
                   <div>
@@ -328,8 +328,8 @@ export default function Kontakt() {
                 </div>
 
                 {/* Öffentliche Verkehrsmittel */}
-                <div className="flex gap-4">
-                  <div className="w-10 h-10 flex items-center justify-center bg-amber-700/10 shrink-0 mt-0.5">
+                <div className="flex gap-4 items-start">
+                  <div className="w-10 h-10 flex items-center justify-center bg-amber-700/10 shrink-0">
                     <Train className="w-5 h-5 text-amber-700" />
                   </div>
                   <div>
