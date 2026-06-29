@@ -12,6 +12,7 @@ import TischReservieren from "@/pages/TischReservieren";
 import Datenschutz from "@/pages/Datenschutz";
 import Impressum from "@/pages/Impressum";
 import { ReservationModalProvider } from "@/components/ReservationModal";
+import SeoManager from "@/components/SeoManager";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ function App() {
       <TooltipProvider>
         <ReservationModalProvider>
           <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <SeoManager />
             <Router />
           </WouterRouter>
           <Toaster />

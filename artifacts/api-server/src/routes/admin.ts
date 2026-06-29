@@ -57,4 +57,38 @@ router.delete("/admin/mittagstisch", authMiddleware, async (_req, res) => {
   res.json({ success: true });
 });
 
+interface SeoPage { title: string; description: string; keywords: string; }
+interface SeoConfig {
+  pages: Record<string, SeoPage>;
+  google: { analyticsId: string; adsId: string; searchConsoleVerification: string; };
+}
+
+const SEO_DEFAULTS: SeoConfig = {
+  pages: {
+    home:        { title: "", description: "", keywords: "" },
+    speisekarte: { title: "", description: "", keywords: "" },
+    "ueber-uns": { title: "", description: "", keywords: "" },
+    kontakt:     { title: "", description: "", keywords: "" },
+    impressum:   { title: "", description: "", keywords: "" },
+    datenschutz: { title: "", description: "", keywords: "" },
+  },
+  google: { analyticsId: "", adsId: "", searchConsoleVerification: "" },
+};
+
+router.get("/seo", async (_req, res) => {
+  const cfg = await readJSON<SeoConfig>("config/seo");
+  res.json(cfg ?? SEO_DEFAULTS);
+});
+
+router.get("/admin/seo", authMiddleware, async (_req, res) => {
+  const cfg = await readJSON<SeoConfig>("config/seo");
+  res.json(cfg ?? SEO_DEFAULTS);
+});
+
+router.post("/admin/seo", authMiddleware, async (req, res) => {
+  const body = req.body as SeoConfig;
+  await writeJSON("config/seo", body);
+  res.json({ success: true });
+});
+
 export default router;

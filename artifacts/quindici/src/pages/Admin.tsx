@@ -5,7 +5,7 @@ import {
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
   RefreshCw, ChevronLeft, ChevronRight,
-  ChevronUp, ChevronDown, Settings, Instagram, Copy,
+  ChevronUp, ChevronDown, Settings, Instagram, Copy, Search,
 } from "lucide-react";
 
 const API = "/api";
@@ -57,7 +57,7 @@ interface Reservation {
   status: "neu" | "bestätigt" | "storniert";
 }
 
-type Tab = "mittagstisch" | "gerichte" | "reservierungen" | "einstellungen";
+type Tab = "mittagstisch" | "gerichte" | "reservierungen" | "einstellungen" | "seo";
 
 const STATUS_LABELS: Record<Reservation["status"], string> = {
   neu: "Neu", bestätigt: "Bestätigt", storniert: "Storniert",
@@ -345,6 +345,7 @@ export default function Admin() {
                 ["reservierungen", "Reserv.", "Reservierungen", CalendarCheck, newBadge],
                 ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
                 ["einstellungen", "Einst.", "Einstellungen", Settings, 0],
+                ["seo", "SEO", "SEO & Analytics", Search, 0],
               ] as const
             ).map(([id, shortLabel, fullLabel, Icon, badge]) => (
               <button key={id} onClick={() => handleTabChange(id as Tab)}
@@ -1136,6 +1137,214 @@ function InstagramSettings({ adminToken }: { adminToken: string }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* ── SEO & ANALYTICS ── */}
+      {tab === "seo" && <SeoTab authedFetch={authedFetch} />}
+
     </div>
+  );
+}
+
+/* ─────────────────────────── SEO Tab ─────────────────────────── */
+
+interface SeoPage { title: string; description: string; keywords: string; }
+interface SeoConfig {
+  pages: Record<string, SeoPage>;
+  google: { analyticsId: string; adsId: string; searchConsoleVerification: string; };
+}
+
+const PAGES_META = [
+  { key: "home",        label: "Startseite",  path: "/" },
+  { key: "speisekarte", label: "Speisekarte", path: "/speisekarte" },
+  { key: "ueber-uns",   label: "Über Uns",    path: "/ueber-uns" },
+  { key: "kontakt",     label: "Kontakt",     path: "/kontakt" },
+  { key: "impressum",   label: "Impressum",   path: "/impressum" },
+  { key: "datenschutz", label: "Datenschutz", path: "/datenschutz" },
+];
+
+const EMPTY_PAGE: SeoPage = { title: "", description: "", keywords: "" };
+
+function SeoTab({ authedFetch }: { authedFetch: (url: string, opts?: RequestInit) => Promise<Response> }) {
+  const [cfg, setCfg] = useState<SeoConfig>({
+    pages: Object.fromEntries(PAGES_META.map(p => [p.key, { ...EMPTY_PAGE }])),
+    google: { analyticsId: "", adsId: "", searchConsoleVerification: "" },
+  });
+  const [seoLoading, setSeoLoading] = useState(true);
+  const [seoSaving, setSeoSaving] = useState(false);
+  const [seoSaved, setSeoSaved] = useState(false);
+  const [seoError, setSeoError] = useState("");
+  const [openPage, setOpenPage] = useState<string>("home");
+
+  useEffect(() => {
+    authedFetch(`${API}/admin/seo`)
+      .then(r => r.json())
+      .then(data => { setCfg(data); setSeoLoading(false); })
+      .catch(() => setSeoLoading(false));
+  }, []);
+
+  const setPageField = (key: string, field: keyof SeoPage, value: string) =>
+    setCfg(prev => ({
+      ...prev,
+      pages: { ...prev.pages, [key]: { ...(prev.pages[key] ?? EMPTY_PAGE), [field]: value } },
+    }));
+
+  const setGoogleField = (field: keyof SeoConfig["google"], value: string) =>
+    setCfg(prev => ({ ...prev, google: { ...prev.google, [field]: value } }));
+
+  const handleSeoSave = async () => {
+    setSeoSaving(true); setSeoError(""); setSeoSaved(false);
+    try {
+      const r = await authedFetch(`${API}/admin/seo`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(cfg),
+      });
+      if (!r.ok) throw new Error();
+      setSeoSaved(true);
+      setTimeout(() => setSeoSaved(false), 3000);
+    } catch {
+      setSeoError("Fehler beim Speichern. Bitte erneut versuchen.");
+    } finally {
+      setSeoSaving(false);
+    }
+  };
+
+  const inp = "w-full bg-zinc-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-200 placeholder-zinc-600 focus:outline-none focus:border-[#c5a485]";
+  const lbl = "text-xs text-zinc-400 uppercase tracking-wider mb-1 block";
+
+  if (seoLoading) return (
+    <div className="flex items-center justify-center py-24">
+      <RefreshCw className="w-5 h-5 animate-spin text-zinc-500" />
+    </div>
+  );
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
+      className="space-y-6">
+      <div className="mb-6 sm:mb-8">
+        <h2 className="text-lg sm:text-xl font-semibold flex items-center gap-2">
+          <Search className="w-5 h-5" style={{ color: GOLD }} />
+          SEO &amp; Analytics
+        </h2>
+        <p className="text-zinc-400 text-sm mt-1">Meta-Tags pro Seite und Google-Tracking-IDs verwalten.</p>
+      </div>
+
+      {/* Per-page */}
+      <div className="bg-[#1a1a1a] border border-white/8">
+        <div className="px-5 py-4 border-b border-white/8">
+          <h3 className="text-xs uppercase tracking-widest text-zinc-400">Seiten-Meta-Tags</h3>
+        </div>
+        <div className="divide-y divide-white/5">
+          {PAGES_META.map(page => (
+            <div key={page.key}>
+              <button
+                onClick={() => setOpenPage(openPage === page.key ? "" : page.key)}
+                className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-white/3 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-medium text-zinc-200">{page.label}</span>
+                  <span className="text-xs text-zinc-600">{page.path}</span>
+                </div>
+                {openPage === page.key
+                  ? <ChevronUp className="w-4 h-4 text-zinc-500 shrink-0" />
+                  : <ChevronDown className="w-4 h-4 text-zinc-500 shrink-0" />}
+              </button>
+              <AnimatePresence initial={false}>
+                {openPage === page.key && (
+                  <motion.div key="body"
+                    initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }}
+                    className="overflow-hidden">
+                    <div className="px-5 pb-5 space-y-4 bg-zinc-900/30 pt-4">
+                      <div>
+                        <label className={lbl}>Title <span className="normal-case text-zinc-600">(Browser-Tab &amp; Google)</span></label>
+                        <input className={inp}
+                          value={cfg.pages[page.key]?.title ?? ""}
+                          onChange={e => setPageField(page.key, "title", e.target.value)}
+                          placeholder="z.B. Quindici Trattoria Pizzeria – Ludwigsburg" maxLength={70} />
+                        <p className="text-[11px] text-zinc-600 mt-1">{(cfg.pages[page.key]?.title ?? "").length}/70 Zeichen</p>
+                      </div>
+                      <div>
+                        <label className={lbl}>Description <span className="normal-case text-zinc-600">(Google-Snippet)</span></label>
+                        <textarea className={`${inp} resize-none`} rows={2}
+                          value={cfg.pages[page.key]?.description ?? ""}
+                          onChange={e => setPageField(page.key, "description", e.target.value)}
+                          placeholder="z.B. Authentische italienische Küche in Ludwigsburg." maxLength={160} />
+                        <p className="text-[11px] text-zinc-600 mt-1">{(cfg.pages[page.key]?.description ?? "").length}/160 Zeichen</p>
+                      </div>
+                      <div>
+                        <label className={lbl}>Keywords <span className="normal-case text-zinc-600">(kommagetrennt)</span></label>
+                        <input className={inp}
+                          value={cfg.pages[page.key]?.keywords ?? ""}
+                          onChange={e => setPageField(page.key, "keywords", e.target.value)}
+                          placeholder="z.B. Pizza Ludwigsburg, Trattoria, Italienisch essen" />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Google */}
+      <div className="bg-[#1a1a1a] border border-white/8">
+        <div className="px-5 py-4 border-b border-white/8">
+          <h3 className="text-xs uppercase tracking-widest text-zinc-400">Google-Tags</h3>
+        </div>
+        <div className="p-5 space-y-5">
+          <div>
+            <label className={lbl}>Google Analytics Measurement ID</label>
+            <input className={inp} value={cfg.google.analyticsId}
+              onChange={e => setGoogleField("analyticsId", e.target.value)}
+              placeholder="G-XXXXXXXXXX" spellCheck={false} />
+            <p className="text-[11px] text-zinc-600 mt-1">Format: <code className="bg-zinc-800 px-1 rounded">G-XXXXXXXXXX</code> — aus Google Analytics „Datenstrom" kopieren.</p>
+          </div>
+          <div>
+            <label className={lbl}>Google Ads Conversion ID</label>
+            <input className={inp} value={cfg.google.adsId}
+              onChange={e => setGoogleField("adsId", e.target.value)}
+              placeholder="AW-XXXXXXXXXX" spellCheck={false} />
+            <p className="text-[11px] text-zinc-600 mt-1">Format: <code className="bg-zinc-800 px-1 rounded">AW-XXXXXXXXXX</code> — aus Google Ads „Conversion-Tracking" kopieren.</p>
+          </div>
+          <div>
+            <label className={lbl}>Google Search Console Verification</label>
+            <input className={inp} value={cfg.google.searchConsoleVerification}
+              onChange={e => setGoogleField("searchConsoleVerification", e.target.value)}
+              placeholder="abc123XYZ..." spellCheck={false} />
+            <p className="text-[11px] text-zinc-600 mt-1">
+              Nur den <code className="bg-zinc-800 px-1 rounded">content="…"</code>-Wert aus dem{" "}
+              <code className="bg-zinc-800 px-1 rounded">{'<meta name="google-site-verification">'}</code>-Tag einfügen.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Save */}
+      <div className="flex flex-col gap-3 pb-10">
+        <button onClick={handleSeoSave} disabled={seoSaving}
+          className="flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-semibold transition-opacity disabled:opacity-50"
+          style={{ backgroundColor: GOLD, color: "#1c1917" }}>
+          {seoSaving
+            ? <><RefreshCw className="w-4 h-4 animate-spin" /> Wird gespeichert…</>
+            : <><CheckCircle className="w-4 h-4" /> SEO-Einstellungen speichern</>}
+        </button>
+        {seoSaved && (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 text-xs text-green-400 bg-green-900/20 border border-green-800/30 rounded-lg px-3 py-2">
+            <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+            Erfolgreich gespeichert. Änderungen sind sofort aktiv.
+          </motion.div>
+        )}
+        {seoError && (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+            className="flex items-center gap-2 text-xs text-red-400 bg-red-900/20 border border-red-800/30 rounded-lg px-3 py-2">
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+            {seoError}
+          </motion.div>
+        )}
+      </div>
+    </motion.div>
   );
 }
