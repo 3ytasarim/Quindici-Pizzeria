@@ -205,7 +205,7 @@ export default function UeberUns() {
         </div>
       </section>
 
-      {/* Team — Teil der Familie */}
+      {/* Team — Teil der Familie — GECİCİ GİZLİ: resimler gelince açılacak
       <section className="relative overflow-hidden py-20 md:py-28" style={{ backgroundColor: "#fdf8f2" }}>
         <div className="container mx-auto px-6 relative z-10">
 
@@ -260,6 +260,7 @@ export default function UeberUns() {
 
         </div>
       </section>
+      */}
 
       {/* Instagram Feed */}
       <InstagramFeed />
