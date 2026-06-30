@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 const navLinks = [
   { label: "Startseite",    href: "/" },
   { label: "Speisekarte",   href: "/speisekarte" },
-  { label: "Mittagstisch",  href: "/speisekarte" },
   { label: "Lieferservice", href: "https://www.lieferando.de/speisekarte/quindici-pizza", external: true },
   { label: "Kontakt",       href: "/kontakt" },
   { label: "Impressum",     href: "/impressum" },
