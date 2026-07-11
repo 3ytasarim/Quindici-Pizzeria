@@ -46,7 +46,7 @@ export default function HeroSection() {
           transition={{ duration: 0.85, ease: "easeOut" }}
           className="text-5xl md:text-7xl lg:text-8xl font-serif text-white leading-tight drop-shadow-lg"
         >
-          Willkommen bei Quindici
+          Willkommen im Quindici
         </motion.h1>
 
         <motion.div
