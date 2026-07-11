@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { UtensilsCrossed } from "lucide-react";
+import { UtensilsCrossed, Tag } from "lucide-react";
 
 export default function HeroSection() {
 
@@ -87,6 +87,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.45, ease: "easeOut" }}
+          className="flex flex-wrap items-center justify-center gap-3"
         >
           <motion.a
             href="/api/mittagstisch/pdf"
@@ -105,6 +106,20 @@ export default function HeroSection() {
             </span>
             <UtensilsCrossed className="w-3.5 h-3.5" style={{ color: "#c5a485" }} />
             Mittagstisch
+          </motion.a>
+
+          <motion.a
+            href="https://www.lieferando.de/speisekarte/quindici-pizza"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(197,164,133,0.4)" }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="inline-flex items-center gap-2.5 px-7 py-3 text-sm font-semibold shadow-sm transition-colors"
+            style={{ backgroundColor: "#c5a485", color: "#1c1917" }}
+          >
+            <Tag className="w-3.5 h-3.5" />
+            10 % Abholrabatt
           </motion.a>
         </motion.div>
       </div>

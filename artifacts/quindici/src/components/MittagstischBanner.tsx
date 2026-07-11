@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { ArrowRight, CalendarCheck, Tag } from "lucide-react";
+import { ArrowRight, CalendarCheck } from "lucide-react";
 import { useReservationModal } from "@/components/ReservationModal";
 
 export default function MittagstischBanner() {
@@ -61,18 +61,6 @@ export default function MittagstischBanner() {
           transition={{ duration: 0.7, delay: 0.45 }}
           className="flex flex-col gap-3 shrink-0 w-full md:w-auto md:self-center"
         >
-          <a
-            href="https://www.lieferando.de/speisekarte/quindici-pizza"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 text-white text-sm font-semibold px-7 py-3.5 transition-colors duration-200"
-            style={{ backgroundColor: "#c5a485" }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = "#b8926e")}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = "#c5a485")}
-          >
-            <Tag className="w-4 h-4" />
-            10 % Abholrabatt
-          </a>
           <a
             href="/api/mittagstisch/pdf"
             target="_blank"
