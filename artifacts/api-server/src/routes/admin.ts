@@ -4,8 +4,8 @@ import jwt from "jsonwebtoken";
 import { uploadFile, deleteFile, readJSON, writeJSON } from "../lib/gcs";
 
 const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "admin1234!";
+const ADMIN_USER = process.env.ADMIN_USERNAME;
+const ADMIN_PASS = process.env.ADMIN_PASSWORD;
 
 interface PdfMeta { filename: string | null; uploadedAt: string | null; gcsUrl?: string | null }
 
@@ -29,6 +29,9 @@ const router = Router();
 
 router.post("/admin/login", (req, res) => {
   const { username, password } = req.body ?? {};
+  if (!ADMIN_USER || !ADMIN_PASS) {
+    return res.status(503).json({ error: "Admin-Zugangsdaten nicht konfiguriert" });
+  }
   if (username === ADMIN_USER && password === ADMIN_PASS) {
     const token = jwt.sign({ sub: "admin" }, JWT_SECRET, { expiresIn: "7d" });
     res.json({ token });
