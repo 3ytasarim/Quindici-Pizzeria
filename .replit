@@ -39,3 +39,5 @@ externalPort = 80
 
 [userenv.shared]
 INSTAGRAM_APP_ID = "991212943916020"
+FROM_EMAIL = "Quindici Trattoria <noreply@resend.dev>"
+RESTAURANT_EMAIL = "reservierung@quindici.de"
