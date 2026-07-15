@@ -1,9 +1,11 @@
 import { motion } from "framer-motion";
 import { CalendarCheck, ShoppingBag } from "lucide-react";
 import { useReservationModal } from "@/components/ReservationModal";
+import { useSommerpauseModal } from "@/components/SommerpauseModal";
 
 export default function StickyActions() {
   const { open: openReservation } = useReservationModal();
+  const { open: openSommerpause } = useSommerpauseModal();
   return (
     <div className="flex fixed right-0 top-1/2 -translate-y-1/2 z-40 flex-col gap-2">
 
@@ -43,7 +45,7 @@ export default function StickyActions() {
       </button>
 
       {/* Jetzt bestellen */}
-      <a href="https://www.lieferando.de/speisekarte/quindici-pizza" target="_blank" rel="noopener noreferrer">
+      <button onClick={openSommerpause} className="block bg-transparent border-0 p-0">
         <motion.div
           initial={{ x: 160 }}
           animate={{ x: 0 }}
@@ -74,7 +76,7 @@ export default function StickyActions() {
             Jetzt bestellen
           </span>
         </motion.div>
-      </a>
+      </button>
 
     </div>
   );

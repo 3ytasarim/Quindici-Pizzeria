@@ -1,7 +1,9 @@
-import { motion } from "framer-motion";
-import { UtensilsCrossed, Tag } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { UtensilsCrossed, Tag, X } from "lucide-react";
 
 export default function HeroSection() {
+  const [abholrabattOpen, setAbholrabattOpen] = useState(false);
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-stone-900">
@@ -108,21 +110,56 @@ export default function HeroSection() {
             Mittagstisch
           </motion.a>
 
-          <motion.a
-            href="https://www.lieferando.de/speisekarte/quindici-pizza"
-            target="_blank"
-            rel="noopener noreferrer"
+          <motion.button
+            onClick={() => setAbholrabattOpen(true)}
             whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(197,164,133,0.4)" }}
             whileTap={{ scale: 0.97 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="inline-flex items-center gap-2.5 px-7 py-3 text-sm font-semibold shadow-sm transition-colors"
+            className="inline-flex items-center gap-2.5 px-7 py-3 text-sm font-semibold shadow-sm transition-colors cursor-pointer"
             style={{ backgroundColor: "#c5a485", color: "#1c1917" }}
           >
             <Tag className="w-3.5 h-3.5" />
             10 % Abholrabatt
-          </motion.a>
+          </motion.button>
         </motion.div>
       </div>
+
+      {/* Abholrabatt lightbox */}
+      <AnimatePresence>
+        {abholrabattOpen && (
+          <>
+            <motion.div
+              className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setAbholrabattOpen(false)}
+            />
+            <motion.div
+              className="fixed inset-0 z-[201] flex items-center justify-center px-4"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+            >
+              <div className="relative max-w-lg w-full shadow-2xl">
+                <button
+                  onClick={() => setAbholrabattOpen(false)}
+                  className="absolute -top-10 right-0 text-white/70 hover:text-white transition-colors"
+                  aria-label="Schließen"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                <img
+                  src="/abholrabatt.png"
+                  alt="10% Abholrabatt im Restaurant"
+                  className="w-full h-auto rounded-sm shadow-2xl"
+                />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

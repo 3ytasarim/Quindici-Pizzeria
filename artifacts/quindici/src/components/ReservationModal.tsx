@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, X } from "lucide-react";
+import { Phone, Mail, X } from "lucide-react";
 
 interface ReservationModalContextType {
   open: () => void;
@@ -67,9 +67,17 @@ export function ReservationModalProvider({ children }: { children: ReactNode }) 
                     07141 473 2887
                   </a>
 
-                  <p className="mt-4 text-xs text-stone-400">
+                  <p className="mt-3 text-xs text-stone-400">
                     Tippen Sie auf die Nummer, um uns direkt anzurufen.
                   </p>
+
+                  <a
+                    href="mailto:info@trattoria-quindici.de"
+                    className="mt-3 inline-flex items-center justify-center gap-3 w-full py-4 px-6 border border-[#c5a485] hover:bg-[#c5a48510] text-[#c5a485] font-semibold text-base transition-colors"
+                  >
+                    <Mail className="w-5 h-5" />
+                    info@trattoria-quindici.de
+                  </a>
                 </div>
               </div>
             </motion.div>

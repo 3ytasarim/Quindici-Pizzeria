@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useReservationModal } from "@/components/ReservationModal";
+import { useSommerpauseModal } from "@/components/SommerpauseModal";
 
 function AnimatedBurger({ open }: { open: boolean }) {
   return (
@@ -37,6 +38,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const { open: openReservation } = useReservationModal();
+  const { open: openSommerpause } = useSommerpauseModal();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -94,17 +96,16 @@ export default function Navbar() {
           >
             Tisch reservieren
           </Button>
-          <a href="https://www.lieferando.de/speisekarte/quindici-pizza" target="_blank" rel="noopener noreferrer">
-            <Button
-              className="text-white uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 shadow-sm transition-all"
-              style={{ backgroundColor: "#c5a485" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#b8962e"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a485"; }}
-              data-testid="button-jetzt-bestellen"
-            >
-              Jetzt bestellen
-            </Button>
-          </a>
+          <Button
+            className="text-white uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 shadow-sm transition-all"
+            style={{ backgroundColor: "#c5a485" }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#b8962e"; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a485"; }}
+            data-testid="button-jetzt-bestellen"
+            onClick={openSommerpause}
+          >
+            Jetzt bestellen
+          </Button>
         </div>
 
         {/* Mobile Hamburger — far right */}
@@ -168,21 +169,14 @@ export default function Navbar() {
                       >
                         Tisch reservieren
                       </Button>
-                      <a
-                        href="https://www.lieferando.de/speisekarte/quindici-pizza"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full"
-                        onClick={() => setMenuOpen(false)}
+                      <Button
+                        className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                        style={{ backgroundColor: "#c5a485" }}
+                        data-testid="mobile-button-jetzt-bestellen"
+                        onClick={() => { setMenuOpen(false); openSommerpause(); }}
                       >
-                        <Button
-                          className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
-                          style={{ backgroundColor: "#c5a485" }}
-                          data-testid="mobile-button-jetzt-bestellen"
-                        >
-                          Jetzt bestellen
-                        </Button>
-                      </a>
+                        Jetzt bestellen
+                      </Button>
                     </motion.div>
                   </motion.div>
                 )}
