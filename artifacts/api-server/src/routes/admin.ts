@@ -44,6 +44,11 @@ function resetFailures(ip: string): void {
   failedAttempts.delete(ip);
 }
 
+/** Exported only for unit tests — clears all in-memory state. */
+export function _clearAllFailedAttempts(): void {
+  failedAttempts.clear();
+}
+
 interface PdfMeta { filename: string | null; uploadedAt: string | null; gcsUrl?: string | null }
 
 const upload = multer({
