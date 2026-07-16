@@ -6,6 +6,11 @@ import { logger } from "./lib/logger";
 
 const app: Express = express();
 
+// Trust only the immediate proxy (one hop). This makes req.ip reflect the
+// real client IP from X-Forwarded-For as set by the reverse proxy, while
+// ignoring any X-Forwarded-For headers injected by the client itself.
+app.set("trust proxy", 1);
+
 app.use(
   pinoHttp({
     logger,
