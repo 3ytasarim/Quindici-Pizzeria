@@ -70,6 +70,31 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Dish"
+  /reservations/availability:
+    get:
+      operationId: getReservationAvailability
+      tags: [reservations]
+      summary: Get time-slot availability for a given date
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Date in DD.MM.YYYY format
+      responses:
+        "200":
+          description: Availability for each time slot
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AvailabilityResponse"
+        "400":
+          description: Missing or invalid date parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /reservations:
     post:
       operationId: createReservation
@@ -198,3 +223,32 @@ components:
           type: string
       required:
         - error
+    TimeSlotAvailability:
+      type: object
+      properties:
+        time:
+          type: string
+          description: Time slot in HH:MM format
+        available:
+          type: boolean
+          description: Whether this slot still has capacity
+        count:
+          type: integer
+          description: Number of existing reservations for this slot
+      required:
+        - time
+        - available
+        - count
+    AvailabilityResponse:
+      type: object
+      properties:
+        date:
+          type: string
+          description: The queried date (DD.MM.YYYY)
+        slots:
+          type: array
+          items:
+            $ref: "#/components/schemas/TimeSlotAvailability"
+      required:
+        - date
+        - slots

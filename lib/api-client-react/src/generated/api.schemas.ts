@@ -52,3 +52,25 @@ export interface ErrorResponse {
   error: string;
 }
 
+export interface TimeSlotAvailability {
+  /** Time slot in HH:MM format */
+  time: string;
+  /** Whether this slot still has capacity */
+  available: boolean;
+  /** Number of existing reservations for this slot */
+  count: number;
+}
+
+export interface AvailabilityResponse {
+  /** The queried date (DD.MM.YYYY) */
+  date: string;
+  slots: TimeSlotAvailability[];
+}
+
+export type GetReservationAvailabilityParams = {
+/**
+ * Date in DD.MM.YYYY format
+ */
+date: string;
+};
+

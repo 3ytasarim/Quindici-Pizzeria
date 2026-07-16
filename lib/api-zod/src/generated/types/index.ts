@@ -6,10 +6,13 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from './availabilityResponse';
 export * from './createReservationInput';
 export * from './dish';
 export * from './errorResponse';
+export * from './getReservationAvailabilityParams';
 export * from './healthStatus';
 export * from './pizzaItem';
 export * from './reservationResult';
 export * from './restaurantInfo';
+export * from './timeSlotAvailability';

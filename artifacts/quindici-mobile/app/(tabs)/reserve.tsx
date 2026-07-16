@@ -7,11 +7,12 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { KeyboardAwareScrollViewCompat } from '@/components/KeyboardAwareScrollViewCompat';
 import { useColors } from '@/hooks/useColors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useCreateReservation } from '@workspace/api-client-react';
+import { useCreateReservation, useGetReservationAvailability } from '@workspace/api-client-react';
 import * as Haptics from 'expo-haptics';
 import { Feather } from '@expo/vector-icons';
 
@@ -21,6 +22,16 @@ const TIME_SLOTS = [
   '20:00', '20:30', '21:00', '21:30',
 ];
 const GUEST_OPTIONS = ['1', '2', '3', '4', '5', '6', '7', '8+'];
+
+/** Normalise any common date input to DD.MM.YYYY for the API */
+function normaliseDate(raw: string): string {
+  return raw.trim();
+}
+
+/** Return true if the string looks like a complete DD.MM.YYYY date */
+function isCompleteDate(d: string): boolean {
+  return /^\d{2}\.\d{2}\.\d{4}$/.test(d.trim());
+}
 
 export default function ReserveScreen() {
   const colors = useColors();
@@ -38,6 +49,25 @@ export default function ReserveScreen() {
   const [guests, setGuests] = useState('2');
   const [notes, setNotes] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  // Fetch availability whenever a complete date is entered
+  const queryDate = isCompleteDate(date) ? normaliseDate(date) : undefined;
+  const {
+    data: availabilityData,
+    isFetching: availabilityLoading,
+  } = useGetReservationAvailability(
+    { date: queryDate ?? '' },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    { query: { enabled: !!queryDate, staleTime: 30_000, retry: 1 } as any }
+  );
+
+  /** Map time → available flag; undefined means we don't know yet */
+  const availabilityMap = React.useMemo(() => {
+    if (!availabilityData) return {} as Record<string, boolean>;
+    return Object.fromEntries(
+      availabilityData.slots.map((s) => [s.time, s.available])
+    );
+  }, [availabilityData]);
 
   const { mutate, isPending } = useCreateReservation({
     mutation: {
@@ -195,35 +225,91 @@ export default function ReserveScreen() {
           { borderColor: colors.border, backgroundColor: colors.card, color: colors.foreground },
         ]}
         value={date}
-        onChangeText={setDate}
+        onChangeText={(v) => {
+          setDate(v);
+          // Clear time selection if date changes so user re-picks from fresh availability
+          setTime('');
+        }}
         placeholder="TT.MM.JJJJ"
         placeholderTextColor={colors.mutedForeground}
       />
 
-      <FieldLabel label="Uhrzeit *" colors={colors} />
+      <View style={styles.slotHeaderRow}>
+        <FieldLabel label="Uhrzeit *" colors={colors} />
+        {availabilityLoading && queryDate && (
+          <ActivityIndicator
+            size="small"
+            color={colors.primary}
+            style={styles.slotSpinner}
+          />
+        )}
+      </View>
+
+      {/* Availability legend — shown once we have data */}
+      {availabilityData && !availabilityLoading && (
+        <View style={styles.legendRow}>
+          <View style={[styles.legendDot, { backgroundColor: colors.muted }]} />
+          <Text style={[styles.legendText, { color: colors.mutedForeground }]}>
+            Ausgebucht
+          </Text>
+        </View>
+      )}
+
       <View style={styles.chipGrid}>
         {TIME_SLOTS.map((t) => {
           const selected = time === t;
+          // undefined = we don't know yet → treat as available
+          const isAvailable = availabilityMap[t] !== false;
+          const isBooked = availabilityMap[t] === false;
+
           return (
             <TouchableOpacity
               key={t}
               style={[
                 styles.timeChip,
                 {
-                  borderColor: selected ? colors.primary : colors.border,
-                  backgroundColor: selected ? colors.primary : colors.card,
+                  borderColor: isBooked
+                    ? colors.border
+                    : selected
+                    ? colors.primary
+                    : colors.border,
+                  backgroundColor: isBooked
+                    ? colors.muted
+                    : selected
+                    ? colors.primary
+                    : colors.card,
+                  opacity: isBooked ? 0.55 : 1,
                 },
               ]}
-              onPress={() => setTime(t)}
+              onPress={() => {
+                if (isBooked) return;
+                setTime(t);
+              }}
+              disabled={isBooked}
+              activeOpacity={isBooked ? 1 : 0.7}
             >
               <Text
                 style={[
                   styles.chipText,
-                  { color: selected ? '#FFFFFF' : colors.foreground },
+                  {
+                    color: isBooked
+                      ? colors.mutedForeground
+                      : selected
+                      ? '#FFFFFF'
+                      : colors.foreground,
+                  },
                 ]}
               >
                 {t}
               </Text>
+              {isBooked && (
+                <Feather
+                  name="x"
+                  size={10}
+                  color={colors.mutedForeground}
+                  style={styles.bookedIcon}
+                />
+              )}
             </TouchableOpacity>
           );
         })}
@@ -349,6 +435,30 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand_400Regular',
     minHeight: 90,
   },
+  slotHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  slotSpinner: {
+    marginLeft: 8,
+    marginTop: 16,
+    marginBottom: 6,
+  },
+  legendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+    gap: 6,
+  },
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+  },
+  legendText: {
+    fontSize: 11,
+    fontFamily: 'Quicksand_400Regular',
+  },
   chipGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -358,6 +468,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 14,
     paddingVertical: 9,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  bookedIcon: {
+    marginLeft: 2,
   },
   guestChip: {
     borderWidth: 1,
