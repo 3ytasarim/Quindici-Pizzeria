@@ -10,11 +10,25 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: info
+    description: Restaurant info operations
   - name: menu
     description: Menu operations
   - name: reservations
     description: Reservation operations
 paths:
+  /info:
+    get:
+      operationId: getRestaurantInfo
+      tags: [info]
+      summary: Get restaurant contact info and location
+      responses:
+        "200":
+          description: Restaurant info
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantInfo"
   /healthz:
     get:
       operationId: healthCheck
@@ -82,6 +96,28 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
+    RestaurantInfo:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
+      required:
+        - name
+        - address
+        - phone
+        - email
+        - lat
+        - lng
     HealthStatus:
       type: object
       properties:

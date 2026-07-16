@@ -25,7 +25,8 @@ import type {
   ErrorResponse,
   HealthStatus,
   PizzaItem,
-  ReservationResult
+  ReservationResult,
+  RestaurantInfo
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -37,6 +38,83 @@ type AwaitedInput<T> = PromiseLike<T> | T;
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
+
+export const getGetRestaurantInfoUrl = () => {
+
+
+
+
+  return `/api/info`
+}
+
+/**
+ * @summary Get restaurant contact info and location
+ */
+export const getRestaurantInfo = async ( options?: RequestInit): Promise<RestaurantInfo> => {
+
+  return customFetch<RestaurantInfo>(getGetRestaurantInfoUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetRestaurantInfoQueryKey = () => {
+    return [
+    `/api/info`
+    ] as const;
+    }
+
+
+export const getGetRestaurantInfoQueryOptions = <TData = Awaited<ReturnType<typeof getRestaurantInfo>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetRestaurantInfoQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getRestaurantInfo>>> = ({ signal }) => getRestaurantInfo({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getRestaurantInfo>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetRestaurantInfoQueryResult = NonNullable<Awaited<ReturnType<typeof getRestaurantInfo>>>
+export type GetRestaurantInfoQueryError = ErrorType<unknown>
+
+
+/**
+ * @summary Get restaurant contact info and location
+ */
+
+export function useGetRestaurantInfo<TData = Awaited<ReturnType<typeof getRestaurantInfo>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getRestaurantInfo>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetRestaurantInfoQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
 
 
 

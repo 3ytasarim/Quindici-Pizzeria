@@ -5,6 +5,15 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
+export interface RestaurantInfo {
+  name: string;
+  address: string;
+  phone: string;
+  email: string;
+  lat: number;
+  lng: number;
+}
+
 export interface HealthStatus {
   status: string;
 }

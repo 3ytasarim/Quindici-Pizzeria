@@ -7,20 +7,13 @@ import {
   ScrollView,
   Linking,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { RestaurantMap } from '@/components/RestaurantMap';
 import { useColors } from '@/hooks/useColors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
-
-const RESTAURANT = {
-  name: 'Quindici Trattoria Pizzeria',
-  address: 'Musterstraße 15, 12345 Musterstadt',
-  phone: '+49 123 456 7890',
-  email: 'info@quindici.de',
-  lat: 48.1351,
-  lng: 11.582,
-};
+import { useGetRestaurantInfo } from '@workspace/api-client-react';
 
 const HOURS = [
   { day: 'Montag', time: 'Ruhetag' },
@@ -32,12 +25,14 @@ const HOURS = [
 export default function ContactScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { data: restaurant, isLoading } = useGetRestaurantInfo();
 
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
   const bottomPad = Platform.OS === 'web' ? 120 : 100;
 
   const openMaps = () => {
-    const query = encodeURIComponent(RESTAURANT.address);
+    if (!restaurant) return;
+    const query = encodeURIComponent(restaurant.address);
     const url =
       Platform.OS === 'ios'
         ? `maps://?q=${query}`
@@ -49,8 +44,8 @@ export default function ContactScreen() {
     );
   };
 
-  const openPhone = () => Linking.openURL(`tel:${RESTAURANT.phone}`);
-  const openEmail = () => Linking.openURL(`mailto:${RESTAURANT.email}`);
+  const openPhone = () => restaurant && Linking.openURL(`tel:${restaurant.phone}`);
+  const openEmail = () => restaurant && Linking.openURL(`mailto:${restaurant.email}`);
 
   return (
     <ScrollView
@@ -67,11 +62,17 @@ export default function ContactScreen() {
 
       {/* Map */}
       <View style={[styles.mapContainer, { borderColor: colors.border }]}>
-        <RestaurantMap
-          lat={RESTAURANT.lat}
-          lng={RESTAURANT.lng}
-          title={RESTAURANT.name}
-        />
+        {restaurant ? (
+          <RestaurantMap
+            lat={restaurant.lat}
+            lng={restaurant.lng}
+            title={restaurant.name}
+          />
+        ) : (
+          <View style={[styles.mapPlaceholder, { backgroundColor: colors.muted }]}>
+            {isLoading && <ActivityIndicator color={colors.primary} />}
+          </View>
+        )}
       </View>
 
       {/* Info cards */}
@@ -81,6 +82,7 @@ export default function ContactScreen() {
           style={[styles.infoRow, { borderBottomColor: colors.border }]}
           onPress={openMaps}
           activeOpacity={0.7}
+          disabled={!restaurant}
         >
           <View style={[styles.iconWrap, { backgroundColor: colors.muted }]}>
             <Feather name="map-pin" size={18} color={colors.primary} />
@@ -89,9 +91,13 @@ export default function ContactScreen() {
             <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>
               Adresse
             </Text>
-            <Text style={[styles.infoValue, { color: colors.foreground }]}>
-              {RESTAURANT.address}
-            </Text>
+            {isLoading ? (
+              <View style={[styles.skeleton, { backgroundColor: colors.muted }]} />
+            ) : (
+              <Text style={[styles.infoValue, { color: colors.foreground }]}>
+                {restaurant?.address ?? '–'}
+              </Text>
+            )}
           </View>
           <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
         </TouchableOpacity>
@@ -101,6 +107,7 @@ export default function ContactScreen() {
           style={[styles.infoRow, { borderBottomColor: colors.border }]}
           onPress={openPhone}
           activeOpacity={0.7}
+          disabled={!restaurant}
         >
           <View style={[styles.iconWrap, { backgroundColor: colors.muted }]}>
             <Feather name="phone" size={18} color={colors.primary} />
@@ -109,9 +116,13 @@ export default function ContactScreen() {
             <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>
               Telefon
             </Text>
-            <Text style={[styles.infoValue, { color: colors.foreground }]}>
-              {RESTAURANT.phone}
-            </Text>
+            {isLoading ? (
+              <View style={[styles.skeleton, { backgroundColor: colors.muted }]} />
+            ) : (
+              <Text style={[styles.infoValue, { color: colors.foreground }]}>
+                {restaurant?.phone ?? '–'}
+              </Text>
+            )}
           </View>
           <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
         </TouchableOpacity>
@@ -121,6 +132,7 @@ export default function ContactScreen() {
           style={[styles.infoRow, { borderBottomColor: 'transparent' }]}
           onPress={openEmail}
           activeOpacity={0.7}
+          disabled={!restaurant}
         >
           <View style={[styles.iconWrap, { backgroundColor: colors.muted }]}>
             <Feather name="mail" size={18} color={colors.primary} />
@@ -129,9 +141,13 @@ export default function ContactScreen() {
             <Text style={[styles.infoLabel, { color: colors.mutedForeground }]}>
               E-Mail
             </Text>
-            <Text style={[styles.infoValue, { color: colors.foreground }]}>
-              {RESTAURANT.email}
-            </Text>
+            {isLoading ? (
+              <View style={[styles.skeleton, { backgroundColor: colors.muted }]} />
+            ) : (
+              <Text style={[styles.infoValue, { color: colors.foreground }]}>
+                {restaurant?.email ?? '–'}
+              </Text>
+            )}
           </View>
           <Feather name="chevron-right" size={16} color={colors.mutedForeground} />
         </TouchableOpacity>
@@ -140,9 +156,13 @@ export default function ContactScreen() {
       {/* Directions button */}
       <View style={{ paddingHorizontal: 20, marginTop: 4 }}>
         <TouchableOpacity
-          style={[styles.directionsBtn, { backgroundColor: colors.primary }]}
+          style={[
+            styles.directionsBtn,
+            { backgroundColor: restaurant ? colors.primary : colors.muted },
+          ]}
           onPress={openMaps}
           activeOpacity={0.8}
+          disabled={!restaurant}
         >
           <Feather name="navigation" size={18} color="#FFFFFF" />
           <Text style={styles.directionsBtnText}>Route starten</Text>
@@ -200,8 +220,19 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     marginBottom: 20,
   },
+  mapPlaceholder: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   map: {
     flex: 1,
+  },
+  skeleton: {
+    height: 16,
+    borderRadius: 4,
+    width: '60%',
+    marginTop: 2,
   },
   section: {
     borderTopWidth: 1,
