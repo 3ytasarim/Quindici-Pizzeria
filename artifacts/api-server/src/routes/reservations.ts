@@ -2,7 +2,7 @@ import { Router } from "express";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "crypto";
 import { db, reservationsTable, wartelisteTable } from "@workspace/db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, and, ne } from "drizzle-orm";
 import {
   sendReservationConfirmationToGuest,
   sendReservationNotificationToRestaurant,
@@ -55,9 +55,55 @@ function toWartelisteDto(row: typeof wartelisteTable.$inferSelect) {
   };
 }
 
+/** Maximum number of reservations per time slot before it's considered full */
+const SLOT_CAPACITY = 4;
+
+/** All time slots the restaurant offers */
+const ALL_TIME_SLOTS = [
+  '12:00', '12:30', '13:00', '13:30',
+  '18:00', '18:30', '19:00', '19:30',
+  '20:00', '20:30', '21:00', '21:30',
+];
+
 const router = Router();
 
 /* ─── RESERVATIONS ─── */
+
+/** GET /reservations/availability?date=DD.MM.YYYY */
+router.get("/reservations/availability", async (req, res) => {
+  const { date } = req.query;
+  if (!date || typeof date !== "string")
+    return res.status(400).json({ error: "Query-Parameter 'date' fehlt" });
+
+  try {
+    // Count confirmed (non-storniert) reservations per time slot for the given date
+    const rows = await db
+      .select({ time: reservationsTable.time })
+      .from(reservationsTable)
+      .where(
+        and(
+          eq(reservationsTable.date, date),
+          ne(reservationsTable.status, "storniert")
+        )
+      );
+
+    const countBySlot: Record<string, number> = {};
+    for (const row of rows) {
+      countBySlot[row.time] = (countBySlot[row.time] ?? 0) + 1;
+    }
+
+    const slots = ALL_TIME_SLOTS.map((time) => ({
+      time,
+      available: (countBySlot[time] ?? 0) < SLOT_CAPACITY,
+      count: countBySlot[time] ?? 0,
+    }));
+
+    res.json({ date, slots });
+  } catch (err) {
+    console.error("Failed to fetch availability:", err);
+    res.status(500).json({ error: "Interner Fehler" });
+  }
+});
 
 router.post("/reservations", async (req, res) => {
   const { date, time, guests, firstName, lastName, phone, email, notes } = req.body ?? {};

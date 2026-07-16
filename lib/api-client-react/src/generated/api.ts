@@ -20,9 +20,11 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AvailabilityResponse,
   CreateReservationInput,
   Dish,
   ErrorResponse,
+  GetReservationAvailabilityParams,
   HealthStatus,
   PizzaItem,
   ReservationResult,
@@ -338,6 +340,90 @@ export function useListDishes<TData = Awaited<ReturnType<typeof listDishes>>, TE
  ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
 
   const queryOptions = getListDishesQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getGetReservationAvailabilityUrl = (params: GetReservationAvailabilityParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/reservations/availability?${stringifiedParams}` : `/api/reservations/availability`
+}
+
+/**
+ * @summary Get time-slot availability for a given date
+ */
+export const getReservationAvailability = async (params: GetReservationAvailabilityParams, options?: RequestInit): Promise<AvailabilityResponse> => {
+
+  return customFetch<AvailabilityResponse>(getGetReservationAvailabilityUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetReservationAvailabilityQueryKey = (params?: GetReservationAvailabilityParams,) => {
+    return [
+    `/api/reservations/availability`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetReservationAvailabilityQueryOptions = <TData = Awaited<ReturnType<typeof getReservationAvailability>>, TError = ErrorType<ErrorResponse>>(params: GetReservationAvailabilityParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReservationAvailability>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetReservationAvailabilityQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getReservationAvailability>>> = ({ signal }) => getReservationAvailability(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getReservationAvailability>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetReservationAvailabilityQueryResult = NonNullable<Awaited<ReturnType<typeof getReservationAvailability>>>
+export type GetReservationAvailabilityQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Get time-slot availability for a given date
+ */
+
+export function useGetReservationAvailability<TData = Awaited<ReturnType<typeof getReservationAvailability>>, TError = ErrorType<ErrorResponse>>(
+ params: GetReservationAvailabilityParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getReservationAvailability>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetReservationAvailabilityQueryOptions(params,options)
 
   const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
 
