@@ -55,6 +55,23 @@ export const ListDishesResponse = zod.array(ListDishesResponseItem)
 
 
 /**
+ * @summary Get time-slot availability for a given date
+ */
+export const GetReservationAvailabilityQueryParams = zod.object({
+  "date": zod.coerce.string().describe('Date in DD.MM.YYYY format')
+})
+
+export const GetReservationAvailabilityResponse = zod.object({
+  "date": zod.string().describe('The queried date (DD.MM.YYYY)'),
+  "slots": zod.array(zod.object({
+  "time": zod.string().describe('Time slot in HH:MM format'),
+  "available": zod.boolean().describe('Whether this slot still has capacity'),
+  "count": zod.number().describe('Number of existing reservations for this slot')
+}))
+})
+
+
+/**
  * @summary Create a table reservation
  */
 export const CreateReservationBody = zod.object({
