@@ -67,10 +67,40 @@ export interface AvailabilityResponse {
   slots: TimeSlotAvailability[];
 }
 
+export interface GuestReservation {
+  id: string;
+  date: string;
+  time: string;
+  guests: string;
+  firstName: string;
+  lastName: string;
+  status: string;
+  notes?: string;
+}
+
+export interface GuestReservationList {
+  reservations: GuestReservation[];
+}
+
+export interface CancelReservationInput {
+  email: string;
+}
+
+export interface CancelReservationResult {
+  success: boolean;
+}
+
 export type GetReservationAvailabilityParams = {
 /**
  * Date in DD.MM.YYYY format
  */
 date: string;
+};
+
+export type LookupReservationsParams = {
+/**
+ * Guest email address
+ */
+email: string;
 };
 

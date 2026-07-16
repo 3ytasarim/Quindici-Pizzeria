@@ -119,7 +119,7 @@ router.post("/reservations", async (req, res) => {
     firstName,
     lastName,
     phone,
-    email,
+    email: (email as string).toLowerCase().trim(),
     notes: notes ?? "",
     seen: false,
     status: "neu",
@@ -135,6 +135,81 @@ router.post("/reservations", async (req, res) => {
     sendReservationNotificationToRestaurant(fullEntry).catch(() => {});
   } catch (err) {
     console.error("Failed to create reservation:", err);
+    res.status(500).json({ error: "Interner Fehler" });
+  }
+});
+
+/** GET /reservations/lookup?email=... — guest-facing, no auth required */
+router.get("/reservations/lookup", async (req, res) => {
+  const { email } = req.query;
+  if (!email || typeof email !== "string")
+    return res.status(400).json({ error: "Query-Parameter 'email' fehlt" });
+
+  try {
+    const rows = await db
+      .select()
+      .from(reservationsTable)
+      .where(eq(reservationsTable.email, email.toLowerCase().trim()))
+      .orderBy(desc(reservationsTable.createdAt));
+
+    // Return only the fields guests need — no internal admin fields
+    const reservations = rows.map((r) => ({
+      id: r.id,
+      date: r.date,
+      time: r.time,
+      guests: r.guests,
+      firstName: r.firstName,
+      lastName: r.lastName,
+      status: r.status,
+      notes: r.notes,
+    }));
+
+    res.json({ reservations });
+  } catch (err) {
+    console.error("Failed to lookup reservations:", err);
+    res.status(500).json({ error: "Interner Fehler" });
+  }
+});
+
+/** DELETE /reservations/:id/cancel — guest self-service cancellation, verified by email */
+router.delete("/reservations/:id/cancel", async (req, res) => {
+  const { email } = req.body ?? {};
+  if (!email || typeof email !== "string")
+    return res.status(400).json({ error: "E-Mail fehlt" });
+
+  try {
+    const existing = await db
+      .select()
+      .from(reservationsTable)
+      .where(eq(reservationsTable.id, req.params.id))
+      .limit(1);
+
+    if (existing.length === 0)
+      return res.status(404).json({ error: "Reservierung nicht gefunden" });
+
+    const reservation = existing[0];
+
+    // Verify the email matches — prevents guests from cancelling other guests' reservations
+    if (reservation.email.toLowerCase() !== (email as string).toLowerCase().trim())
+      return res.status(403).json({ error: "E-Mail stimmt nicht überein" });
+
+    if (reservation.status === "storniert")
+      return res.status(400).json({ error: "Reservierung ist bereits storniert" });
+
+    const [updated] = await db
+      .update(reservationsTable)
+      .set({ status: "storniert" })
+      .where(eq(reservationsTable.id, req.params.id))
+      .returning();
+
+    res.json({ success: true });
+
+    // Send status-update email asynchronously
+    if (updated.email) {
+      sendReservationStatusUpdateToGuest(toReservationDto(updated), "storniert").catch(() => {});
+    }
+  } catch (err) {
+    console.error("Failed to cancel reservation:", err);
     res.status(500).json({ error: "Interner Fehler" });
   }
 });

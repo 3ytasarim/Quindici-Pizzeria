@@ -21,11 +21,15 @@ import type {
 
 import type {
   AvailabilityResponse,
+  CancelReservationInput,
+  CancelReservationResult,
   CreateReservationInput,
   Dish,
   ErrorResponse,
   GetReservationAvailabilityParams,
+  GuestReservationList,
   HealthStatus,
+  LookupReservationsParams,
   PizzaItem,
   ReservationResult,
   RestaurantInfo
@@ -505,5 +509,161 @@ export const useCreateReservation = <TError = ErrorType<ErrorResponse>,
         TContext
       > => {
       return useMutation(getCreateReservationMutationOptions(options));
+    }
+
+export const getLookupReservationsUrl = (params: LookupReservationsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/reservations/lookup?${stringifiedParams}` : `/api/reservations/lookup`
+}
+
+/**
+ * @summary Look up upcoming reservations by guest email
+ */
+export const lookupReservations = async (params: LookupReservationsParams, options?: RequestInit): Promise<GuestReservationList> => {
+
+  return customFetch<GuestReservationList>(getLookupReservationsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getLookupReservationsQueryKey = (params?: LookupReservationsParams,) => {
+    return [
+    `/api/reservations/lookup`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getLookupReservationsQueryOptions = <TData = Awaited<ReturnType<typeof lookupReservations>>, TError = ErrorType<ErrorResponse>>(params: LookupReservationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof lookupReservations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getLookupReservationsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof lookupReservations>>> = ({ signal }) => lookupReservations(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof lookupReservations>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type LookupReservationsQueryResult = NonNullable<Awaited<ReturnType<typeof lookupReservations>>>
+export type LookupReservationsQueryError = ErrorType<ErrorResponse>
+
+
+/**
+ * @summary Look up upcoming reservations by guest email
+ */
+
+export function useLookupReservations<TData = Awaited<ReturnType<typeof lookupReservations>>, TError = ErrorType<ErrorResponse>>(
+ params: LookupReservationsParams, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof lookupReservations>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getLookupReservationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export const getCancelReservationUrl = (id: string,) => {
+
+
+
+
+  return `/api/reservations/${id}/cancel`
+}
+
+/**
+ * @summary Cancel a reservation (guest self-service, verified by email)
+ */
+export const cancelReservation = async (id: string,
+    cancelReservationInput: CancelReservationInput, options?: RequestInit): Promise<CancelReservationResult> => {
+
+  return customFetch<CancelReservationResult>(getCancelReservationUrl(id),
+  {
+    ...options,
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(
+      cancelReservationInput,)
+  }
+);}
+
+
+
+
+export const getCancelReservationMutationOptions = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelReservation>>, TError,{id: string;data: BodyType<CancelReservationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof cancelReservation>>, TError,{id: string;data: BodyType<CancelReservationInput>}, TContext> => {
+
+const mutationKey = ['cancelReservation'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelReservation>>, {id: string;data: BodyType<CancelReservationInput>}> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  cancelReservation(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CancelReservationMutationResult = NonNullable<Awaited<ReturnType<typeof cancelReservation>>>
+    export type CancelReservationMutationBody = BodyType<CancelReservationInput>
+    export type CancelReservationMutationError = ErrorType<ErrorResponse>
+
+    /**
+ * @summary Cancel a reservation (guest self-service, verified by email)
+ */
+export const useCancelReservation = <TError = ErrorType<ErrorResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof cancelReservation>>, TError,{id: string;data: BodyType<CancelReservationInput>}, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof cancelReservation>>,
+        TError,
+        {id: string;data: BodyType<CancelReservationInput>},
+        TContext
+      > => {
+      return useMutation(getCancelReservationMutationOptions(options));
     }
 
