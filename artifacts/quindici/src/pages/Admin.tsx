@@ -100,6 +100,7 @@ export default function Admin() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [calendarDate, setCalendarDate] = useState(() => { const d = new Date(); d.setDate(1); return d; });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [emailPreview, setEmailPreview] = useState<{ reservation: Reservation; newStatus: Reservation["status"] } | null>(null);
 
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -208,6 +209,16 @@ export default function Admin() {
       body: JSON.stringify({ status }),
     });
     setReservations(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+  };
+
+  const requestStatusChange = (reservation: Reservation, newStatus: Reservation["status"]) => {
+    setEmailPreview({ reservation, newStatus });
+  };
+
+  const confirmStatusChange = async () => {
+    if (!emailPreview) return;
+    await updateReservationStatus(emailPreview.reservation.id, emailPreview.newStatus);
+    setEmailPreview(null);
   };
 
   const deleteReservation = async (id: string) => {
@@ -754,13 +765,13 @@ export default function Admin() {
 
                       <div className="flex flex-wrap gap-2 pt-3 border-t border-white/6">
                         {r.status !== "bestätigt" && (
-                          <button onClick={() => updateReservationStatus(r.id, "bestätigt")}
+                          <button onClick={() => requestStatusChange(r, "bestätigt")}
                             className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-green-500/30 text-green-400 hover:bg-green-500/10 transition-colors">
                             <CheckCircle className="w-3 h-3" />Bestätigen
                           </button>
                         )}
                         {r.status !== "storniert" && (
-                          <button onClick={() => updateReservationStatus(r.id, "storniert")}
+                          <button onClick={() => requestStatusChange(r, "storniert")}
                             className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">
                             <X className="w-3 h-3" />Stornieren
                           </button>
@@ -786,6 +797,149 @@ export default function Admin() {
         {tab === "seo" && <SeoTab authedFetch={authedFetch} />}
 
       </div>
+
+      {/* ── EMAIL PREVIEW MODAL ── */}
+      <AnimatePresence>
+        {emailPreview && (() => {
+          const { reservation: r, newStatus } = emailPreview;
+          const isConfirmed = newStatus === "bestätigt";
+          const isCancelled = newStatus === "storniert";
+
+          const subject = isConfirmed
+            ? `Reservierung bestätigt – ${r.date} um ${r.time} Uhr`
+            : isCancelled
+            ? `Reservierung storniert – ${r.date} um ${r.time} Uhr`
+            : `Ihre Reservierung wurde aktualisiert – ${r.date} um ${r.time} Uhr`;
+
+          const heading = isConfirmed
+            ? "Ihre Reservierung wurde bestätigt"
+            : isCancelled
+            ? "Ihre Reservierung wurde storniert"
+            : "Ihre Reservierung wurde aktualisiert";
+
+          const bodySnippet = isConfirmed
+            ? `Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Reservierung bei uns bestätigt wurde.`
+            : isCancelled
+            ? `Wir möchten Sie darüber informieren, dass Ihre Reservierung leider storniert wurde.`
+            : `Wir möchten Sie darüber informieren, dass Ihre Reservierung aktualisiert wurde.`;
+
+          const accentColor = isConfirmed ? "text-green-400" : isCancelled ? "text-red-400" : "text-amber-400";
+          const badgeCls = isConfirmed
+            ? "text-green-400 bg-green-500/10 border-green-500/30"
+            : isCancelled
+            ? "text-red-400 bg-red-500/10 border-red-500/30"
+            : "text-amber-400 bg-amber-500/10 border-amber-500/30";
+
+          return (
+            <motion.div
+              key="email-preview-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+              onClick={() => setEmailPreview(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 8 }}
+                transition={{ duration: 0.18 }}
+                className="relative w-full max-w-md bg-[#111] border border-white/12 rounded-2xl shadow-2xl overflow-hidden"
+                onClick={e => e.stopPropagation()}
+              >
+                {/* Modal header */}
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/8">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 shrink-0" style={{ color: GOLD }} />
+                    <span className="text-sm font-semibold text-white">E-Mail-Vorschau</span>
+                  </div>
+                  <button
+                    onClick={() => setEmailPreview(null)}
+                    className="p-1 text-zinc-500 hover:text-white transition-colors rounded"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Preview content */}
+                <div className="px-5 py-4 space-y-4">
+                  {/* Status badge */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-zinc-500 uppercase tracking-widest">Neuer Status</span>
+                    <span className={`text-[11px] font-bold uppercase tracking-widest px-2 py-0.5 border rounded-sm ${badgeCls}`}>
+                      {STATUS_LABELS[newStatus]}
+                    </span>
+                  </div>
+
+                  {/* Envelope summary */}
+                  <div className="bg-[#1a1a1a] border border-white/8 rounded-xl p-4 space-y-3 text-sm">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-0.5">An</p>
+                      <p className="text-white font-medium">{r.firstName} {r.lastName}</p>
+                      <p className="text-zinc-400 text-xs">{r.email}</p>
+                    </div>
+                    <div className="border-t border-white/6 pt-3">
+                      <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-0.5">Betreff</p>
+                      <p className="text-zinc-200 leading-snug">{subject}</p>
+                    </div>
+                    <div className="border-t border-white/6 pt-3">
+                      <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Inhalt</p>
+                      <p className={`text-xs font-semibold mb-1 ${accentColor}`}>{heading}</p>
+                      <p className="text-zinc-400 text-xs leading-relaxed">{bodySnippet}</p>
+                      <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-0.5">Datum</p>
+                          <p className="text-zinc-300">{r.date}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-0.5">Uhrzeit</p>
+                          <p className="text-zinc-300">{r.time} Uhr</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-0.5">Personen</p>
+                          <p className="text-zinc-300">{r.guests}</p>
+                        </div>
+                      </div>
+                      {r.notes && (
+                        <div className="mt-2">
+                          <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-0.5">Anmerkungen</p>
+                          <p className="text-zinc-400 text-xs italic">"{r.notes}"</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-zinc-500">
+                    Diese E-Mail wird nach der Bestätigung automatisch an den Gast gesendet.
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 px-5 pb-5">
+                  <button
+                    onClick={() => setEmailPreview(null)}
+                    className="flex-1 text-xs px-4 py-2.5 border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-colors rounded-lg"
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    onClick={confirmStatusChange}
+                    className={`flex-1 text-xs px-4 py-2.5 font-semibold rounded-lg transition-colors ${
+                      isConfirmed
+                        ? "bg-green-600 hover:bg-green-500 text-white"
+                        : isCancelled
+                        ? "bg-red-700 hover:bg-red-600 text-white"
+                        : "bg-[#c5a485] hover:bg-[#d4b394] text-black"
+                    }`}
+                  >
+                    {isConfirmed ? "Bestätigen & E-Mail senden" : isCancelled ? "Stornieren & E-Mail senden" : "Speichern & E-Mail senden"}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
     </div>
   );
 }
