@@ -7,6 +7,51 @@ const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
 const ADMIN_USER = process.env.ADMIN_USERNAME;
 const ADMIN_PASS = process.env.ADMIN_PASSWORD;
 
+// Brute-force protection — configurable via env vars
+const MAX_ATTEMPTS = parseInt(process.env.LOGIN_MAX_ATTEMPTS ?? "5", 10);
+const WINDOW_MS    = parseInt(process.env.LOGIN_WINDOW_MS   ?? String(15 * 60 * 1000), 10);
+const LOCKOUT_MS   = parseInt(process.env.LOGIN_LOCKOUT_MS  ?? String(WINDOW_MS), 10);
+
+interface AttemptRecord { count: number; windowStart: number; lockedUntil: number }
+const failedAttempts = new Map<string, AttemptRecord>();
+
+function getClientIp(req: any): string {
+  return (
+    (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ??
+    req.socket?.remoteAddress ??
+    "unknown"
+  );
+}
+
+function checkRateLimit(ip: string): { allowed: boolean; retryAfterMs: number } {
+  const now = Date.now();
+  const rec = failedAttempts.get(ip);
+
+  if (rec && now < rec.lockedUntil) {
+    return { allowed: false, retryAfterMs: rec.lockedUntil - now };
+  }
+  return { allowed: true, retryAfterMs: 0 };
+}
+
+function recordFailure(ip: string): void {
+  const now = Date.now();
+  const rec = failedAttempts.get(ip);
+
+  if (!rec || now - rec.windowStart > WINDOW_MS) {
+    failedAttempts.set(ip, { count: 1, windowStart: now, lockedUntil: 0 });
+    return;
+  }
+
+  rec.count += 1;
+  if (rec.count >= MAX_ATTEMPTS) {
+    rec.lockedUntil = now + LOCKOUT_MS;
+  }
+}
+
+function resetFailures(ip: string): void {
+  failedAttempts.delete(ip);
+}
+
 interface PdfMeta { filename: string | null; uploadedAt: string | null; gcsUrl?: string | null }
 
 const upload = multer({
@@ -28,14 +73,28 @@ function authMiddleware(req: any, res: any, next: any) {
 const router = Router();
 
 router.post("/admin/login", (req, res) => {
+  const ip = getClientIp(req);
+  const { allowed, retryAfterMs } = checkRateLimit(ip);
+
+  if (!allowed) {
+    const retryAfterSec = Math.ceil(retryAfterMs / 1000);
+    res.setHeader("Retry-After", String(retryAfterSec));
+    return res.status(429).json({
+      error: "Zu viele Anmeldeversuche. Bitte später erneut versuchen.",
+      retryAfterSeconds: retryAfterSec,
+    });
+  }
+
   const { username, password } = req.body ?? {};
   if (!ADMIN_USER || !ADMIN_PASS) {
     return res.status(503).json({ error: "Admin-Zugangsdaten nicht konfiguriert" });
   }
   if (username === ADMIN_USER && password === ADMIN_PASS) {
+    resetFailures(ip);
     const token = jwt.sign({ sub: "admin" }, JWT_SECRET, { expiresIn: "7d" });
     res.json({ token });
   } else {
+    recordFailure(ip);
     res.status(401).json({ error: "Ungültige Zugangsdaten" });
   }
 });
