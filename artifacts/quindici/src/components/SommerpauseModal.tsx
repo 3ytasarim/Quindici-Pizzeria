@@ -69,11 +69,6 @@ export function SommerpauseModalProvider({ children }: { children: ReactNode }) 
                   <p className="text-stone-600 text-sm leading-relaxed mb-2">
                     Unser Lieferservice befindet sich bis Ende August in den Betriebsferien.
                   </p>
-                  <p className="text-stone-600 text-sm leading-relaxed mb-2">
-                    Wir freuen uns, Sie währenddessen weiterhin per{" "}
-                    <span className="font-semibold" style={{ color: "#c5a485" }}>Abholrabatt</span>{" "}
-                    in unserem Restaurant begrüßen zu dürfen.
-                  </p>
                   <p className="text-stone-600 text-sm leading-relaxed">
                     Vielen Dank für Ihr Verständnis – wir sind ab September wieder für Sie da!
                   </p>
