@@ -4,6 +4,10 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { randomUUID } from "crypto";
+import {
+  sendReservationConfirmationToGuest,
+  sendReservationNotificationToRestaurant,
+} from "../lib/email.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RES_FILE = path.resolve(__dirname, "../uploads/reservations.json");
@@ -43,6 +47,10 @@ router.post("/reservations", (req, res) => {
   list.unshift(entry);
   writeFile(RES_FILE, list);
   res.status(201).json({ success: true, id: entry.id });
+
+  // Send emails asynchronously — don't block the response
+  sendReservationConfirmationToGuest(entry).catch(() => {});
+  sendReservationNotificationToRestaurant(entry).catch(() => {});
 });
 
 router.get("/admin/reservations", authMiddleware, (_req, res) => {
