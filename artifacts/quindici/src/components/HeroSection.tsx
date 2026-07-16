@@ -142,7 +142,7 @@ export default function HeroSection() {
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
             >
-              <div className="relative max-w-lg w-full shadow-2xl">
+              <div className="relative max-w-md w-full shadow-2xl bg-[#fdf8f2]">
                 <button
                   onClick={() => setAbholrabattOpen(false)}
                   className="absolute -top-10 right-0 text-white/70 hover:text-white transition-colors"
@@ -153,8 +153,19 @@ export default function HeroSection() {
                 <img
                   src="/abholrabatt.png"
                   alt="10% Abholrabatt im Restaurant"
-                  className="w-full h-auto rounded-sm shadow-2xl"
+                  className="w-full h-auto"
                 />
+                <div className="px-7 py-6 text-center">
+                  <p className="text-xs font-semibold uppercase tracking-[0.25em] mb-3" style={{ color: "#c5a485" }}>
+                    10 % Abholrabatt
+                  </p>
+                  <p className="text-stone-700 text-sm leading-relaxed">
+                    Bei Selbstabholung im Restaurant erhalten Sie 10 % Rabatt auf alle Pizza- und Pastagerichte.
+                  </p>
+                  <p className="text-stone-400 text-xs mt-3 leading-relaxed">
+                    Ausgenommen Mittagsangebote, Wochenkarte, Aktionsgerichte, Getränke und Desserts.
+                  </p>
+                </div>
               </div>
             </motion.div>
           </>

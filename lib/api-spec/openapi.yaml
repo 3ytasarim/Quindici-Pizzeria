@@ -10,6 +10,10 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: menu
+    description: Menu operations
+  - name: reservations
+    description: Reservation operations
 paths:
   /healthz:
     get:
@@ -24,6 +28,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /pizza:
+    get:
+      operationId: listPizza
+      tags: [menu]
+      summary: List all pizza items
+      responses:
+        "200":
+          description: Pizza list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PizzaItem"
+  /dishes:
+    get:
+      operationId: listDishes
+      tags: [menu]
+      summary: List all dishes
+      responses:
+        "200":
+          description: Dishes list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Dish"
+  /reservations:
+    post:
+      operationId: createReservation
+      tags: [reservations]
+      summary: Create a table reservation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReservationInput"
+      responses:
+        "201":
+          description: Reservation created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReservationResult"
+        "400":
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +89,76 @@ components:
           type: string
       required:
         - status
-
+    PizzaItem:
+      type: object
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        imageUrl:
+          type: string
+        isDefault:
+          type: boolean
+      required:
+        - id
+        - label
+        - imageUrl
+    Dish:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        desc:
+          type: string
+        imageUrl:
+          type: string
+      required:
+        - id
+        - name
+    CreateReservationInput:
+      type: object
+      properties:
+        date:
+          type: string
+        time:
+          type: string
+        guests:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        notes:
+          type: string
+      required:
+        - date
+        - time
+        - guests
+        - firstName
+        - lastName
+        - phone
+        - email
+    ReservationResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+        id:
+          type: string
+      required:
+        - success
+        - id
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
