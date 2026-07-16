@@ -1,5 +1,6 @@
 import { Router, type IRouter, type Request, type Response, type NextFunction } from "express";
 import healthRouter from "./health";
+import infoRouter from "./info";
 import adminRouter from "./admin";
 import mittagstischRouter from "./mittagstisch";
 import dishesRouter from "./dishes";
@@ -21,6 +22,7 @@ router.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 router.use(healthRouter);
+router.use(infoRouter);
 router.use(adminRouter);
 router.use(mittagstischRouter);
 router.use(dishesRouter);
