@@ -15,14 +15,6 @@ const LOCKOUT_MS   = parseInt(process.env.LOGIN_LOCKOUT_MS  ?? String(WINDOW_MS)
 interface AttemptRecord { count: number; windowStart: number; lockedUntil: number }
 const failedAttempts = new Map<string, AttemptRecord>();
 
-function getClientIp(req: any): string {
-  return (
-    (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ??
-    req.socket?.remoteAddress ??
-    "unknown"
-  );
-}
-
 function checkRateLimit(ip: string): { allowed: boolean; retryAfterMs: number } {
   const now = Date.now();
   const rec = failedAttempts.get(ip);
@@ -52,6 +44,11 @@ function resetFailures(ip: string): void {
   failedAttempts.delete(ip);
 }
 
+/** Exported only for unit tests — clears all in-memory state. */
+export function _clearAllFailedAttempts(): void {
+  failedAttempts.clear();
+}
+
 interface PdfMeta { filename: string | null; uploadedAt: string | null; gcsUrl?: string | null }
 
 const upload = multer({
@@ -73,7 +70,7 @@ function authMiddleware(req: any, res: any, next: any) {
 const router = Router();
 
 router.post("/admin/login", (req, res) => {
-  const ip = getClientIp(req);
+  const ip = req.ip ?? "unknown";
   const { allowed, retryAfterMs } = checkRateLimit(ip);
 
   if (!allowed) {

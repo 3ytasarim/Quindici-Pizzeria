@@ -25,6 +25,10 @@ function NativeTabLayout() {
         <Icon sf={{ default: 'calendar', selected: 'calendar.badge.plus' }} />
         <Label>Reservierung</Label>
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="my-reservation">
+        <Icon sf={{ default: 'ticket', selected: 'ticket.fill' }} />
+        <Label>Meine Res.</Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="contact">
         <Icon sf={{ default: 'mappin', selected: 'mappin.circle.fill' }} />
         <Label>Kontakt</Label>
@@ -107,6 +111,18 @@ function ClassicTabLayout() {
               <SymbolView name="calendar" tintColor={color} size={22} />
             ) : (
               <Feather name="calendar" size={22} color={color} />
+            ),
+        }}
+      />
+      <Tabs.Screen
+        name="my-reservation"
+        options={{
+          title: 'Meine Res.',
+          tabBarIcon: ({ color }) =>
+            isIOS ? (
+              <SymbolView name="ticket" tintColor={color} size={22} />
+            ) : (
+              <Feather name="bookmark" size={22} color={color} />
             ),
         }}
       />

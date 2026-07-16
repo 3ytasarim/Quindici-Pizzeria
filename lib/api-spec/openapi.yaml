@@ -119,6 +119,74 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /reservations/lookup:
+    get:
+      operationId: lookupReservations
+      tags: [reservations]
+      summary: Look up upcoming reservations by guest email
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Guest email address
+      responses:
+        "200":
+          description: List of upcoming reservations for this email
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GuestReservationList"
+        "400":
+          description: Missing email parameter
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /reservations/{id}/cancel:
+    delete:
+      operationId: cancelReservation
+      tags: [reservations]
+      summary: Cancel a reservation (guest self-service, verified by email)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Reservation ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelReservationInput"
+      responses:
+        "200":
+          description: Reservation cancelled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CancelReservationResult"
+        "400":
+          description: Missing fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "403":
+          description: Email does not match reservation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Reservation not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 components:
   schemas:
     RestaurantInfo:
@@ -252,3 +320,53 @@ components:
       required:
         - date
         - slots
+    GuestReservation:
+      type: object
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+        time:
+          type: string
+        guests:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        status:
+          type: string
+        notes:
+          type: string
+      required:
+        - id
+        - date
+        - time
+        - guests
+        - firstName
+        - lastName
+        - status
+    GuestReservationList:
+      type: object
+      properties:
+        reservations:
+          type: array
+          items:
+            $ref: "#/components/schemas/GuestReservation"
+      required:
+        - reservations
+    CancelReservationInput:
+      type: object
+      properties:
+        email:
+          type: string
+      required:
+        - email
+    CancelReservationResult:
+      type: object
+      properties:
+        success:
+          type: boolean
+      required:
+        - success
