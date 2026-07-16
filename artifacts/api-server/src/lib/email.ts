@@ -141,6 +141,151 @@ export async function sendReservationConfirmationToGuest(
   }
 }
 
+export async function sendReservationStatusUpdateToGuest(
+  data: ReservationEmailData,
+  newStatus: string,
+): Promise<void> {
+  const resend = getResendClient();
+  if (!resend) return;
+
+  const formattedDate = formatDate(data.date);
+
+  const isConfirmed = newStatus === "bestätigt";
+  const isCancelled = newStatus === "storniert";
+
+  let subjectLine: string;
+  let headingText: string;
+  let bodyText: string;
+  let accentColor: string;
+
+  if (isConfirmed) {
+    subjectLine = `Reservierung bestätigt – ${formattedDate} um ${data.time} Uhr`;
+    headingText = "Ihre Reservierung wurde bestätigt";
+    bodyText = `Liebe/r ${data.firstName} ${data.lastName},<br><br>wir freuen uns, Ihnen mitteilen zu können, dass Ihre Reservierung bei uns <strong>bestätigt</strong> wurde. Wir freuen uns auf Ihren Besuch!`;
+    accentColor = "#4caf50";
+  } else if (isCancelled) {
+    subjectLine = `Reservierung storniert – ${formattedDate} um ${data.time} Uhr`;
+    headingText = "Ihre Reservierung wurde storniert";
+    bodyText = `Liebe/r ${data.firstName} ${data.lastName},<br><br>wir möchten Sie darüber informieren, dass Ihre Reservierung bei uns leider <strong>storniert</strong> wurde. Für Rückfragen stehen wir Ihnen gerne zur Verfügung.`;
+    accentColor = "#e53935";
+  } else {
+    subjectLine = `Ihre Reservierung wurde aktualisiert – ${formattedDate} um ${data.time} Uhr`;
+    headingText = "Ihre Reservierung wurde aktualisiert";
+    bodyText = `Liebe/r ${data.firstName} ${data.lastName},<br><br>wir möchten Sie darüber informieren, dass Ihre Reservierung bei uns aktualisiert wurde. Den aktuellen Status entnehmen Sie bitte den Details unten.`;
+    accentColor = "#c9a96e";
+  }
+
+  const statusLabel =
+    newStatus.charAt(0).toUpperCase() + newStatus.slice(1);
+
+  const html = `
+<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="font-family: Georgia, serif; background: #faf9f7; margin: 0; padding: 0;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background: #faf9f7; padding: 40px 20px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background: #fff; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+        <tr>
+          <td style="background: #1a1a1a; padding: 32px 40px; text-align: center;">
+            <h1 style="color: #c9a96e; font-family: Georgia, serif; font-size: 28px; margin: 0; letter-spacing: 2px;">QUINDICI</h1>
+            <p style="color: #888; font-size: 12px; margin: 4px 0 0; letter-spacing: 1px;">TRATTORIA PIZZERIA</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 40px;">
+            <h2 style="color: #1a1a1a; font-size: 20px; margin: 0 0 8px;">${headingText}</h2>
+            <p style="color: #555; font-size: 15px; line-height: 1.6; margin: 0 0 28px;">
+              ${bodyText}
+            </p>
+
+            <table width="100%" cellpadding="0" cellspacing="0" style="background: #faf9f7; border-radius: 4px; padding: 24px; margin-bottom: 28px;">
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #e8e4de;">
+                  <span style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Status</span><br>
+                  <span style="color: ${accentColor}; font-size: 16px; font-weight: bold;">${statusLabel}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #e8e4de;">
+                  <span style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Datum</span><br>
+                  <span style="color: #1a1a1a; font-size: 16px; font-weight: bold;">${formattedDate}</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #e8e4de;">
+                  <span style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Uhrzeit</span><br>
+                  <span style="color: #1a1a1a; font-size: 16px; font-weight: bold;">${data.time} Uhr</span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; border-bottom: 1px solid #e8e4de;">
+                  <span style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Personen</span><br>
+                  <span style="color: #1a1a1a; font-size: 16px; font-weight: bold;">${data.guests}</span>
+                </td>
+              </tr>
+              ${
+                data.notes
+                  ? `<tr>
+                <td style="padding: 8px 0;">
+                  <span style="color: #888; font-size: 12px; text-transform: uppercase; letter-spacing: 1px;">Anmerkungen</span><br>
+                  <span style="color: #1a1a1a; font-size: 15px;">${data.notes}</span>
+                </td>
+              </tr>`
+                  : ""
+              }
+            </table>
+
+            <p style="color: #555; font-size: 14px; line-height: 1.6; margin: 0 0 8px;">
+              Bei Fragen oder Änderungen erreichen Sie uns unter:
+            </p>
+            <p style="color: #1a1a1a; font-size: 14px; margin: 0 0 28px;">
+              📞 Telefon: <a href="tel:+4930000000" style="color: #c9a96e;">+49 30 000 000</a><br>
+              📧 E-Mail: <a href="mailto:${RESTAURANT_EMAIL}" style="color: #c9a96e;">${RESTAURANT_EMAIL}</a>
+            </p>
+
+            <p style="color: #888; font-size: 13px; line-height: 1.6; margin: 0; border-top: 1px solid #e8e4de; padding-top: 24px;">
+              Herzliche Grüße,<br>
+              <strong>Das Team vom Quindici</strong>
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="background: #1a1a1a; padding: 20px 40px; text-align: center;">
+            <p style="color: #555; font-size: 12px; margin: 0;">
+              Quindici Trattoria Pizzeria · Berlin
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: data.email,
+      subject: subjectLine,
+      html,
+    });
+    if (error) {
+      console.error("[email] Failed to send status update to guest:", error);
+    } else {
+      console.info(
+        `[email] Status update (${newStatus}) sent to`,
+        data.email,
+      );
+    }
+  } catch (err) {
+    console.error(
+      "[email] Unexpected error sending status update to guest:",
+      err,
+    );
+  }
+}
+
 export async function sendReservationNotificationToRestaurant(
   data: ReservationEmailData,
 ): Promise<void> {

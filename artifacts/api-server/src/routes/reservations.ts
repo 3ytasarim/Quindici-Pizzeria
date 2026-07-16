@@ -7,6 +7,7 @@ import { randomUUID } from "crypto";
 import {
   sendReservationConfirmationToGuest,
   sendReservationNotificationToRestaurant,
+  sendReservationStatusUpdateToGuest,
 } from "../lib/email.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -61,9 +62,16 @@ router.patch("/admin/reservations/:id", authMiddleware, (req, res) => {
   const list = readFile(RES_FILE);
   const idx = list.findIndex((r: any) => r.id === req.params.id);
   if (idx === -1) return res.status(404).json({ error: "Nicht gefunden" });
+  const previousStatus = list[idx].status;
   list[idx] = { ...list[idx], ...req.body };
   writeFile(RES_FILE, list);
   res.json(list[idx]);
+
+  // Notify guest when status changes
+  const newStatus = list[idx].status;
+  if (newStatus && newStatus !== previousStatus && list[idx].email) {
+    sendReservationStatusUpdateToGuest(list[idx], newStatus).catch(() => {});
+  }
 });
 
 router.delete("/admin/reservations/:id", authMiddleware, (req, res) => {
