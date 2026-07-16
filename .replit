@@ -1,4 +1,4 @@
-modules = ["nodejs-24"]
+modules = ["nodejs-24", "postgresql-16"]
 
 [deployment]
 router = "application"
@@ -45,3 +45,6 @@ externalPort = 3001
 INSTAGRAM_APP_ID = "991212943916020"
 FROM_EMAIL = "Quindici Trattoria <noreply@resend.dev>"
 RESTAURANT_EMAIL = "reservierung@quindici.de"
+
+[nix]
+channel = "stable-25_05"
