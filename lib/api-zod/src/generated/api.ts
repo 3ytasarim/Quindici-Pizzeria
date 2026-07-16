@@ -86,3 +86,40 @@ export const CreateReservationBody = zod.object({
 })
 
 
+/**
+ * @summary Look up upcoming reservations by guest email
+ */
+export const LookupReservationsQueryParams = zod.object({
+  "email": zod.coerce.string().describe('Guest email address')
+})
+
+export const LookupReservationsResponse = zod.object({
+  "reservations": zod.array(zod.object({
+  "id": zod.string(),
+  "date": zod.string(),
+  "time": zod.string(),
+  "guests": zod.string(),
+  "firstName": zod.string(),
+  "lastName": zod.string(),
+  "status": zod.string(),
+  "notes": zod.string().optional()
+}))
+})
+
+
+/**
+ * @summary Cancel a reservation (guest self-service, verified by email)
+ */
+export const CancelReservationParams = zod.object({
+  "id": zod.coerce.string().describe('Reservation ID')
+})
+
+export const CancelReservationBody = zod.object({
+  "email": zod.string()
+})
+
+export const CancelReservationResponse = zod.object({
+  "success": zod.boolean()
+})
+
+

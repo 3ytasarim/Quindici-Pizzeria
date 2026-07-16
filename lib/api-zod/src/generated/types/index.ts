@@ -7,11 +7,16 @@
  */
 
 export * from './availabilityResponse';
+export * from './cancelReservationInput';
+export * from './cancelReservationResult';
 export * from './createReservationInput';
 export * from './dish';
 export * from './errorResponse';
 export * from './getReservationAvailabilityParams';
+export * from './guestReservation';
+export * from './guestReservationList';
 export * from './healthStatus';
+export * from './lookupReservationsParams';
 export * from './pizzaItem';
 export * from './reservationResult';
 export * from './restaurantInfo';
