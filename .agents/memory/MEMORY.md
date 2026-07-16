@@ -1,0 +1,1 @@
+- [Object Storage auth failure in dev](object-storage-issue.md) — Use PostgreSQL kv_store + local filesystem instead of GCS/Object Storage; sidecar returns dummy token in dev causing silent write failures.
