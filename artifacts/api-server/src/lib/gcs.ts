@@ -1,63 +1,76 @@
-import { objectStorageClient } from "./objectStorage";
 import { randomUUID } from "crypto";
+import path from "path";
+import fs from "fs";
+import fsPromises from "fs/promises";
+import { db, kvStoreTable } from "@workspace/db";
+import { eq } from "drizzle-orm";
 
-const BUCKET_ID = process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID ?? "";
+const UPLOADS_DIR = path.join(process.cwd(), "uploads");
+fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-function getBucket() {
-  if (!BUCKET_ID) throw new Error("DEFAULT_OBJECT_STORAGE_BUCKET_ID not set");
-  return objectStorageClient.bucket(BUCKET_ID);
-}
+// ── File storage (local filesystem) ──────────────────────────────────────────
 
 export async function uploadFile(
   folder: string,
   buffer: Buffer,
   ext: string,
-  mimeType: string
+  _mimeType: string
 ): Promise<string> {
   const filename = `${randomUUID()}${ext}`;
-  const objectName = `quindici/${folder}/${filename}`;
-  const file = getBucket().file(objectName);
-  await file.save(buffer, { contentType: mimeType, resumable: false });
+  const dir = path.join(UPLOADS_DIR, folder);
+  fs.mkdirSync(dir, { recursive: true });
+  await fsPromises.writeFile(path.join(dir, filename), buffer);
   return `/api/files/${folder}/${filename}`;
 }
 
 export async function deleteFile(servingUrl: string): Promise<void> {
   if (!servingUrl.startsWith("/api/files/")) return;
   const relativePath = servingUrl.slice("/api/files/".length);
-  const objectName = `quindici/${relativePath}`;
+  const filePath = path.join(UPLOADS_DIR, relativePath);
   try {
-    await getBucket().file(objectName).delete();
-  } catch {}
+    await fsPromises.unlink(filePath);
+  } catch {
+    // ignore — file may already be gone
+  }
 }
 
 export async function streamFile(gcsRelative: string, res: any): Promise<void> {
-  const objectName = `quindici/${gcsRelative}`;
-  const file = getBucket().file(objectName);
-  const [exists] = await file.exists();
-  if (!exists) {
+  const filePath = path.join(UPLOADS_DIR, gcsRelative);
+  try {
+    await fsPromises.access(filePath);
+  } catch {
     res.status(404).end();
     return;
   }
-  const [metadata] = await file.getMetadata();
-  res.set("Content-Type", (metadata.contentType as string) || "application/octet-stream");
+  const ext = path.extname(gcsRelative).toLowerCase();
+  const contentTypeMap: Record<string, string> = {
+    ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
+    ".gif": "image/gif", ".webp": "image/webp", ".pdf": "application/pdf",
+    ".svg": "image/svg+xml",
+  };
+  res.set("Content-Type", contentTypeMap[ext] || "application/octet-stream");
   res.set("Cache-Control", "public, max-age=31536000");
-  file.createReadStream().pipe(res);
+  fs.createReadStream(filePath).pipe(res);
 }
 
+// ── JSON storage (PostgreSQL kv_store) ───────────────────────────────────────
+
 export async function readJSON<T>(key: string): Promise<T | null> {
-  const objectName = `quindici/data/${key}.json`;
-  const file = getBucket().file(objectName);
-  const [exists] = await file.exists();
-  if (!exists) return null;
-  const [content] = await file.download();
-  return JSON.parse(content.toString()) as T;
+  const rows = await db
+    .select()
+    .from(kvStoreTable)
+    .where(eq(kvStoreTable.key, key))
+    .limit(1);
+  if (rows.length === 0) return null;
+  return rows[0].value as T;
 }
 
 export async function writeJSON(key: string, data: unknown): Promise<void> {
-  const objectName = `quindici/data/${key}.json`;
-  const file = getBucket().file(objectName);
-  await file.save(JSON.stringify(data, null, 2), {
-    contentType: "application/json",
-    resumable: false,
-  });
+  await db
+    .insert(kvStoreTable)
+    .values({ key, value: data as any })
+    .onConflictDoUpdate({
+      target: kvStoreTable.key,
+      set: { value: data as any, updatedAt: new Date() },
+    });
 }
