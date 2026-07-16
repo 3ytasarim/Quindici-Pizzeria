@@ -206,7 +206,14 @@ router.delete("/reservations/:id/cancel", async (req, res) => {
 
     // Send status-update email asynchronously
     if (updated.email) {
-      sendReservationStatusUpdateToGuest(toReservationDto(updated), "storniert").catch(() => {});
+      sendReservationStatusUpdateToGuest(toReservationDto(updated), "storniert").catch((err) => {
+        console.error("[email] Unhandled rejection sending cancellation email:", {
+          reservationId: updated.id,
+          guestEmail: updated.email,
+          status: "storniert",
+          error: err instanceof Error ? err.message : String(err),
+        });
+      });
     }
   } catch (err) {
     console.error("Failed to cancel reservation:", err);
@@ -264,7 +271,14 @@ router.patch("/admin/reservations/:id", authMiddleware, async (req, res) => {
 
     // Notify guest when status changes
     if (updates.status && updates.status !== previousStatus && updated.email) {
-      sendReservationStatusUpdateToGuest(toReservationDto(updated), updates.status).catch(() => {});
+      sendReservationStatusUpdateToGuest(toReservationDto(updated), updates.status).catch((err) => {
+        console.error("[email] Unhandled rejection sending status update:", {
+          reservationId: updated.id,
+          guestEmail: updated.email,
+          status: updates.status,
+          error: err instanceof Error ? err.message : String(err),
+        });
+      });
     }
   } catch (err) {
     console.error("Failed to update reservation:", err);

@@ -1,10 +1,36 @@
 import { Resend } from "resend";
+import { appendFileSync } from "fs";
+import { join } from "path";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const RESTAURANT_EMAIL =
   process.env.RESTAURANT_EMAIL ?? "reservierung@quindici.de";
 const FROM_EMAIL =
   process.env.FROM_EMAIL ?? "Quindici Trattoria <noreply@quindici.de>";
+
+const EMAIL_DEAD_LETTER_LOG = join(
+  process.env.LOG_DIR ?? process.cwd(),
+  "email-failures.ndjson",
+);
+
+/**
+ * Appends a structured failure record to the dead-letter log so ops can
+ * identify and manually resend missed emails.
+ */
+function recordEmailFailure(entry: {
+  at: string;
+  kind: string;
+  reservationId: string;
+  guestEmail: string;
+  status?: string;
+  error: string;
+}) {
+  try {
+    appendFileSync(EMAIL_DEAD_LETTER_LOG, JSON.stringify(entry) + "\n", "utf8");
+  } catch (fsErr) {
+    console.error("[email] Could not write to dead-letter log:", fsErr);
+  }
+}
 
 function getResendClient(): Resend | null {
   if (!RESEND_API_KEY) {
@@ -271,18 +297,44 @@ export async function sendReservationStatusUpdateToGuest(
       html,
     });
     if (error) {
-      console.error("[email] Failed to send status update to guest:", error);
+      const errorMessage = typeof error === "object" && error !== null
+        ? JSON.stringify(error)
+        : String(error);
+      console.error("[email] Failed to send status update to guest:", {
+        reservationId: data.id,
+        guestEmail: data.email,
+        status: newStatus,
+        error: errorMessage,
+      });
+      recordEmailFailure({
+        at: new Date().toISOString(),
+        kind: "status-update",
+        reservationId: data.id,
+        guestEmail: data.email,
+        status: newStatus,
+        error: errorMessage,
+      });
     } else {
       console.info(
-        `[email] Status update (${newStatus}) sent to`,
-        data.email,
+        `[email] Status update (${newStatus}) sent to ${data.email} [reservation ${data.id}]`,
       );
     }
   } catch (err) {
-    console.error(
-      "[email] Unexpected error sending status update to guest:",
-      err,
-    );
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error("[email] Unexpected error sending status update to guest:", {
+      reservationId: data.id,
+      guestEmail: data.email,
+      status: newStatus,
+      error: errorMessage,
+    });
+    recordEmailFailure({
+      at: new Date().toISOString(),
+      kind: "status-update",
+      reservationId: data.id,
+      guestEmail: data.email,
+      status: newStatus,
+      error: errorMessage,
+    });
   }
 }
 
