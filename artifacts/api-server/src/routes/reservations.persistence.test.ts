@@ -17,9 +17,17 @@ import request from "supertest";
 import pg from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { eq } from "drizzle-orm";
+import jwt from "jsonwebtoken";
 
 import app from "../app.js";
 import { reservationsTable, wartelisteTable } from "@workspace/db";
+
+// ---------------------------------------------------------------------------
+// Admin auth token (uses the same default secret as the production code)
+// ---------------------------------------------------------------------------
+
+const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
+const ADMIN_TOKEN = jwt.sign({ sub: "admin" }, JWT_SECRET, { expiresIn: "1h" });
 
 // ---------------------------------------------------------------------------
 // Fresh connection — simulates a new server process after a restart
@@ -216,5 +224,207 @@ describe("POST /api/warteliste — data survives a server restart", () => {
         await freshPool.end();
       }
     }
+  });
+});
+
+describe("PATCH /api/admin/warteliste/:id — admin update persists to PostgreSQL", () => {
+  it("marks a warteliste entry as seen and the change survives a reconnect", async () => {
+    // Step 1 — create
+    const createRes = await request(app)
+      .post("/api/warteliste")
+      .send({ ...WARTELISTE_PAYLOAD, email: "patch-seen@example.com" });
+
+    expect(createRes.status).toBe(201);
+    const id: string = createRes.body.id;
+    createdWartelisteIds.push(id);
+
+    // Step 2 — mark as seen via admin PATCH
+    const patchRes = await request(app)
+      .patch(`/api/admin/warteliste/${id}`)
+      .set("Authorization", `Bearer ${ADMIN_TOKEN}`)
+      .send({ seen: true });
+
+    expect(patchRes.status).toBe(200);
+    expect(patchRes.body.seen).toBe(true);
+
+    // Step 3 — verify via fresh DB connection
+    const { db: freshDb, pool: freshPool } = createFreshDb();
+    try {
+      const rows = await freshDb
+        .select()
+        .from(wartelisteTable)
+        .where(eq(wartelisteTable.id, id));
+
+      expect(rows).toHaveLength(1);
+      expect(rows[0].seen).toBe(true);
+    } finally {
+      await freshPool.end();
+    }
+  });
+
+  it("updates guest details and the change survives a reconnect", async () => {
+    // Step 1 — create
+    const createRes = await request(app)
+      .post("/api/warteliste")
+      .send({ ...WARTELISTE_PAYLOAD, email: "patch-details@example.com" });
+
+    expect(createRes.status).toBe(201);
+    const id: string = createRes.body.id;
+    createdWartelisteIds.push(id);
+
+    // Step 2 — update phone via admin PATCH
+    const patchRes = await request(app)
+      .patch(`/api/admin/warteliste/${id}`)
+      .set("Authorization", `Bearer ${ADMIN_TOKEN}`)
+      .send({ phone: "+49 999 9999999", guests: "4" });
+
+    expect(patchRes.status).toBe(200);
+    expect(patchRes.body.phone).toBe("+49 999 9999999");
+    expect(patchRes.body.guests).toBe("4");
+
+    // Step 3 — verify via fresh DB connection
+    const { db: freshDb, pool: freshPool } = createFreshDb();
+    try {
+      const rows = await freshDb
+        .select()
+        .from(wartelisteTable)
+        .where(eq(wartelisteTable.id, id));
+
+      expect(rows).toHaveLength(1);
+      expect(rows[0].phone).toBe("+49 999 9999999");
+      expect(rows[0].guests).toBe("4");
+    } finally {
+      await freshPool.end();
+    }
+  });
+
+  it("ignores disallowed fields — id, type, and createdAt cannot be overwritten", async () => {
+    // Step 1 — create
+    const createRes = await request(app)
+      .post("/api/warteliste")
+      .send({ ...WARTELISTE_PAYLOAD, email: "patch-allowlist@example.com" });
+
+    expect(createRes.status).toBe(201);
+    const id: string = createRes.body.id;
+    createdWartelisteIds.push(id);
+
+    // Step 2 — attempt to overwrite protected fields
+    const patchRes = await request(app)
+      .patch(`/api/admin/warteliste/${id}`)
+      .set("Authorization", `Bearer ${ADMIN_TOKEN}`)
+      .send({
+        id: "00000000-0000-0000-0000-000000000000",
+        type: "reservation",
+        createdAt: "1970-01-01T00:00:00.000Z",
+        seen: true, // the one allowed field to confirm the request went through
+      });
+
+    expect(patchRes.status).toBe(200);
+    // The allowed field was applied
+    expect(patchRes.body.seen).toBe(true);
+    // The protected fields were not changed
+    expect(patchRes.body.id).toBe(id);
+
+    // Step 3 — verify via fresh DB connection that id is unchanged
+    const { db: freshDb, pool: freshPool } = createFreshDb();
+    try {
+      const rows = await freshDb
+        .select()
+        .from(wartelisteTable)
+        .where(eq(wartelisteTable.id, id));
+
+      expect(rows).toHaveLength(1);
+      expect(rows[0].id).toBe(id);
+      expect(rows[0].type).toBe("warteliste");
+    } finally {
+      await freshPool.end();
+    }
+  });
+
+  it("returns 401 when called without a valid token", async () => {
+    const res = await request(app)
+      .patch("/api/admin/warteliste/nonexistent-id")
+      .send({ seen: true });
+
+    expect(res.status).toBe(401);
+  });
+});
+
+describe("DELETE /api/admin/warteliste/:id — deletion is permanent in PostgreSQL", () => {
+  it("removes the row from the database and it cannot be found via a fresh connection", async () => {
+    // Step 1 — create
+    const createRes = await request(app)
+      .post("/api/warteliste")
+      .send({ ...WARTELISTE_PAYLOAD, email: "delete-persist@example.com" });
+
+    expect(createRes.status).toBe(201);
+    const id: string = createRes.body.id;
+    // Do NOT push to createdWartelisteIds — the test deletes it itself
+
+    // Step 2 — delete via admin API
+    const deleteRes = await request(app)
+      .delete(`/api/admin/warteliste/${id}`)
+      .set("Authorization", `Bearer ${ADMIN_TOKEN}`);
+
+    expect(deleteRes.status).toBe(200);
+    expect(deleteRes.body.success).toBe(true);
+
+    // Step 3 — verify deletion via fresh DB connection
+    const { db: freshDb, pool: freshPool } = createFreshDb();
+    try {
+      const rows = await freshDb
+        .select()
+        .from(wartelisteTable)
+        .where(eq(wartelisteTable.id, id));
+
+      expect(rows).toHaveLength(0);
+    } finally {
+      await freshPool.end();
+    }
+  });
+
+  it("returns 404 when deleting a non-existent entry", async () => {
+    const res = await request(app)
+      .delete("/api/admin/warteliste/00000000-0000-0000-0000-000000000000")
+      .set("Authorization", `Bearer ${ADMIN_TOKEN}`);
+
+    expect(res.status).toBe(404);
+  });
+
+  it("returns 401 when called without a valid token", async () => {
+    const res = await request(app)
+      .delete("/api/admin/warteliste/nonexistent-id");
+
+    expect(res.status).toBe(401);
+  });
+});
+
+describe("GET /api/admin/warteliste — list returns all entries from PostgreSQL", () => {
+  it("returns newly created entries and requires auth", async () => {
+    // Step 1 — confirm unauthenticated access is rejected
+    const unauthRes = await request(app).get("/api/admin/warteliste");
+    expect(unauthRes.status).toBe(401);
+
+    // Step 2 — create an entry
+    const createRes = await request(app)
+      .post("/api/warteliste")
+      .send({ ...WARTELISTE_PAYLOAD, email: "list-test@example.com" });
+
+    expect(createRes.status).toBe(201);
+    const id: string = createRes.body.id;
+    createdWartelisteIds.push(id);
+
+    // Step 3 — fetch the admin list and confirm the entry appears
+    const listRes = await request(app)
+      .get("/api/admin/warteliste")
+      .set("Authorization", `Bearer ${ADMIN_TOKEN}`);
+
+    expect(listRes.status).toBe(200);
+    expect(Array.isArray(listRes.body)).toBe(true);
+
+    const found = listRes.body.find((e: { id: string }) => e.id === id);
+    expect(found).toBeDefined();
+    expect(found.email).toBe("list-test@example.com");
+    expect(found.seen).toBe(false);
   });
 });
