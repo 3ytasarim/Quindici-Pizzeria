@@ -9,6 +9,19 @@ import * as zod from 'zod';
 
 
 /**
+ * @summary Get restaurant contact info and location
+ */
+export const GetRestaurantInfoResponse = zod.object({
+  "name": zod.string(),
+  "address": zod.string(),
+  "phone": zod.string(),
+  "email": zod.string(),
+  "lat": zod.number(),
+  "lng": zod.number()
+})
+
+
+/**
  * Returns server health status
  * @summary Health check
  */

@@ -12,3 +12,4 @@ export * from './errorResponse';
 export * from './healthStatus';
 export * from './pizzaItem';
 export * from './reservationResult';
+export * from './restaurantInfo';
