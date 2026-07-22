@@ -5,7 +5,7 @@ import {
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
   RefreshCw, ChevronLeft, ChevronRight,
-  ChevronUp, ChevronDown, Settings, Instagram, Copy, Search,
+  ChevronUp, ChevronDown, Settings, Instagram, Copy, Search, MapPin,
 } from "lucide-react";
 
 const API = "/api";
@@ -100,6 +100,7 @@ export default function Admin() {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
   const [calendarDate, setCalendarDate] = useState(() => { const d = new Date(); d.setDate(1); return d; });
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
+  const [emailPreview, setEmailPreview] = useState<{ reservation: Reservation; newStatus: Reservation["status"] } | null>(null);
 
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -208,6 +209,16 @@ export default function Admin() {
       body: JSON.stringify({ status }),
     });
     setReservations(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+  };
+
+  const requestStatusChange = (reservation: Reservation, newStatus: Reservation["status"]) => {
+    setEmailPreview({ reservation, newStatus });
+  };
+
+  const confirmStatusChange = async () => {
+    if (!emailPreview) return;
+    await updateReservationStatus(emailPreview.reservation.id, emailPreview.newStatus);
+    setEmailPreview(null);
   };
 
   const deleteReservation = async (id: string) => {
@@ -754,13 +765,13 @@ export default function Admin() {
 
                       <div className="flex flex-wrap gap-2 pt-3 border-t border-white/6">
                         {r.status !== "bestätigt" && (
-                          <button onClick={() => updateReservationStatus(r.id, "bestätigt")}
+                          <button onClick={() => requestStatusChange(r, "bestätigt")}
                             className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-green-500/30 text-green-400 hover:bg-green-500/10 transition-colors">
                             <CheckCircle className="w-3 h-3" />Bestätigen
                           </button>
                         )}
                         {r.status !== "storniert" && (
-                          <button onClick={() => updateReservationStatus(r.id, "storniert")}
+                          <button onClick={() => requestStatusChange(r, "storniert")}
                             className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">
                             <X className="w-3 h-3" />Stornieren
                           </button>
@@ -786,6 +797,149 @@ export default function Admin() {
         {tab === "seo" && <SeoTab authedFetch={authedFetch} />}
 
       </div>
+
+      {/* ── EMAIL PREVIEW MODAL ── */}
+      <AnimatePresence>
+        {emailPreview && (() => {
+          const { reservation: r, newStatus } = emailPreview;
+          const isConfirmed = newStatus === "bestätigt";
+          const isCancelled = newStatus === "storniert";
+
+          const subject = isConfirmed
+            ? `Reservierung bestätigt – ${r.date} um ${r.time} Uhr`
+            : isCancelled
+            ? `Reservierung storniert – ${r.date} um ${r.time} Uhr`
+            : `Ihre Reservierung wurde aktualisiert – ${r.date} um ${r.time} Uhr`;
+
+          const heading = isConfirmed
+            ? "Ihre Reservierung wurde bestätigt"
+            : isCancelled
+            ? "Ihre Reservierung wurde storniert"
+            : "Ihre Reservierung wurde aktualisiert";
+
+          const bodySnippet = isConfirmed
+            ? `Wir freuen uns, Ihnen mitteilen zu können, dass Ihre Reservierung bei uns bestätigt wurde.`
+            : isCancelled
+            ? `Wir möchten Sie darüber informieren, dass Ihre Reservierung leider storniert wurde.`
+            : `Wir möchten Sie darüber informieren, dass Ihre Reservierung aktualisiert wurde.`;
+
+          const accentColor = isConfirmed ? "text-green-400" : isCancelled ? "text-red-400" : "text-amber-400";
+          const badgeCls = isConfirmed
+            ? "text-green-400 bg-green-500/10 border-green-500/30"
+            : isCancelled
+            ? "text-red-400 bg-red-500/10 border-red-500/30"
+            : "text-amber-400 bg-amber-500/10 border-amber-500/30";
+
+          return (
+            <motion.div
+              key="email-preview-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+              onClick={() => setEmailPreview(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: 8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: 8 }}
+                transition={{ duration: 0.18 }}
+                className="relative w-full max-w-md bg-[#111] border border-white/12 rounded-2xl shadow-2xl overflow-hidden"
+                onClick={e => e.stopPropagation()}
+              >
+                {/* Modal header */}
+                <div className="flex items-center justify-between px-5 py-4 border-b border-white/8">
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 shrink-0" style={{ color: GOLD }} />
+                    <span className="text-sm font-semibold text-white">E-Mail-Vorschau</span>
+                  </div>
+                  <button
+                    onClick={() => setEmailPreview(null)}
+                    className="p-1 text-zinc-500 hover:text-white transition-colors rounded"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Preview content */}
+                <div className="px-5 py-4 space-y-4">
+                  {/* Status badge */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-zinc-500 uppercase tracking-widest">Neuer Status</span>
+                    <span className={`text-[11px] font-bold uppercase tracking-widest px-2 py-0.5 border rounded-sm ${badgeCls}`}>
+                      {STATUS_LABELS[newStatus]}
+                    </span>
+                  </div>
+
+                  {/* Envelope summary */}
+                  <div className="bg-[#1a1a1a] border border-white/8 rounded-xl p-4 space-y-3 text-sm">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-0.5">An</p>
+                      <p className="text-white font-medium">{r.firstName} {r.lastName}</p>
+                      <p className="text-zinc-400 text-xs">{r.email}</p>
+                    </div>
+                    <div className="border-t border-white/6 pt-3">
+                      <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-0.5">Betreff</p>
+                      <p className="text-zinc-200 leading-snug">{subject}</p>
+                    </div>
+                    <div className="border-t border-white/6 pt-3">
+                      <p className="text-[10px] uppercase tracking-widest text-zinc-500 mb-1">Inhalt</p>
+                      <p className={`text-xs font-semibold mb-1 ${accentColor}`}>{heading}</p>
+                      <p className="text-zinc-400 text-xs leading-relaxed">{bodySnippet}</p>
+                      <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-0.5">Datum</p>
+                          <p className="text-zinc-300">{r.date}</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-0.5">Uhrzeit</p>
+                          <p className="text-zinc-300">{r.time} Uhr</p>
+                        </div>
+                        <div>
+                          <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-0.5">Personen</p>
+                          <p className="text-zinc-300">{r.guests}</p>
+                        </div>
+                      </div>
+                      {r.notes && (
+                        <div className="mt-2">
+                          <p className="text-[9px] uppercase tracking-widest text-zinc-600 mb-0.5">Anmerkungen</p>
+                          <p className="text-zinc-400 text-xs italic">"{r.notes}"</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <p className="text-[11px] text-zinc-500">
+                    Diese E-Mail wird nach der Bestätigung automatisch an den Gast gesendet.
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 px-5 pb-5">
+                  <button
+                    onClick={() => setEmailPreview(null)}
+                    className="flex-1 text-xs px-4 py-2.5 border border-white/10 text-zinc-400 hover:text-white hover:border-white/20 transition-colors rounded-lg"
+                  >
+                    Abbrechen
+                  </button>
+                  <button
+                    onClick={confirmStatusChange}
+                    className={`flex-1 text-xs px-4 py-2.5 font-semibold rounded-lg transition-colors ${
+                      isConfirmed
+                        ? "bg-green-600 hover:bg-green-500 text-white"
+                        : isCancelled
+                        ? "bg-red-700 hover:bg-red-600 text-white"
+                        : "bg-[#c5a485] hover:bg-[#d4b394] text-black"
+                    }`}
+                  >
+                    {isConfirmed ? "Bestätigen & E-Mail senden" : isCancelled ? "Stornieren & E-Mail senden" : "Speichern & E-Mail senden"}
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
     </div>
   );
 }
@@ -800,8 +954,135 @@ function SettingsPanel({ adminToken }: { adminToken: string }) {
         </h2>
         <p className="text-sm text-zinc-500">Website-Konfiguration und Integrationen verwalten.</p>
       </div>
+      <ContactInfoSettings adminToken={adminToken} />
       <InstagramPostPicker adminToken={adminToken} />
       <InstagramSettings adminToken={adminToken} />
+    </div>
+  );
+}
+
+/* ─────────────────────── Contact Info Settings ──────────────────────── */
+interface RestaurantInfo { name: string; address: string; phone: string; email: string; lat: number; lng: number }
+
+function ContactInfoSettings({ adminToken }: { adminToken: string }) {
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState<RestaurantInfo | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function load() {
+    if (form !== null) return;
+    setLoading(true); setError(null);
+    try {
+      const r = await fetch(`${API}/admin/info`, { headers: { Authorization: `Bearer ${adminToken}` } });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error ?? "Fehler beim Laden");
+      setForm(d);
+    } catch (e: any) { setError(e.message); }
+    finally { setLoading(false); }
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form) return;
+    setSaving(true); setSaved(false); setError(null);
+    try {
+      const r = await fetch(`${API}/admin/info`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ ...form, lat: Number(form.lat), lng: Number(form.lng) }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error ?? "Fehler beim Speichern");
+      setForm(d);
+      setSaved(true); setTimeout(() => setSaved(false), 3000);
+    } catch (e: any) { setError(e.message); }
+    finally { setSaving(false); }
+  }
+
+  useEffect(() => { if (open) load(); }, [open]);
+
+  function field(key: keyof RestaurantInfo, label: string, icon: React.ReactNode, type = "text") {
+    return (
+      <div className="space-y-1">
+        <label className="text-xs text-zinc-400 flex items-center gap-1.5">{icon}{label}</label>
+        <input
+          type={type}
+          step={type === "number" ? "any" : undefined}
+          value={form?.[key] ?? ""}
+          onChange={(e) => setForm((f) => f ? { ...f, [key]: type === "number" ? e.target.value : e.target.value } : f)}
+          className="w-full bg-zinc-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#c5a485] transition-colors"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="border border-white/8 rounded-xl overflow-hidden bg-[#111]">
+      <button onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "rgba(197,164,133,0.15)" }}>
+            <MapPin className="w-4 h-4" style={{ color: "#c5a485" }} />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-white">Kontaktdaten &amp; Standort</p>
+            <p className="text-xs text-zinc-500 mt-0.5">Name, Adresse, Telefon, E-Mail und GPS-Koordinaten</p>
+          </div>
+        </div>
+        <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+            <div className="px-5 pb-5 pt-1 border-t border-white/8">
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <RefreshCw className="w-5 h-5 animate-spin text-zinc-500" />
+                  <span className="ml-2 text-sm text-zinc-500">Wird geladen…</span>
+                </div>
+              )}
+              {error && (
+                <div className="flex items-center gap-2 text-xs text-red-400 bg-red-900/20 border border-red-800/30 rounded-lg px-3 py-2 mt-3">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />{error}
+                </div>
+              )}
+              {!loading && form && (
+                <form onSubmit={handleSave} className="space-y-3 pt-3">
+                  {field("name", "Restaurantname", <UtensilsCrossed className="w-3 h-3" />)}
+                  {field("address", "Adresse", <MapPin className="w-3 h-3" />)}
+                  <div className="grid grid-cols-2 gap-3">
+                    {field("phone", "Telefon", <Phone className="w-3 h-3" />)}
+                    {field("email", "E-Mail", <Mail className="w-3 h-3" />, "email")}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {field("lat", "Breitengrad (lat)", <MapPin className="w-3 h-3" />, "number")}
+                    {field("lng", "Längengrad (lng)", <MapPin className="w-3 h-3" />, "number")}
+                  </div>
+
+                  <button type="submit" disabled={saving}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-opacity disabled:opacity-40 mt-1"
+                    style={{ backgroundColor: GOLD, color: "#1c1917" }}>
+                    {saving ? <><RefreshCw className="w-4 h-4 animate-spin" /> Wird gespeichert…</> : <><CheckCircle className="w-4 h-4" /> Änderungen speichern</>}
+                  </button>
+
+                  {saved && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="flex items-center gap-2 text-xs text-green-400 bg-green-900/20 border border-green-800/30 rounded-lg px-3 py-2">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      Kontaktdaten wurden gespeichert.
+                    </motion.div>
+                  )}
+                </form>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

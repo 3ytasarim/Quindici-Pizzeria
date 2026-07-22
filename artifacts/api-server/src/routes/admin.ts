@@ -2,6 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import jwt from "jsonwebtoken";
 import { uploadFile, deleteFile, readJSON, writeJSON } from "../lib/gcs";
+import { INFO_DEFAULTS, INFO_KEY } from "./info";
 
 const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
 const ADMIN_USER = process.env.ADMIN_USERNAME;
@@ -133,6 +134,32 @@ const SEO_DEFAULTS: SeoConfig = {
   },
   google: { analyticsId: "", adsId: "", searchConsoleVerification: "" },
 };
+
+router.get("/admin/info", authMiddleware, async (_req, res) => {
+  const stored = await readJSON<typeof INFO_DEFAULTS>(INFO_KEY);
+  res.json(stored ?? INFO_DEFAULTS);
+});
+
+router.patch("/admin/info", authMiddleware, async (req, res) => {
+  const current = (await readJSON<typeof INFO_DEFAULTS>(INFO_KEY)) ?? INFO_DEFAULTS;
+  const { name, address, phone, email, lat, lng } = req.body ?? {};
+
+  const updated = {
+    name:    typeof name    === "string" ? name.trim()    : current.name,
+    address: typeof address === "string" ? address.trim() : current.address,
+    phone:   typeof phone   === "string" ? phone.trim()   : current.phone,
+    email:   typeof email   === "string" ? email.trim()   : current.email,
+    lat:     typeof lat     === "number" ? lat            : current.lat,
+    lng:     typeof lng     === "number" ? lng            : current.lng,
+  };
+
+  if (!updated.name || !updated.address || !updated.phone || !updated.email) {
+    return res.status(400).json({ error: "name, address, phone und email sind erforderlich" });
+  }
+
+  await writeJSON(INFO_KEY, updated);
+  res.json(updated);
+});
 
 router.get("/seo", async (_req, res) => {
   const cfg = await readJSON<SeoConfig>("config/seo");

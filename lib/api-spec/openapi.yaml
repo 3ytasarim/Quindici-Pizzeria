@@ -29,6 +29,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/RestaurantInfo"
+  /admin/info:
+    patch:
+      operationId: updateRestaurantInfo
+      tags: [info]
+      summary: Update restaurant contact info (admin only)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRestaurantInfoInput"
+      responses:
+        "200":
+          description: Info updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RestaurantInfo"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /healthz:
     get:
       operationId: healthCheck
@@ -211,6 +243,21 @@ components:
         - email
         - lat
         - lng
+    UpdateRestaurantInfoInput:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        lat:
+          type: number
+        lng:
+          type: number
     HealthStatus:
       type: object
       properties:
@@ -370,3 +417,8 @@ components:
           type: boolean
       required:
         - success
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
