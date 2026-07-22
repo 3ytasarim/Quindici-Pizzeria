@@ -5,7 +5,7 @@ import {
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
   RefreshCw, ChevronLeft, ChevronRight,
-  ChevronUp, ChevronDown, Settings, Instagram, Copy, Search,
+  ChevronUp, ChevronDown, Settings, Instagram, Copy, Search, MapPin,
 } from "lucide-react";
 
 const API = "/api";
@@ -954,8 +954,135 @@ function SettingsPanel({ adminToken }: { adminToken: string }) {
         </h2>
         <p className="text-sm text-zinc-500">Website-Konfiguration und Integrationen verwalten.</p>
       </div>
+      <ContactInfoSettings adminToken={adminToken} />
       <InstagramPostPicker adminToken={adminToken} />
       <InstagramSettings adminToken={adminToken} />
+    </div>
+  );
+}
+
+/* ─────────────────────── Contact Info Settings ──────────────────────── */
+interface RestaurantInfo { name: string; address: string; phone: string; email: string; lat: number; lng: number }
+
+function ContactInfoSettings({ adminToken }: { adminToken: string }) {
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState<RestaurantInfo | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function load() {
+    if (form !== null) return;
+    setLoading(true); setError(null);
+    try {
+      const r = await fetch(`${API}/admin/info`, { headers: { Authorization: `Bearer ${adminToken}` } });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error ?? "Fehler beim Laden");
+      setForm(d);
+    } catch (e: any) { setError(e.message); }
+    finally { setLoading(false); }
+  }
+
+  async function handleSave(e: React.FormEvent) {
+    e.preventDefault();
+    if (!form) return;
+    setSaving(true); setSaved(false); setError(null);
+    try {
+      const r = await fetch(`${API}/admin/info`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${adminToken}` },
+        body: JSON.stringify({ ...form, lat: Number(form.lat), lng: Number(form.lng) }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error ?? "Fehler beim Speichern");
+      setForm(d);
+      setSaved(true); setTimeout(() => setSaved(false), 3000);
+    } catch (e: any) { setError(e.message); }
+    finally { setSaving(false); }
+  }
+
+  useEffect(() => { if (open) load(); }, [open]);
+
+  function field(key: keyof RestaurantInfo, label: string, icon: React.ReactNode, type = "text") {
+    return (
+      <div className="space-y-1">
+        <label className="text-xs text-zinc-400 flex items-center gap-1.5">{icon}{label}</label>
+        <input
+          type={type}
+          step={type === "number" ? "any" : undefined}
+          value={form?.[key] ?? ""}
+          onChange={(e) => setForm((f) => f ? { ...f, [key]: type === "number" ? e.target.value : e.target.value } : f)}
+          className="w-full bg-zinc-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-[#c5a485] transition-colors"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="border border-white/8 rounded-xl overflow-hidden bg-[#111]">
+      <button onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/[0.02] transition-colors">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: "rgba(197,164,133,0.15)" }}>
+            <MapPin className="w-4 h-4" style={{ color: "#c5a485" }} />
+          </div>
+          <div className="text-left">
+            <p className="text-sm font-semibold text-white">Kontaktdaten &amp; Standort</p>
+            <p className="text-xs text-zinc-500 mt-0.5">Name, Adresse, Telefon, E-Mail und GPS-Koordinaten</p>
+          </div>
+        </div>
+        <ChevronDown className={`w-4 h-4 text-zinc-500 transition-transform duration-300 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.25 }} className="overflow-hidden">
+            <div className="px-5 pb-5 pt-1 border-t border-white/8">
+              {loading && (
+                <div className="flex items-center justify-center py-8">
+                  <RefreshCw className="w-5 h-5 animate-spin text-zinc-500" />
+                  <span className="ml-2 text-sm text-zinc-500">Wird geladen…</span>
+                </div>
+              )}
+              {error && (
+                <div className="flex items-center gap-2 text-xs text-red-400 bg-red-900/20 border border-red-800/30 rounded-lg px-3 py-2 mt-3">
+                  <AlertCircle className="w-3.5 h-3.5 shrink-0" />{error}
+                </div>
+              )}
+              {!loading && form && (
+                <form onSubmit={handleSave} className="space-y-3 pt-3">
+                  {field("name", "Restaurantname", <UtensilsCrossed className="w-3 h-3" />)}
+                  {field("address", "Adresse", <MapPin className="w-3 h-3" />)}
+                  <div className="grid grid-cols-2 gap-3">
+                    {field("phone", "Telefon", <Phone className="w-3 h-3" />)}
+                    {field("email", "E-Mail", <Mail className="w-3 h-3" />, "email")}
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    {field("lat", "Breitengrad (lat)", <MapPin className="w-3 h-3" />, "number")}
+                    {field("lng", "Längengrad (lng)", <MapPin className="w-3 h-3" />, "number")}
+                  </div>
+
+                  <button type="submit" disabled={saving}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-opacity disabled:opacity-40 mt-1"
+                    style={{ backgroundColor: GOLD, color: "#1c1917" }}>
+                    {saving ? <><RefreshCw className="w-4 h-4 animate-spin" /> Wird gespeichert…</> : <><CheckCircle className="w-4 h-4" /> Änderungen speichern</>}
+                  </button>
+
+                  {saved && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="flex items-center gap-2 text-xs text-green-400 bg-green-900/20 border border-green-800/30 rounded-lg px-3 py-2">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      Kontaktdaten wurden gespeichert.
+                    </motion.div>
+                  )}
+                </form>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
