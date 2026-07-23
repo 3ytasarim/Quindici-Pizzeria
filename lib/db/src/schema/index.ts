@@ -19,3 +19,4 @@
 
 export * from "./reservations";
 export * from "./kvStore";
+export * from "./fileStore";

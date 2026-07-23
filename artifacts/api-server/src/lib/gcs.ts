@@ -1,29 +1,18 @@
 /**
- * Storage abstraction layer.
+ * Storage layer — veritabanı tabanlı (PostgreSQL).
  *
- * Files (uploadFile / streamFile / deleteFile):
- *   - Upload: try GCS first (works in production, persistent across redeploys).
- *             Fall back to local filesystem when GCS is unavailable (dev env).
- *   - Serve:  try local filesystem first, then GCS fallback.
- *             Covers both dev-only uploads and pre-migration GCS files.
+ * Dosyalar (resimler, PDF):  file_store tablosunda base64 olarak saklanır.
+ *   → Redeploy'da, sunucu yeniden başlamada asla kaybolmaz.
+ *   → Hem geliştirme hem üretim ortamında aynı şekilde çalışır.
  *
- * JSON (readJSON / writeJSON):
- *   - Primary storage: PostgreSQL kv_store (works everywhere).
- *   - readJSON fallback: GCS (recovers data uploaded before this migration).
- *     On successful GCS read the data is promoted to kv_store automatically.
+ * JSON verisi (yemekler, galeri, pizza, SEO…):  kv_store tablosunda.
+ *   → GCS fallback: ilk okumada eski GCS verisini otomatik taşır.
  */
 
 import { randomUUID } from "crypto";
 import path from "path";
-import fs from "fs";
-import fsPromises from "fs/promises";
-import { Client } from "@replit/object-storage";
-import { db, kvStoreTable } from "@workspace/db";
-import { eq } from "drizzle-orm";
-
-// Local filesystem fallback (dev environment / emergency)
-const UPLOADS_DIR = path.join(process.cwd(), "uploads");
-fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+import { db, kvStoreTable, fileStoreTable } from "@workspace/db";
+import { eq, and } from "drizzle-orm";
 
 const CONTENT_TYPES: Record<string, string> = {
   ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
@@ -31,91 +20,87 @@ const CONTENT_TYPES: Record<string, string> = {
   ".svg": "image/svg+xml",
 };
 
-// Lazy GCS client — initialised once, reused across requests
-let _gcsClient: Client | null = null;
-function getGcsClient(): Client {
-  if (!_gcsClient) {
-    _gcsClient = new Client({ bucketId: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID });
-  }
-  return _gcsClient;
-}
-
-// ── File storage ──────────────────────────────────────────────────────────────
+// ── Dosya depolama (PostgreSQL file_store) ────────────────────────────────────
 
 export async function uploadFile(
   folder: string,
   buffer: Buffer,
   ext: string,
-  _mimeType: string
+  mimeType: string,
 ): Promise<string> {
-  const filename = `${randomUUID()}${ext}`;
-  const objectPath = `${folder}/${filename}`;
+  const id = randomUUID();
+  const filename = `${id}${ext}`;
+  const content = buffer.toString("base64");
 
-  // 1. Prefer GCS — persistent across redeployments (works in production)
-  try {
-    const client = getGcsClient();
-    const result = await client.uploadFromBytes(
-      `quindici/${objectPath}`,
-      buffer,
-      { compress: false },
-    );
-    if (result.ok) {
-      return `/api/files/${objectPath}`;
-    }
-    // GCS upload failed (e.g. dev env 403) — fall through to local filesystem
-  } catch { /* GCS not available */ }
-
-  // 2. Local filesystem fallback (dev environment)
-  const dir = path.join(UPLOADS_DIR, folder);
-  fs.mkdirSync(dir, { recursive: true });
-  await fsPromises.writeFile(path.join(dir, filename), buffer);
-  return `/api/files/${objectPath}`;
+  await db.insert(fileStoreTable).values({ id, folder, filename, content, mimeType });
+  return `/api/files/${folder}/${filename}`;
 }
 
 export async function deleteFile(servingUrl: string): Promise<void> {
   if (!servingUrl.startsWith("/api/files/")) return;
-  const relativePath = servingUrl.slice("/api/files/".length);
-  // Both stores — one of them will have the file
-  try { await fsPromises.unlink(path.join(UPLOADS_DIR, relativePath)); } catch { /* gone */ }
-  try {
-    await getGcsClient().delete(`quindici/${relativePath}`, { ignoreNotFound: true });
-  } catch { /* GCS unavailable */ }
+  const parts = servingUrl.slice("/api/files/".length).split("/");
+  if (parts.length < 2) return;
+  const [folder, filename] = parts;
+  await db
+    .delete(fileStoreTable)
+    .where(and(eq(fileStoreTable.folder, folder), eq(fileStoreTable.filename, filename)));
 }
 
 export async function streamFile(gcsRelative: string, res: any): Promise<void> {
-  const ext = path.extname(gcsRelative).toLowerCase();
-  const contentType = CONTENT_TYPES[ext] || "application/octet-stream";
+  // gcsRelative = "folder/uuid.ext"
+  const parts = gcsRelative.split("/");
+  if (parts.length < 2) { res.status(404).end(); return; }
+  const [folder, filename] = parts;
 
-  // 1. Local filesystem (dev uploads / cached copies)
-  const filePath = path.join(UPLOADS_DIR, gcsRelative);
-  try {
-    await fsPromises.access(filePath);
-    res.set("Content-Type", contentType);
+  // 1. Veritabanında ara (birincil depolama)
+  const rows = await db
+    .select()
+    .from(fileStoreTable)
+    .where(and(eq(fileStoreTable.folder, folder), eq(fileStoreTable.filename, filename)))
+    .limit(1);
+
+  if (rows.length > 0) {
+    const row = rows[0];
+    const ext = path.extname(filename).toLowerCase();
+    res.set("Content-Type", CONTENT_TYPES[ext] || row.mimeType || "application/octet-stream");
     res.set("Cache-Control", "public, max-age=31536000");
-    fs.createReadStream(filePath).pipe(res);
+    res.end(Buffer.from(row.content, "base64"));
     return;
-  } catch { /* not found locally */ }
+  }
 
-  // 2. GCS (production uploads, pre-migration files)
+  // 2. GCS fallback — geçiş öncesi yüklenen eski dosyalar (üretimde çalışır)
   try {
-    const client = getGcsClient();
+    const { Client } = await import("@replit/object-storage");
+    const client = new Client({ bucketId: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID });
     const objectName = `quindici/${gcsRelative}`;
     const existsResult = await client.exists(objectName);
     if (existsResult.ok && existsResult.value) {
-      res.set("Content-Type", contentType);
-      res.set("Cache-Control", "public, max-age=31536000");
-      client.downloadAsStream(objectName).pipe(res);
-      return;
+      const dlResult = await client.downloadAsBytes(objectName);
+      if (dlResult.ok) {
+        const buffer = dlResult.value[0];
+        const ext = path.extname(filename).toLowerCase();
+        const mimeType = CONTENT_TYPES[ext] || "application/octet-stream";
+        // Veritabanına taşı — bir daha GCS'e gitme
+        const id = filename.replace(/\.[^.]+$/, "");
+        await db
+          .insert(fileStoreTable)
+          .values({ id, folder, filename, content: buffer.toString("base64"), mimeType })
+          .onConflictDoNothing();
+        res.set("Content-Type", mimeType);
+        res.set("Cache-Control", "public, max-age=31536000");
+        res.end(buffer);
+        return;
+      }
     }
-  } catch { /* GCS unavailable in dev */ }
+  } catch { /* GCS geliştirme ortamında erişilemez — sorun değil */ }
 
   res.status(404).end();
 }
 
-// ── JSON storage ──────────────────────────────────────────────────────────────
+// ── JSON depolama (PostgreSQL kv_store) ───────────────────────────────────────
 
 export async function readJSON<T>(key: string): Promise<T | null> {
-  // 1. PostgreSQL kv_store — primary for all new writes
+  // 1. kv_store — birincil
   const rows = await db
     .select()
     .from(kvStoreTable)
@@ -123,20 +108,19 @@ export async function readJSON<T>(key: string): Promise<T | null> {
     .limit(1);
   if (rows.length > 0) return rows[0].value as T;
 
-  // 2. GCS fallback — recovers data uploaded before the PostgreSQL migration
-  //    (only reaches this path the first time; once promoted it lives in kv_store)
+  // 2. GCS fallback — geçiş öncesi veri (üretimde çalışır, kv_store'a taşır)
   try {
-    const client = getGcsClient();
+    const { Client } = await import("@replit/object-storage");
+    const client = new Client({ bucketId: process.env.DEFAULT_OBJECT_STORAGE_BUCKET_ID });
     const objectName = `quindici/data/${key}.json`;
     const existsResult = await client.exists(objectName);
     if (!existsResult.ok || !existsResult.value) return null;
     const result = await client.downloadAsText(objectName);
     if (!result.ok) return null;
     const parsed = JSON.parse(result.value) as T;
-    // Promote to kv_store so future reads skip GCS entirely
-    await writeJSON(key, parsed);
+    await writeJSON(key, parsed); // kv_store'a taşı
     return parsed;
-  } catch { /* GCS unavailable (dev env) */ }
+  } catch { /* GCS geliştirme ortamında erişilemez */ }
 
   return null;
 }
