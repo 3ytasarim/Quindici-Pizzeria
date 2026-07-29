@@ -150,7 +150,7 @@ export default function HeroSection() {
                 >
                   <X className="w-6 h-6" />
                 </button>
-                <div className="w-full overflow-hidden" style={{ height: "210px" }}>
+                <div className="w-full overflow-hidden" style={{ height: "270px" }}>
                   <img
                     src="/abholrabatt.png"
                     alt="10% Abholrabatt im Restaurant"
