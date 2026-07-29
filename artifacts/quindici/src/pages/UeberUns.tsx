@@ -39,7 +39,6 @@ export default function UeberUns() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#fdf8f2" }}>
       <Navbar />
-
       {/* Hero */}
       <section className="relative min-h-[52vh] flex items-center justify-center overflow-hidden">
         <div
@@ -90,9 +89,7 @@ export default function UeberUns() {
               transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
               className="text-6xl md:text-8xl font-bold text-stone-800 mb-6"
               style={{ fontFamily: "'Playfair Display', serif" }}
-            >
-              Über Quindici
-            </motion.h1>
+            >Das Quindici</motion.h1>
           </div>
 
           {/* Divider */}
@@ -105,7 +102,6 @@ export default function UeberUns() {
           />
         </div>
       </section>
-
       {/* Text + Two Photos Section */}
       <section className="pt-2 pb-20 md:pt-4 md:pb-28 overflow-hidden" style={{ backgroundColor: "#fdf8f2" }}>
         <div className="container mx-auto px-6">
@@ -204,7 +200,6 @@ export default function UeberUns() {
           </div>
         </div>
       </section>
-
       {/* Team — Teil der Familie — GECİCİ GİZLİ: resimler gelince açılacak
       <section className="relative overflow-hidden py-20 md:py-28" style={{ backgroundColor: "#fdf8f2" }}>
         <div className="container mx-auto px-6 relative z-10">
@@ -261,14 +256,10 @@ export default function UeberUns() {
         </div>
       </section>
       */}
-
       {/* Instagram Feed */}
       <InstagramFeed />
-
       {/* Mittagstisch Banner */}
       <MittagstischBanner />
-
-
       <Footer />
     </div>
   );
