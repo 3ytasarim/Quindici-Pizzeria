@@ -38,7 +38,7 @@ export default function Feiern() {
       <section className="relative min-h-[52vh] flex items-center justify-center overflow-hidden">
         <div
           className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url(/speisekarte-bg.jpg)", opacity: 0.5 }}
+          style={{ backgroundImage: "url(/ueberuns-hero.jpg)", opacity: 0.55, backgroundPosition: "center 70%" }}
         />
         <div
           className="absolute inset-0 z-0 pointer-events-none"
