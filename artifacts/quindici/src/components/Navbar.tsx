@@ -48,6 +48,7 @@ export default function Navbar() {
 
   const navLinks = [
     { name: "Willkommen", href: "/" },
+    { name: "Feiern", href: "/feiern" },
     { name: "Speisekarte", href: "/speisekarte" },
     { name: "Über uns", href: "/ueber-uns" },
     { name: "Kontakt & Anfahrt", href: "/kontakt" },
