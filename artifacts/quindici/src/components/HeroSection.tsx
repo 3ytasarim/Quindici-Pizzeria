@@ -150,11 +150,13 @@ export default function HeroSection() {
                 >
                   <X className="w-6 h-6" />
                 </button>
-                <img
-                  src="/abholrabatt.png"
-                  alt="10% Abholrabatt im Restaurant"
-                  className="w-full h-auto"
-                />
+                <div className="w-full overflow-hidden" style={{ height: "210px" }}>
+                  <img
+                    src="/abholrabatt.png"
+                    alt="10% Abholrabatt im Restaurant"
+                    className="w-full h-full object-cover object-center"
+                  />
+                </div>
                 <div className="px-7 py-6 text-center">
                   <p className="text-xs font-semibold uppercase tracking-[0.25em] mb-3" style={{ color: "#c5a485" }}>
                     10 % Abholrabatt
