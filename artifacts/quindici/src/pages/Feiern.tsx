@@ -55,7 +55,7 @@ export default function Feiern() {
             className="text-6xl md:text-8xl font-bold text-stone-800 mb-6"
             style={{ fontFamily: "'Playfair Display', serif" }}
           >
-            Feiern
+            Feiern im Quindici
           </motion.h1>
           <motion.div
             initial={{ scaleX: 0 }}
