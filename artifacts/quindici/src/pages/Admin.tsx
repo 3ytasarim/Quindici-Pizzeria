@@ -49,6 +49,7 @@ function playAlertBeep() {
 }
 
 interface Dish { id: string; name: string; desc: string; imageUrl: string; }
+interface Event { id: string; title: string; description: string; imageUrl: string; pdfUrl: string; order: number; }
 
 interface Reservation {
   id: string; date: string; time: string; guests: string;
@@ -57,7 +58,7 @@ interface Reservation {
   status: "neu" | "bestätigt" | "storniert";
 }
 
-type Tab = "mittagstisch" | "gerichte" | "reservierungen" | "einstellungen" | "seo";
+type Tab = "mittagstisch" | "gerichte" | "feiern" | "reservierungen" | "einstellungen" | "seo";
 
 const STATUS_LABELS: Record<Reservation["status"], string> = {
   neu: "Neu", bestätigt: "Bestätigt", storniert: "Storniert",
@@ -92,6 +93,20 @@ export default function Admin() {
   const [dishDragOver, setDishDragOver] = useState(false);
   const [dishUploading, setDishUploading] = useState(false);
   const dishFileRef = useRef<HTMLInputElement>(null);
+
+  // ── Feiern / Events state ──────────────────────────────────────────────────
+  const [events, setEvents] = useState<Event[]>([]);
+  const [eventStatus, setEventStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [eventForm, setEventForm] = useState({ title: "", description: "" });
+  const [eventImageFile, setEventImageFile] = useState<File | null>(null);
+  const [eventPdfFile, setEventPdfFile] = useState<File | null>(null);
+  const [eventUploading, setEventUploading] = useState(false);
+  const [eventImgDragOver, setEventImgDragOver] = useState(false);
+  const [eventPdfDragOver, setEventPdfDragOver] = useState(false);
+  const eventImageRef = useRef<HTMLInputElement>(null);
+  const eventPdfRef = useRef<HTMLInputElement>(null);
 
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -135,6 +150,11 @@ export default function Admin() {
     if (r.ok) setDishes(await r.json());
   }, []);
 
+  const fetchEvents = useCallback(async () => {
+    const r = await fetch(`${API}/events`);
+    if (r.ok) setEvents(await r.json());
+  }, []);
+
 
   const fetchReservations = useCallback(async (silent = false) => {
     const t = tokenRef.current;
@@ -174,8 +194,8 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    if (token) { fetchPdfStatus(token); fetchDishes(); fetchReservations(); }
-  }, [token, fetchPdfStatus, fetchDishes, fetchReservations]);
+    if (token) { fetchPdfStatus(token); fetchDishes(); fetchEvents(); fetchReservations(); }
+  }, [token, fetchPdfStatus, fetchDishes, fetchEvents, fetchReservations]);
 
   useEffect(() => {
     if (!token) return;
@@ -355,6 +375,7 @@ export default function Admin() {
                 ["mittagstisch", "PDF", "Mittagstisch PDF", FileText, 0],
                 ["reservierungen", "Reserv.", "Reservierungen", CalendarCheck, newBadge],
                 ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
+                ["feiern", "Feiern", "Feiern & Events", CalendarCheck, 0],
                 ["einstellungen", "Einst.", "Einstellungen", Settings, 0],
                 ["seo", "SEO", "SEO & Analytics", Search, 0],
               ] as const
@@ -555,6 +576,183 @@ export default function Admin() {
                         <Trash2 className="w-3 h-3" />Löschen
                       </button>
                     </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {/* ── FEIERN ── */}
+        {tab === "feiern" && (
+          <>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-8">
+              <div>
+                <h2 className="text-lg sm:text-xl font-semibold">Feiern & Events</h2>
+                <p className="text-zinc-400 text-sm mt-1">Veranstaltungen verwalten – hinzufügen, bearbeiten, löschen, sortieren.</p>
+              </div>
+              <button onClick={() => { setEditingEvent(null); setEventForm({ title: "", description: "" }); setEventImageFile(null); setEventPdfFile(null); setShowEventForm(true); }}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold uppercase tracking-widest text-black w-full sm:w-auto"
+                style={{ backgroundColor: GOLD }}>
+                <Plus className="w-4 h-4" />Neue Veranstaltung
+              </button>
+            </div>
+
+            <AnimatePresence>
+              {eventStatus && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                  className={`mb-4 flex items-start gap-2 text-sm px-3 py-2 ${eventStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
+                  {eventStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" /> : <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
+                  {eventStatus.msg}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Form */}
+            <AnimatePresence>
+              {showEventForm && (
+                <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -12 }}
+                  className="bg-[#1a1a1a] border border-white/8 p-5 sm:p-6 mb-6">
+                  <div className="flex items-center justify-between mb-5">
+                    <h3 className="text-sm font-semibold uppercase tracking-widest text-zinc-300">
+                      {editingEvent ? "Veranstaltung bearbeiten" : "Neue Veranstaltung"}
+                    </h3>
+                    <button onClick={() => setShowEventForm(false)} className="text-zinc-500 hover:text-white transition-colors p-1"><X className="w-4 h-4" /></button>
+                  </div>
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    setEventUploading(true); setEventStatus(null);
+                    try {
+                      const fd = new FormData();
+                      fd.append("title", eventForm.title);
+                      fd.append("description", eventForm.description);
+                      if (eventImageFile) fd.append("image", eventImageFile);
+                      if (eventPdfFile) fd.append("pdf", eventPdfFile);
+                      const url = editingEvent ? `${API}/admin/events/${editingEvent.id}` : `${API}/admin/events`;
+                      const r = await authedFetch(url, { method: editingEvent ? "PUT" : "POST", body: fd });
+                      if (!r.ok) throw new Error((await r.json()).error ?? "Fehler");
+                      await fetchEvents();
+                      setShowEventForm(false);
+                      setEventStatus({ type: "success", msg: editingEvent ? "Gespeichert." : "Hinzugefügt." });
+                    } catch (err: any) { setEventStatus({ type: "error", msg: err.message }); }
+                    finally { setEventUploading(false); }
+                  }} className="space-y-4">
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-2">Titel *</label>
+                        <input type="text" value={eventForm.title} onChange={e => setEventForm(f => ({ ...f, title: e.target.value }))} required
+                          className="w-full bg-[#111] border border-white/10 text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a485] transition-colors"
+                          placeholder="z.B. Hochzeit, Geburtstag…" />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-2">Beschreibung</label>
+                        <textarea value={eventForm.description} onChange={e => setEventForm(f => ({ ...f, description: e.target.value }))} rows={2}
+                          className="w-full bg-[#111] border border-white/10 text-white px-4 py-2.5 text-sm focus:outline-none focus:border-[#c5a485] transition-colors resize-none"
+                          placeholder="Kurze Beschreibung der Veranstaltung" />
+                      </div>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {/* Image upload */}
+                      <div>
+                        <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-2">Foto</label>
+                        <div onDragOver={e => { e.preventDefault(); setEventImgDragOver(true); }} onDragLeave={() => setEventImgDragOver(false)}
+                          onDrop={e => { e.preventDefault(); setEventImgDragOver(false); const f = e.dataTransfer.files[0]; if (f?.type.startsWith("image/")) setEventImageFile(f); }}
+                          onClick={() => eventImageRef.current?.click()}
+                          className={`border-2 border-dashed p-5 text-center cursor-pointer transition-all h-[120px] flex flex-col items-center justify-center ${eventImgDragOver ? "border-[#c5a485] bg-[#c5a485]/5" : eventImageFile ? "border-green-500/50 bg-green-500/5" : "border-white/15 hover:border-white/30"}`}>
+                          <input ref={eventImageRef} type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && setEventImageFile(e.target.files[0])} />
+                          {eventImageFile ? (<><CheckCircle className="w-5 h-5 text-green-400 mb-1" /><p className="text-xs truncate max-w-full px-2">{eventImageFile.name}</p></>)
+                            : editingEvent?.imageUrl ? (<><img src={editingEvent.imageUrl} alt="" className="h-12 w-12 object-cover mb-1" /><p className="text-xs text-zinc-500">Klicken zum Ersetzen</p></>)
+                            : (<><Image className="w-5 h-5 text-zinc-500 mb-1" /><p className="text-xs text-zinc-400">Bild hochladen</p></>)}
+                        </div>
+                      </div>
+                      {/* PDF upload */}
+                      <div>
+                        <label className="block text-xs text-zinc-400 uppercase tracking-widest mb-2">PDF (Mehr erfahren)</label>
+                        <div onDragOver={e => { e.preventDefault(); setEventPdfDragOver(true); }} onDragLeave={() => setEventPdfDragOver(false)}
+                          onDrop={e => { e.preventDefault(); setEventPdfDragOver(false); const f = e.dataTransfer.files[0]; if (f?.type === "application/pdf") setEventPdfFile(f); }}
+                          onClick={() => eventPdfRef.current?.click()}
+                          className={`border-2 border-dashed p-5 text-center cursor-pointer transition-all h-[120px] flex flex-col items-center justify-center ${eventPdfDragOver ? "border-[#c5a485] bg-[#c5a485]/5" : eventPdfFile ? "border-green-500/50 bg-green-500/5" : "border-white/15 hover:border-white/30"}`}>
+                          <input ref={eventPdfRef} type="file" accept=".pdf,application/pdf" className="hidden" onChange={e => e.target.files?.[0] && setEventPdfFile(e.target.files[0])} />
+                          {eventPdfFile ? (<><CheckCircle className="w-5 h-5 text-green-400 mb-1" /><p className="text-xs truncate max-w-full px-2">{eventPdfFile.name}</p></>)
+                            : editingEvent?.pdfUrl ? (<><FileText className="w-5 h-5 text-[#c5a485] mb-1" /><p className="text-xs text-zinc-400">PDF vorhanden. Klicken zum Ersetzen</p></>)
+                            : (<><FileText className="w-5 h-5 text-zinc-500 mb-1" /><p className="text-xs text-zinc-400">PDF hochladen</p></>)}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-1">
+                      <button type="button" onClick={() => setShowEventForm(false)}
+                        className="w-full sm:w-auto px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-zinc-400 border border-white/10 hover:border-white/25 transition-colors">
+                        Abbrechen
+                      </button>
+                      <button type="submit" disabled={eventUploading}
+                        className="w-full sm:w-auto px-6 py-2.5 text-xs font-semibold uppercase tracking-widest text-black disabled:opacity-50"
+                        style={{ backgroundColor: GOLD }}>
+                        {eventUploading ? "Wird gespeichert…" : editingEvent ? "Speichern" : "Hinzufügen"}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Event list with reorder */}
+            <div className="space-y-3">
+              {events.length === 0 && (
+                <p className="text-zinc-500 text-sm text-center py-12">Noch keine Veranstaltungen. Klicken Sie auf „Neue Veranstaltung".</p>
+              )}
+              {events.map((ev, idx) => (
+                <motion.div key={ev.id} layout className="bg-[#1a1a1a] border border-white/8 flex gap-4 p-4 items-start">
+                  {/* Reorder buttons */}
+                  <div className="flex flex-col gap-1 shrink-0 mt-0.5">
+                    <button onClick={async () => {
+                      if (idx === 0) return;
+                      const ids = events.map(e => e.id);
+                      [ids[idx - 1], ids[idx]] = [ids[idx], ids[idx - 1]];
+                      const r = await authedFetch(`${API}/admin/events/reorder`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids }) });
+                      if (r.ok) setEvents(await r.json());
+                    }} disabled={idx === 0} className="p-1 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors">
+                      <ChevronUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={async () => {
+                      if (idx === events.length - 1) return;
+                      const ids = events.map(e => e.id);
+                      [ids[idx], ids[idx + 1]] = [ids[idx + 1], ids[idx]];
+                      const r = await authedFetch(`${API}/admin/events/reorder`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ids }) });
+                      if (r.ok) setEvents(await r.json());
+                    }} disabled={idx === events.length - 1} className="p-1 text-zinc-500 hover:text-white disabled:opacity-20 transition-colors">
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  {/* Image thumbnail */}
+                  {ev.imageUrl && (
+                    <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 overflow-hidden bg-zinc-800">
+                      <img src={ev.imageUrl} alt={ev.title} className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-sm text-white leading-tight">{ev.title}</p>
+                    <p className="text-xs text-zinc-400 mt-1 leading-snug line-clamp-2">{ev.description}</p>
+                    {ev.pdfUrl && (
+                      <a href={ev.pdfUrl} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] mt-2 text-[#c5a485] hover:underline">
+                        <FileText className="w-3 h-3" />PDF anzeigen
+                      </a>
+                    )}
+                  </div>
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-2 shrink-0">
+                    <button onClick={() => { setEditingEvent(ev); setEventForm({ title: ev.title, description: ev.description }); setEventImageFile(null); setEventPdfFile(null); setShowEventForm(true); }}
+                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-[#c5a485]/40 text-[#c5a485] hover:bg-[#c5a485]/10 transition-colors">
+                      <Pencil className="w-3 h-3" />Bearbeiten
+                    </button>
+                    <button onClick={async () => {
+                      if (!confirm("Veranstaltung löschen?")) return;
+                      const r = await authedFetch(`${API}/admin/events/${ev.id}`, { method: "DELETE" });
+                      if (r.ok) { setEvents(prev => prev.filter(e => e.id !== ev.id)); setEventStatus({ type: "success", msg: "Gelöscht." }); }
+                    }} className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">
+                      <Trash2 className="w-3 h-3" />Löschen
+                    </button>
                   </div>
                 </motion.div>
               ))}
