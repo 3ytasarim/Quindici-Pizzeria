@@ -9,6 +9,7 @@ import galleryRouter from "./gallery";
 import pizzaRouter from "./pizza";
 import filesRouter from "./files";
 import instagramRouter from "./instagram";
+import eventsRouter from "./events";
 
 const router: IRouter = Router();
 
@@ -31,5 +32,6 @@ router.use(galleryRouter);
 router.use(pizzaRouter);
 router.use(filesRouter);
 router.use(instagramRouter);
+router.use(eventsRouter);
 
 export default router;

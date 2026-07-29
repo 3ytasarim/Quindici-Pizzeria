@@ -9,6 +9,7 @@ import Kontakt from "@/pages/Kontakt";
 import UeberUns from "@/pages/UeberUns";
 import Admin from "@/pages/Admin";
 import TischReservieren from "@/pages/TischReservieren";
+import Feiern from "@/pages/Feiern";
 import Datenschutz from "@/pages/Datenschutz";
 import Impressum from "@/pages/Impressum";
 import { ReservationModalProvider } from "@/components/ReservationModal";
@@ -21,6 +22,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/feiern" component={Feiern} />
       <Route path="/speisekarte" component={Speisekarte} />
       <Route path="/kontakt" component={Kontakt} />
       <Route path="/ueber-uns" component={UeberUns} />
