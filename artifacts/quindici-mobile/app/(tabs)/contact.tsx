@@ -16,10 +16,9 @@ import { Feather } from '@expo/vector-icons';
 import { useGetRestaurantInfo } from '@workspace/api-client-react';
 
 const HOURS = [
-  { day: 'Montag', time: 'Ruhetag' },
-  { day: 'Dienstag – Freitag', time: '11:30 – 14:30 · 17:30 – 22:00' },
-  { day: 'Samstag', time: '12:00 – 22:30' },
-  { day: 'Sonntag', time: '12:00 – 21:30' },
+  { day: 'Montag – Freitag', time: '12:00 – 14:30 · 17:00 – 23:00' },
+  { day: 'Samstag', time: 'Geschlossen' },
+  { day: 'Sonntag', time: 'Geschlossen' },
 ];
 
 export default function ContactScreen() {

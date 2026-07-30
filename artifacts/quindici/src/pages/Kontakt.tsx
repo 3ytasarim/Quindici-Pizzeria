@@ -35,13 +35,13 @@ const rulerExpand = {
 };
 
 const hours = [
-  { day: "Montag", time: "12:00 – 23:00" },
-  { day: "Dienstag", time: "12:00 – 23:00" },
-  { day: "Mittwoch", time: "12:00 – 23:00" },
-  { day: "Donnerstag", time: "12:00 – 23:00" },
-  { day: "Freitag", time: "12:00 – 23:00" },
-  { day: "Samstag", time: "17:00 – 23:00" },
-  { day: "Sonntag", time: "Ruhetag", closed: true },
+  { day: "Montag", time: "12:00 – 14:30 · 17:00 – 23:00" },
+  { day: "Dienstag", time: "12:00 – 14:30 · 17:00 – 23:00" },
+  { day: "Mittwoch", time: "12:00 – 14:30 · 17:00 – 23:00" },
+  { day: "Donnerstag", time: "12:00 – 14:30 · 17:00 – 23:00" },
+  { day: "Freitag", time: "12:00 – 14:30 · 17:00 – 23:00" },
+  { day: "Samstag", time: "Geschlossen", closed: true },
+  { day: "Sonntag", time: "Geschlossen", closed: true },
 ];
 
 export default function Kontakt() {
