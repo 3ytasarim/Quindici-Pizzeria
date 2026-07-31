@@ -6,7 +6,7 @@ import { useReservationModal } from "@/components/ReservationModal";
 
 const hours = [
   { day: "Mo – Fr",  time: "12:00 – 14:30 · 17:00 – 23:00 Uhr" },
-  { day: "Sa",       time: "Geschlossen" },
+  { day: "Sa",       time: "17:00 – 23:00 Uhr" },
   { day: "So",       time: "Geschlossen" },
 ];
 

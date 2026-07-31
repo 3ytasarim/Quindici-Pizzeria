@@ -17,7 +17,7 @@ import { useGetRestaurantInfo } from '@workspace/api-client-react';
 
 const HOURS = [
   { day: 'Montag – Freitag', time: '12:00 – 14:30 · 17:00 – 23:00' },
-  { day: 'Samstag', time: 'Geschlossen' },
+  { day: 'Samstag', time: '17:00 – 23:00' },
   { day: 'Sonntag', time: 'Geschlossen' },
 ];
 
