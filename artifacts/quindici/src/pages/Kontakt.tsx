@@ -40,7 +40,7 @@ const hours = [
   { day: "Mittwoch", time: "12:00 – 14:30 · 17:00 – 23:00" },
   { day: "Donnerstag", time: "12:00 – 14:30 · 17:00 – 23:00" },
   { day: "Freitag", time: "12:00 – 14:30 · 17:00 – 23:00" },
-  { day: "Samstag", time: "Geschlossen", closed: true },
+  { day: "Samstag", time: "17:00 – 23:00" },
   { day: "Sonntag", time: "Geschlossen", closed: true },
 ];
 
