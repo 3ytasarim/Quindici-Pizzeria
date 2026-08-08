@@ -90,7 +90,7 @@ function VideoCard({ post, index }: { post: VideoPost; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-20px" }}
       transition={{ duration: 0.5, delay: index * 0.12 }}
-      className="flex flex-col rounded-xl overflow-hidden"
+      className="h-full flex flex-col rounded-xl overflow-hidden"
       style={{ backgroundColor: cardBg, border: `1px solid ${borderCol}` }}
     >
       {/* Card Header */}
@@ -201,7 +201,7 @@ function VideoCard({ post, index }: { post: VideoPost; index: number }) {
         </a>
       </div>
 
-      <div className="mx-3.5 mb-3.5 mt-0.5">
+      <div className="mx-3.5 mb-3.5 mt-auto pt-2">
         <a
           href={PROFILE_URL}
           target="_blank"
