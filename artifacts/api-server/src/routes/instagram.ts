@@ -112,6 +112,25 @@ router.post("/admin/instagram/save-token", auth, async (req, res) => {
   const { shortToken } = req.body as { shortToken?: string };
   if (!shortToken?.trim()) return res.status(400).json({ error: "Kein Token" });
 
+  // Instagram-Login-Tokens (IGAA…) gehören zu graph.instagram.com und lassen sich
+  // nicht über den Facebook-Exchange tauschen → prüfen und direkt speichern.
+  if (/^IG[A-Za-z]{2}/.test(shortToken.trim())) {
+    const igToken = shortToken.trim();
+    try {
+      const check = await fetch(`https://graph.instagram.com/me?fields=user_id,username&access_token=${encodeURIComponent(igToken)}`);
+      const info = await check.json() as any;
+      if (!check.ok || info?.error) {
+        return res.status(400).json({ error: info?.error?.message ?? "Token ungültig oder abgelaufen" });
+      }
+      await writeJSON(CONFIG_PATH, { accessToken: igToken, savedAt: new Date().toISOString(), expiresInDays: 60 } satisfies InstagramConfig);
+      req.log.info({ username: info?.username }, "Instagram token saved (IG login)");
+      return res.json({ success: true, expiresInDays: 60 });
+    } catch (err) {
+      req.log.error({ err }, "Instagram token check failed");
+      return res.status(500).json({ error: "Serverfehler" });
+    }
+  }
+
   const appId = process.env.INSTAGRAM_APP_ID;
   const appSecret = process.env.INSTAGRAM_APP_SECRET;
   if (!appId || !appSecret) return res.status(500).json({ error: "App-Konfiguration fehlt" });
