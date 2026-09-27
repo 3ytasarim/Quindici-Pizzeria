@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UtensilsCrossed, Tag, X } from "lucide-react";
+import { UtensilsCrossed, Tag, Megaphone, X } from "lucide-react";
 
 export default function HeroSection() {
   const [abholrabattOpen, setAbholrabattOpen] = useState(false);
@@ -121,6 +121,25 @@ export default function HeroSection() {
             <Tag className="w-3.5 h-3.5" />
             10 % Abholrabatt
           </motion.button>
+
+          <motion.a
+            href="/api/sonderaktion/pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            whileHover={{ scale: 1.04, boxShadow: "0 0 24px rgba(212,175,55,0.35)" }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="inline-flex items-center gap-2.5 px-7 py-3 border border-[#c5a485]/70 bg-black/30 backdrop-blur-sm text-sm font-semibold shadow-sm hover:bg-[#c5a485]/10 transition-colors"
+            style={{ color: "#c5a485" }}
+            data-testid="button-sonderaktion"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-60" style={{ backgroundColor: "#c5a485" }} />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: "#c5a485" }} />
+            </span>
+            <Megaphone className="w-3.5 h-3.5" style={{ color: "#c5a485" }} />
+            Sonderaktion
+          </motion.a>
         </motion.div>
       </div>
 

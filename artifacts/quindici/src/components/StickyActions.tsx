@@ -3,6 +3,9 @@ import { CalendarCheck, ShoppingBag } from "lucide-react";
 import { useReservationModal } from "@/components/ReservationModal";
 import { useSommerpauseModal } from "@/components/SommerpauseModal";
 
+// TODO: Lieferservice/Bestellung wieder aktiv -> auf true setzen.
+const SHOW_JETZT_BESTELLEN = false;
+
 export default function StickyActions() {
   const { open: openReservation } = useReservationModal();
   const { open: openSommerpause } = useSommerpauseModal();
@@ -45,38 +48,40 @@ export default function StickyActions() {
       </button>
 
       {/* Jetzt bestellen */}
-      <button onClick={openSommerpause} className="block bg-transparent border-0 p-0">
-        <motion.div
-          initial={{ x: 160 }}
-          animate={{ x: 0 }}
-          transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          whileHover={{ x: -6, scale: 1.03 }}
-          className="flex items-center gap-2 cursor-pointer"
-          style={{
-            backgroundColor: "#1c1c1c",
-            borderRadius: "10px 0 0 10px",
-            paddingTop: "12px",
-            paddingBottom: "12px",
-            paddingLeft: "10px",
-            paddingRight: "8px",
-            boxShadow: "0 6px 24px rgba(0,0,0,0.4)",
-          }}
-        >
+      {SHOW_JETZT_BESTELLEN && (
+        <button onClick={openSommerpause} className="block bg-transparent border-0 p-0">
           <motion.div
-            animate={{ y: [0, -3, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-            className="shrink-0 text-white"
+            initial={{ x: 160 }}
+            animate={{ x: 0 }}
+            transition={{ duration: 0.6, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            whileHover={{ x: -6, scale: 1.03 }}
+            className="flex items-center gap-2 cursor-pointer"
+            style={{
+              backgroundColor: "#1c1c1c",
+              borderRadius: "10px 0 0 10px",
+              paddingTop: "12px",
+              paddingBottom: "12px",
+              paddingLeft: "10px",
+              paddingRight: "8px",
+              boxShadow: "0 6px 24px rgba(0,0,0,0.4)",
+            }}
           >
-            <ShoppingBag className="w-4 h-4" />
+            <motion.div
+              animate={{ y: [0, -3, 0] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+              className="shrink-0 text-white"
+            >
+              <ShoppingBag className="w-4 h-4" />
+            </motion.div>
+            <span
+              className="hidden sm:block text-[10px] font-bold tracking-[0.2em] uppercase text-white whitespace-nowrap select-none"
+              style={{ writingMode: "vertical-rl", textOrientation: "mixed", transform: "rotate(180deg)" }}
+            >
+              Jetzt bestellen
+            </span>
           </motion.div>
-          <span
-            className="hidden sm:block text-[10px] font-bold tracking-[0.2em] uppercase text-white whitespace-nowrap select-none"
-            style={{ writingMode: "vertical-rl", textOrientation: "mixed", transform: "rotate(180deg)" }}
-          >
-            Jetzt bestellen
-          </span>
-        </motion.div>
-      </button>
+        </button>
+      )}
 
     </div>
   );

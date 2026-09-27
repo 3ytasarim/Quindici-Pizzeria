@@ -117,6 +117,26 @@ router.delete("/admin/mittagstisch", authMiddleware, async (_req, res) => {
   res.json({ success: true });
 });
 
+router.post("/admin/sonderaktion", authMiddleware, upload.single("pdf"), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "Keine Datei hochgeladen" });
+  const gcsUrl = await uploadFile("pdf", req.file.buffer, ".pdf", "application/pdf");
+  const meta: PdfMeta = { filename: "sonderaktion.pdf", uploadedAt: new Date().toISOString(), gcsUrl };
+  await writeJSON("sonderaktion-meta", meta);
+  res.json({ success: true, uploadedAt: meta.uploadedAt });
+});
+
+router.get("/admin/sonderaktion/meta", authMiddleware, async (_req, res) => {
+  const meta = await readJSON<PdfMeta>("sonderaktion-meta");
+  res.json(meta ?? { filename: null, uploadedAt: null, gcsUrl: null });
+});
+
+router.delete("/admin/sonderaktion", authMiddleware, async (_req, res) => {
+  const meta = await readJSON<PdfMeta>("sonderaktion-meta");
+  if (meta?.gcsUrl) await deleteFile(meta.gcsUrl);
+  await writeJSON("sonderaktion-meta", { filename: null, uploadedAt: null, gcsUrl: null });
+  res.json({ success: true });
+});
+
 interface SeoPage { title: string; description: string; keywords: string; }
 interface SeoConfig {
   pages: Record<string, SeoPage>;

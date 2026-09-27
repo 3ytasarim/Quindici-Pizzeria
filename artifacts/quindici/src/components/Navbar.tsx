@@ -6,6 +6,9 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useReservationModal } from "@/components/ReservationModal";
 import { useSommerpauseModal } from "@/components/SommerpauseModal";
 
+// TODO: Lieferservice/Bestellung wieder aktiv -> auf true setzen.
+const SHOW_JETZT_BESTELLEN = false;
+
 function AnimatedBurger({ open }: { open: boolean }) {
   return (
     <div className="w-6 h-5 flex flex-col justify-between relative">
@@ -97,16 +100,18 @@ export default function Navbar() {
           >
             Tisch reservieren
           </Button>
-          <Button
-            className="text-white uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 shadow-sm transition-all"
-            style={{ backgroundColor: "#c5a485" }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#b8962e"; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a485"; }}
-            data-testid="button-jetzt-bestellen"
-            onClick={openSommerpause}
-          >
-            Jetzt bestellen
-          </Button>
+          {SHOW_JETZT_BESTELLEN && (
+            <Button
+              className="text-white uppercase tracking-widest text-xs font-bold rounded-none px-6 h-11 shadow-sm transition-all"
+              style={{ backgroundColor: "#c5a485" }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#b8962e"; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#c5a485"; }}
+              data-testid="button-jetzt-bestellen"
+              onClick={openSommerpause}
+            >
+              Jetzt bestellen
+            </Button>
+          )}
         </div>
 
         {/* Mobile Hamburger — far right */}
@@ -170,14 +175,16 @@ export default function Navbar() {
                       >
                         Tisch reservieren
                       </Button>
-                      <Button
-                        className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
-                        style={{ backgroundColor: "#c5a485" }}
-                        data-testid="mobile-button-jetzt-bestellen"
-                        onClick={() => { setMenuOpen(false); openSommerpause(); }}
-                      >
-                        Jetzt bestellen
-                      </Button>
+                      {SHOW_JETZT_BESTELLEN && (
+                        <Button
+                          className="w-full text-white uppercase tracking-widest text-[11px] font-semibold rounded-none"
+                          style={{ backgroundColor: "#c5a485" }}
+                          data-testid="mobile-button-jetzt-bestellen"
+                          onClick={() => { setMenuOpen(false); openSommerpause(); }}
+                        >
+                          Jetzt bestellen
+                        </Button>
+                      )}
                     </motion.div>
                   </motion.div>
                 )}

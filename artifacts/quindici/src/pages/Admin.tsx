@@ -5,7 +5,7 @@ import {
   Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
   RefreshCw, ChevronLeft, ChevronRight,
-  ChevronUp, ChevronDown, Settings, Instagram, Copy, Search, MapPin,
+  ChevronUp, ChevronDown, Settings, Instagram, Copy, Search, MapPin, Megaphone,
 } from "lucide-react";
 
 const API = "/api";
@@ -58,7 +58,7 @@ interface Reservation {
   status: "neu" | "bestätigt" | "storniert";
 }
 
-type Tab = "mittagstisch" | "gerichte" | "feiern" | "reservierungen" | "einstellungen" | "seo";
+type Tab = "mittagstisch" | "sonderaktion" | "gerichte" | "feiern" | "reservierungen" | "einstellungen" | "seo";
 
 const STATUS_LABELS: Record<Reservation["status"], string> = {
   neu: "Neu", bestätigt: "Bestätigt", storniert: "Storniert",
@@ -83,6 +83,14 @@ export default function Admin() {
   const [dragOver, setDragOver] = useState(false);
   const [selectedPdf, setSelectedPdf] = useState<File | null>(null);
   const pdfRef = useRef<HTMLInputElement>(null);
+
+  const [sonderaktionUploadedAt, setSonderaktionUploadedAt] = useState<string | null>(null);
+  const [sonderaktionAvailable, setSonderaktionAvailable] = useState(false);
+  const [sonderaktionStatus, setSonderaktionStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [sonderaktionUploading, setSonderaktionUploading] = useState(false);
+  const [sonderaktionDragOver, setSonderaktionDragOver] = useState(false);
+  const [selectedSonderaktionPdf, setSelectedSonderaktionPdf] = useState<File | null>(null);
+  const sonderaktionRef = useRef<HTMLInputElement>(null);
 
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [dishStatus, setDishStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
@@ -145,6 +153,11 @@ export default function Admin() {
     if (r.ok) { const d = await r.json(); setPdfAvailable(d.available); setUploadedAt(d.uploadedAt); }
   }, []);
 
+  const fetchSonderaktionStatus = useCallback(async (t: string) => {
+    const r = await fetch(`${API}/sonderaktion`, { headers: { Authorization: `Bearer ${t}` } });
+    if (r.ok) { const d = await r.json(); setSonderaktionAvailable(d.available); setSonderaktionUploadedAt(d.uploadedAt); }
+  }, []);
+
   const fetchDishes = useCallback(async () => {
     const r = await fetch(`${API}/dishes`);
     if (r.ok) setDishes(await r.json());
@@ -194,8 +207,8 @@ export default function Admin() {
   };
 
   useEffect(() => {
-    if (token) { fetchPdfStatus(token); fetchDishes(); fetchEvents(); fetchReservations(); }
-  }, [token, fetchPdfStatus, fetchDishes, fetchEvents, fetchReservations]);
+    if (token) { fetchPdfStatus(token); fetchSonderaktionStatus(token); fetchDishes(); fetchEvents(); fetchReservations(); }
+  }, [token, fetchPdfStatus, fetchSonderaktionStatus, fetchDishes, fetchEvents, fetchReservations]);
 
   useEffect(() => {
     if (!token) return;
@@ -265,6 +278,26 @@ export default function Admin() {
     if (!confirm("Aktuelles PDF löschen?")) return;
     await authedFetch(`${API}/admin/mittagstisch`, { method: "DELETE" });
     setPdfStatus({ type: "success", msg: "PDF gelöscht." }); fetchPdfStatus(token);
+  };
+
+  const handleSonderaktionUpload = async (file: File) => {
+    if (file.type !== "application/pdf") { setSonderaktionStatus({ type: "error", msg: "Bitte eine gültige PDF-Datei auswählen." }); return; }
+    setSonderaktionUploading(true); setSonderaktionStatus(null);
+    const form = new FormData(); form.append("pdf", file);
+    try {
+      const r = await authedFetch(`${API}/admin/sonderaktion`, { method: "POST", body: form });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error ?? "Upload fehlgeschlagen");
+      setSonderaktionStatus({ type: "success", msg: "PDF erfolgreich hochgeladen!" });
+      setSelectedSonderaktionPdf(null); fetchSonderaktionStatus(token);
+    } catch (err: any) { setSonderaktionStatus({ type: "error", msg: err.message }); }
+    finally { setSonderaktionUploading(false); }
+  };
+
+  const handleSonderaktionDelete = async () => {
+    if (!confirm("Aktuelles PDF löschen?")) return;
+    await authedFetch(`${API}/admin/sonderaktion`, { method: "DELETE" });
+    setSonderaktionStatus({ type: "success", msg: "PDF gelöscht." }); fetchSonderaktionStatus(token);
   };
 
   const openNewForm = () => {
@@ -373,6 +406,7 @@ export default function Admin() {
             {(
               [
                 ["mittagstisch", "PDF", "Mittagstisch PDF", FileText, 0],
+                ["sonderaktion", "Aktion", "Sonderaktion PDF", Megaphone, 0],
                 ["reservierungen", "Reserv.", "Reservierungen", CalendarCheck, newBadge],
                 ["gerichte", "Gerichte", "Lieblingsgerichte", UtensilsCrossed, 0],
                 ["feiern", "Feiern", "Feiern & Events", CalendarCheck, 0],
@@ -466,6 +500,80 @@ export default function Admin() {
                   className="mt-4 w-full py-3 text-sm font-semibold uppercase tracking-widest text-black transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                   style={{ backgroundColor: GOLD }}>
                   {uploading ? "Wird hochgeladen…" : "PDF hochladen"}
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* ── SONDERAKTION ── */}
+        {tab === "sonderaktion" && (
+          <>
+            <div className="mb-6 sm:mb-8">
+              <h2 className="text-lg sm:text-xl font-semibold">Sonderaktion PDF</h2>
+              <p className="text-zinc-400 text-sm mt-1">Laden Sie das PDF für die aktuelle Sonderaktion hoch.</p>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+              {/* Status */}
+              <div className="bg-[#1a1a1a] border border-white/8 p-5 sm:p-6">
+                <h3 className="text-xs uppercase tracking-widest text-zinc-400 mb-4">Aktueller Status</h3>
+                <div className="flex items-start gap-3 sm:gap-4">
+                  <div className={`p-2.5 sm:p-3 shrink-0 ${sonderaktionAvailable ? "bg-green-500/10" : "bg-zinc-800"}`}>
+                    <FileText className={`w-5 h-5 sm:w-6 sm:h-6 ${sonderaktionAvailable ? "text-green-400" : "text-zinc-500"}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium">{sonderaktionAvailable ? "PDF verfügbar" : "Kein PDF hochgeladen"}</p>
+                    <p className="text-xs text-zinc-500 mt-0.5 break-words">
+                      {sonderaktionAvailable ? `Hochgeladen: ${formatDate(sonderaktionUploadedAt)}` : "Noch keine Datei vorhanden"}
+                    </p>
+                  </div>
+                </div>
+                {sonderaktionAvailable && (
+                  <div className="flex flex-wrap gap-2 mt-4 sm:mt-5">
+                    <a href="/api/sonderaktion/pdf" target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs px-3 py-2 border border-[#c5a485]/40 text-[#c5a485] hover:bg-[#c5a485]/10 transition-colors">
+                      <Eye className="w-3.5 h-3.5" />Vorschau
+                    </a>
+                    <button onClick={handleSonderaktionDelete}
+                      className="flex items-center gap-1.5 text-xs px-3 py-2 border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors">
+                      <Trash2 className="w-3.5 h-3.5" />Löschen
+                    </button>
+                  </div>
+                )}
+              </div>
+              {/* Upload */}
+              <div className="bg-[#1a1a1a] border border-white/8 p-5 sm:p-6">
+                <h3 className="text-xs uppercase tracking-widest text-zinc-400 mb-4">Neues PDF hochladen</h3>
+                <div onDragOver={e => { e.preventDefault(); setSonderaktionDragOver(true); }} onDragLeave={() => setSonderaktionDragOver(false)}
+                  onDrop={e => { e.preventDefault(); setSonderaktionDragOver(false); const f = e.dataTransfer.files[0]; if (f) setSelectedSonderaktionPdf(f); }}
+                  onClick={() => sonderaktionRef.current?.click()}
+                  className={`border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all ${sonderaktionDragOver ? "border-[#c5a485] bg-[#c5a485]/5" : selectedSonderaktionPdf ? "border-green-500/50 bg-green-500/5" : "border-white/15 hover:border-white/30"}`}>
+                  <input ref={sonderaktionRef} type="file" accept=".pdf,application/pdf" className="hidden" onChange={e => e.target.files?.[0] && setSelectedSonderaktionPdf(e.target.files[0])} />
+                  {selectedSonderaktionPdf ? (
+                    <div><CheckCircle className="w-7 h-7 sm:w-8 sm:h-8 text-green-400 mx-auto mb-2" />
+                      <p className="text-sm font-medium truncate">{selectedSonderaktionPdf.name}</p>
+                      <p className="text-xs text-zinc-500 mt-1">{(selectedSonderaktionPdf.size / 1024).toFixed(0)} KB</p>
+                    </div>
+                  ) : (
+                    <div><Upload className="w-7 h-7 sm:w-8 sm:h-8 text-zinc-500 mx-auto mb-2" />
+                      <p className="text-sm text-zinc-300">PDF hierher ziehen</p>
+                      <p className="text-xs text-zinc-500 mt-1">oder klicken zum Auswählen</p>
+                    </div>
+                  )}
+                </div>
+                <AnimatePresence>
+                  {sonderaktionStatus && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                      className={`mt-3 flex items-start gap-2 text-sm px-3 py-2 ${sonderaktionStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
+                      {sonderaktionStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" /> : <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
+                      {sonderaktionStatus.msg}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                <button disabled={!selectedSonderaktionPdf || sonderaktionUploading} onClick={() => selectedSonderaktionPdf && handleSonderaktionUpload(selectedSonderaktionPdf)}
+                  className="mt-4 w-full py-3 text-sm font-semibold uppercase tracking-widest text-black transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  style={{ backgroundColor: GOLD }}>
+                  {sonderaktionUploading ? "Wird hochgeladen…" : "PDF hochladen"}
                 </button>
               </div>
             </div>
