@@ -91,6 +91,10 @@ export default function Admin() {
   const [sonderaktionDragOver, setSonderaktionDragOver] = useState(false);
   const [selectedSonderaktionPdf, setSelectedSonderaktionPdf] = useState<File | null>(null);
   const sonderaktionRef = useRef<HTMLInputElement>(null);
+  const [sonderaktionLabel, setSonderaktionLabel] = useState("Sonderaktion");
+  const [sonderaktionLabelInput, setSonderaktionLabelInput] = useState("Sonderaktion");
+  const [savingLabel, setSavingLabel] = useState(false);
+  const [labelStatus, setLabelStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
 
   const [dishes, setDishes] = useState<Dish[]>([]);
   const [dishStatus, setDishStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
@@ -155,7 +159,11 @@ export default function Admin() {
 
   const fetchSonderaktionStatus = useCallback(async (t: string) => {
     const r = await fetch(`${API}/sonderaktion`, { headers: { Authorization: `Bearer ${t}` } });
-    if (r.ok) { const d = await r.json(); setSonderaktionAvailable(d.available); setSonderaktionUploadedAt(d.uploadedAt); }
+    if (r.ok) {
+      const d = await r.json();
+      setSonderaktionAvailable(d.available); setSonderaktionUploadedAt(d.uploadedAt);
+      setSonderaktionLabel(d.label); setSonderaktionLabelInput(d.label);
+    }
   }, []);
 
   const fetchDishes = useCallback(async () => {
@@ -298,6 +306,23 @@ export default function Admin() {
     if (!confirm("Aktuelles PDF löschen?")) return;
     await authedFetch(`${API}/admin/sonderaktion`, { method: "DELETE" });
     setSonderaktionStatus({ type: "success", msg: "PDF gelöscht." }); fetchSonderaktionStatus(token);
+  };
+
+  const handleSonderaktionLabelSave = async () => {
+    if (!sonderaktionLabelInput.trim()) return;
+    setSavingLabel(true); setLabelStatus(null);
+    try {
+      const r = await authedFetch(`${API}/admin/sonderaktion/label`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ label: sonderaktionLabelInput.trim() }),
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error ?? "Fehler beim Speichern");
+      setSonderaktionLabel(d.label);
+      setLabelStatus({ type: "success", msg: "Button-Text gespeichert!" });
+    } catch (err: any) { setLabelStatus({ type: "error", msg: err.message }); }
+    finally { setSavingLabel(false); }
   };
 
   const openNewForm = () => {
@@ -472,7 +497,7 @@ export default function Admin() {
                 <h3 className="text-xs uppercase tracking-widest text-zinc-400 mb-4">Neues PDF hochladen</h3>
                 <div onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)}
                   onDrop={e => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) setSelectedPdf(f); }}
-                  onClick={() => pdfRef.current?.click()}
+                  onClick={() => { if (pdfRef.current) pdfRef.current.value = ""; pdfRef.current?.click(); }}
                   className={`border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all ${dragOver ? "border-[#c5a485] bg-[#c5a485]/5" : selectedPdf ? "border-green-500/50 bg-green-500/5" : "border-white/15 hover:border-white/30"}`}>
                   <input ref={pdfRef} type="file" accept=".pdf,application/pdf" className="hidden" onChange={e => e.target.files?.[0] && setSelectedPdf(e.target.files[0])} />
                   {selectedPdf ? (
@@ -513,6 +538,41 @@ export default function Admin() {
               <h2 className="text-lg sm:text-xl font-semibold">Sonderaktion PDF</h2>
               <p className="text-zinc-400 text-sm mt-1">Laden Sie das PDF für die aktuelle Sonderaktion hoch.</p>
             </div>
+
+            {/* Button-Text */}
+            <div className="bg-[#1a1a1a] border border-white/8 p-5 sm:p-6 mb-4 sm:mb-6">
+              <h3 className="text-xs uppercase tracking-widest text-zinc-400 mb-1">Button-Text auf der Website</h3>
+              <p className="text-xs text-zinc-500 mb-4">
+                Text auf dem Startseiten-Button (aktuell: "{sonderaktionLabel}"). Kann jederzeit geändert werden, z. B. jede Woche neu.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2.5">
+                <input
+                  type="text"
+                  value={sonderaktionLabelInput}
+                  onChange={e => setSonderaktionLabelInput(e.target.value)}
+                  maxLength={40}
+                  placeholder="Sonderaktion"
+                  className="flex-1 bg-black/30 border border-white/15 px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#c5a485]/60"
+                />
+                <button
+                  disabled={!sonderaktionLabelInput.trim() || savingLabel || sonderaktionLabelInput.trim() === sonderaktionLabel}
+                  onClick={handleSonderaktionLabelSave}
+                  className="px-6 py-3 text-sm font-semibold uppercase tracking-widest text-black transition-all disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+                  style={{ backgroundColor: GOLD }}>
+                  {savingLabel ? "Speichert…" : "Speichern"}
+                </button>
+              </div>
+              <AnimatePresence>
+                {labelStatus && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}
+                    className={`mt-3 flex items-start gap-2 text-sm px-3 py-2 ${labelStatus.type === "success" ? "bg-green-500/10 border border-green-500/20 text-green-400" : "bg-red-500/10 border border-red-500/20 text-red-400"}`}>
+                    {labelStatus.type === "success" ? <CheckCircle className="w-4 h-4 shrink-0 mt-0.5" /> : <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />}
+                    {labelStatus.msg}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
             <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
               {/* Status */}
               <div className="bg-[#1a1a1a] border border-white/8 p-5 sm:p-6">
@@ -546,7 +606,7 @@ export default function Admin() {
                 <h3 className="text-xs uppercase tracking-widest text-zinc-400 mb-4">Neues PDF hochladen</h3>
                 <div onDragOver={e => { e.preventDefault(); setSonderaktionDragOver(true); }} onDragLeave={() => setSonderaktionDragOver(false)}
                   onDrop={e => { e.preventDefault(); setSonderaktionDragOver(false); const f = e.dataTransfer.files[0]; if (f) setSelectedSonderaktionPdf(f); }}
-                  onClick={() => sonderaktionRef.current?.click()}
+                  onClick={() => { if (sonderaktionRef.current) sonderaktionRef.current.value = ""; sonderaktionRef.current?.click(); }}
                   className={`border-2 border-dashed p-6 sm:p-8 text-center cursor-pointer transition-all ${sonderaktionDragOver ? "border-[#c5a485] bg-[#c5a485]/5" : selectedSonderaktionPdf ? "border-green-500/50 bg-green-500/5" : "border-white/15 hover:border-white/30"}`}>
                   <input ref={sonderaktionRef} type="file" accept=".pdf,application/pdf" className="hidden" onChange={e => e.target.files?.[0] && setSelectedSonderaktionPdf(e.target.files[0])} />
                   {selectedSonderaktionPdf ? (

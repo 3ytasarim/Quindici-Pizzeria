@@ -3,6 +3,7 @@ import multer from "multer";
 import jwt from "jsonwebtoken";
 import { uploadFile, deleteFile, readJSON, writeJSON } from "../lib/gcs";
 import { INFO_DEFAULTS, INFO_KEY } from "./info";
+import { SONDERAKTION_KEY, SONDERAKTION_DEFAULT_LABEL, type SonderaktionMeta } from "./sonderaktion";
 
 const JWT_SECRET = process.env.SESSION_SECRET ?? "quindici-admin-secret-2024";
 const ADMIN_USER = process.env.ADMIN_USERNAME;
@@ -119,21 +120,34 @@ router.delete("/admin/mittagstisch", authMiddleware, async (_req, res) => {
 
 router.post("/admin/sonderaktion", authMiddleware, upload.single("pdf"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "Keine Datei hochgeladen" });
+  const current = await readJSON<SonderaktionMeta>(SONDERAKTION_KEY);
   const gcsUrl = await uploadFile("pdf", req.file.buffer, ".pdf", "application/pdf");
-  const meta: PdfMeta = { filename: "sonderaktion.pdf", uploadedAt: new Date().toISOString(), gcsUrl };
-  await writeJSON("sonderaktion-meta", meta);
-  res.json({ success: true, uploadedAt: meta.uploadedAt });
+  const label = typeof req.body?.label === "string" && req.body.label.trim() ? req.body.label.trim() : current?.label;
+  const meta: SonderaktionMeta = { filename: "sonderaktion.pdf", uploadedAt: new Date().toISOString(), gcsUrl, label };
+  await writeJSON(SONDERAKTION_KEY, meta);
+  res.json({ success: true, uploadedAt: meta.uploadedAt, label: meta.label ?? SONDERAKTION_DEFAULT_LABEL });
 });
 
 router.get("/admin/sonderaktion/meta", authMiddleware, async (_req, res) => {
-  const meta = await readJSON<PdfMeta>("sonderaktion-meta");
-  res.json(meta ?? { filename: null, uploadedAt: null, gcsUrl: null });
+  const meta = await readJSON<SonderaktionMeta>(SONDERAKTION_KEY);
+  res.json(meta ?? { filename: null, uploadedAt: null, gcsUrl: null, label: SONDERAKTION_DEFAULT_LABEL });
+});
+
+router.patch("/admin/sonderaktion/label", authMiddleware, async (req, res) => {
+  const { label } = req.body as { label?: string };
+  if (typeof label !== "string" || !label.trim()) {
+    return res.status(400).json({ error: "Ein Button-Text ist erforderlich" });
+  }
+  const current = (await readJSON<SonderaktionMeta>(SONDERAKTION_KEY)) ?? { filename: null, uploadedAt: null, gcsUrl: null };
+  const updated: SonderaktionMeta = { ...current, label: label.trim() };
+  await writeJSON(SONDERAKTION_KEY, updated);
+  res.json({ success: true, label: updated.label });
 });
 
 router.delete("/admin/sonderaktion", authMiddleware, async (_req, res) => {
-  const meta = await readJSON<PdfMeta>("sonderaktion-meta");
+  const meta = await readJSON<SonderaktionMeta>(SONDERAKTION_KEY);
   if (meta?.gcsUrl) await deleteFile(meta.gcsUrl);
-  await writeJSON("sonderaktion-meta", { filename: null, uploadedAt: null, gcsUrl: null });
+  await writeJSON(SONDERAKTION_KEY, { filename: null, uploadedAt: null, gcsUrl: null, label: meta?.label });
   res.json({ success: true });
 });
 

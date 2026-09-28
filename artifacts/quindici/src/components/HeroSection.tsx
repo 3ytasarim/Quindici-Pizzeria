@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { UtensilsCrossed, Tag, Megaphone, X } from "lucide-react";
 
 export default function HeroSection() {
   const [abholrabattOpen, setAbholrabattOpen] = useState(false);
+  const [sonderaktionLabel, setSonderaktionLabel] = useState("Sonderaktion");
+
+  useEffect(() => {
+    fetch("/api/sonderaktion")
+      .then(r => r.json())
+      .then(d => { if (d?.label) setSonderaktionLabel(d.label); })
+      .catch(() => {});
+  }, []);
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-stone-900">
@@ -138,7 +146,7 @@ export default function HeroSection() {
               <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: "#c5a485" }} />
             </span>
             <Megaphone className="w-3.5 h-3.5" style={{ color: "#c5a485" }} />
-            Sonderaktion
+            {sonderaktionLabel}
           </motion.a>
         </motion.div>
       </div>
