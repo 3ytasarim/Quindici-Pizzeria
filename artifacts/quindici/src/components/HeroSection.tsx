@@ -20,13 +20,14 @@ export default function HeroSection() {
       <video
         className="absolute inset-0 w-full h-full object-cover"
         style={{ zIndex: 0 }}
+        poster="/hero-video-poster.jpg"
         autoPlay
         loop
         muted
         playsInline
+        preload="auto"
       >
-        <source src="/hero-video.mov" type="video/mp4" />
-        <source src="/hero-video.mov" type="video/quicktime" />
+        <source src="/hero-video.mp4" type="video/mp4" />
       </video>
 
       {/* Dark shadow overlay — so text stays readable */}
