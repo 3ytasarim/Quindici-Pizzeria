@@ -82,7 +82,8 @@ const sections = [
           <li>Anzahl der Personen</li>
           <li>optionale Bemerkungen</li>
         </ul>
-        <p>Diese Daten werden ausschließlich verwendet, um Ihre Reservierung entgegenzunehmen, zu verwalten und gegebenenfalls Rückfragen zu Ihrer Reservierung stellen zu können. Ohne diese Daten ist eine Reservierung leider nicht möglich.</p>
+        <p>Die Online-Reservierung erfolgt über Google unter Einbindung des Reservierungsdienstes resmio. Die im Rahmen der Reservierung eingegebenen Daten werden dabei an Google und resmio übermittelt und zur Abwicklung Ihrer Reservierung verarbeitet.</p>
+        <p>Diese Daten werden ausschließlich verwendet, um Ihre Reservierung entgegenzunehmen, zu verwalten und gegebenenfalls Rückfragen zu Ihrer Reservierung stellen zu können. Ohne die hierfür erforderlichen Daten ist eine Reservierung leider nicht möglich. Die Angabe von Bemerkungen ist freiwillig.</p>
         <p>Rechtsgrundlage der Verarbeitung ist Art. 6 Abs. 1 lit. b DSGVO. Die Daten werden nur solange gespeichert, wie sie für die Durchführung der Reservierung erforderlich sind oder gesetzliche Aufbewahrungspflichten bestehen.</p>
       </>
     ),
