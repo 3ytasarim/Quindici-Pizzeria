@@ -2,7 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Upload, LogOut, FileText, CheckCircle, AlertCircle,
-  Trash2, Eye, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
+  Trash2, Eye, EyeOff, Lock, User, UtensilsCrossed, Plus, Pencil, X, Image,
   CalendarCheck, Bell, BellOff, Phone, Mail, Users, Clock, Calendar,
   RefreshCw, ChevronLeft, ChevronRight,
   ChevronUp, ChevronDown, Settings, Instagram, Copy, Search, MapPin, Megaphone,
@@ -49,7 +49,7 @@ function playAlertBeep() {
 }
 
 interface Dish { id: string; name: string; desc: string; imageUrl: string; }
-interface Event { id: string; title: string; description: string; imageUrl: string; pdfUrl: string; order: number; }
+interface Event { id: string; title: string; description: string; imageUrl: string; pdfUrl: string; order: number; active?: boolean; }
 
 interface Reservation {
   id: string; date: string; time: string; guests: string;
@@ -111,7 +111,7 @@ export default function Admin() {
   const [eventStatus, setEventStatus] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [eventForm, setEventForm] = useState({ title: "", description: "" });
+  const [eventForm, setEventForm] = useState({ title: "", description: "", active: true });
   const [eventImageFile, setEventImageFile] = useState<File | null>(null);
   const [eventPdfFile, setEventPdfFile] = useState<File | null>(null);
   const [eventUploading, setEventUploading] = useState(false);
@@ -171,10 +171,11 @@ export default function Admin() {
     if (r.ok) setDishes(await r.json());
   }, []);
 
+  // Admin-Liste enthält auch inaktive Veranstaltungen (public /events nur aktive)
   const fetchEvents = useCallback(async () => {
-    const r = await fetch(`${API}/events`);
+    const r = await authedFetch(`${API}/admin/events`);
     if (r.ok) setEvents(await r.json());
-  }, []);
+  }, [authedFetch]);
 
 
   const fetchReservations = useCallback(async (silent = false) => {
@@ -757,9 +758,9 @@ export default function Admin() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 sm:mb-8">
               <div>
                 <h2 className="text-lg sm:text-xl font-semibold">Feiern & Events</h2>
-                <p className="text-zinc-400 text-sm mt-1">Veranstaltungen verwalten – hinzufügen, bearbeiten, löschen, sortieren.</p>
+                <p className="text-zinc-400 text-sm mt-1">Veranstaltungen verwalten – hinzufügen, bearbeiten, sortieren, aktiv/inaktiv schalten oder löschen. Nur aktive erscheinen auf der Website.</p>
               </div>
-              <button onClick={() => { setEditingEvent(null); setEventForm({ title: "", description: "" }); setEventImageFile(null); setEventPdfFile(null); setShowEventForm(true); }}
+              <button onClick={() => { setEditingEvent(null); setEventForm({ title: "", description: "", active: true }); setEventImageFile(null); setEventPdfFile(null); setShowEventForm(true); }}
                 className="flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold uppercase tracking-widest text-black w-full sm:w-auto"
                 style={{ backgroundColor: GOLD }}>
                 <Plus className="w-4 h-4" />Neue Veranstaltung
@@ -794,6 +795,7 @@ export default function Admin() {
                       const fd = new FormData();
                       fd.append("title", eventForm.title);
                       fd.append("description", eventForm.description);
+                      fd.append("active", String(eventForm.active));
                       if (eventImageFile) fd.append("image", eventImageFile);
                       if (eventPdfFile) fd.append("pdf", eventPdfFile);
                       const url = editingEvent ? `${API}/admin/events/${editingEvent.id}` : `${API}/admin/events`;
@@ -847,6 +849,12 @@ export default function Admin() {
                         </div>
                       </div>
                     </div>
+                    <label className="flex items-center gap-3 cursor-pointer select-none w-fit">
+                      <input type="checkbox" checked={eventForm.active}
+                        onChange={e => setEventForm(f => ({ ...f, active: e.target.checked }))}
+                        className="w-4 h-4 accent-[#c5a485]" />
+                      <span className="text-sm text-zinc-300">Auf der Website anzeigen (aktiv)</span>
+                    </label>
                     <div className="flex flex-col sm:flex-row gap-3 sm:justify-end pt-1">
                       <button type="button" onClick={() => setShowEventForm(false)}
                         className="w-full sm:w-auto px-5 py-2.5 text-xs font-semibold uppercase tracking-widest text-zinc-400 border border-white/10 hover:border-white/25 transition-colors">
@@ -893,13 +901,18 @@ export default function Admin() {
                   </div>
                   {/* Image thumbnail */}
                   {ev.imageUrl && (
-                    <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 overflow-hidden bg-zinc-800">
+                    <div className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 overflow-hidden bg-zinc-800 transition-opacity ${ev.active === false ? "opacity-40" : ""}`}>
                       <img src={ev.imageUrl} alt={ev.title} className="w-full h-full object-cover" />
                     </div>
                   )}
                   {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-sm text-white leading-tight">{ev.title}</p>
+                  <div className={`flex-1 min-w-0 transition-opacity ${ev.active === false ? "opacity-50" : ""}`}>
+                    <p className="font-semibold text-sm text-white leading-tight">
+                      {ev.title}
+                      {ev.active === false && (
+                        <span className="ml-2 align-middle px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider bg-zinc-700 text-zinc-300">Inaktiv</span>
+                      )}
+                    </p>
                     <p className="text-xs text-zinc-400 mt-1 leading-snug line-clamp-2">{ev.description}</p>
                     {ev.pdfUrl && (
                       <a href={ev.pdfUrl} target="_blank" rel="noopener noreferrer"
@@ -910,7 +923,25 @@ export default function Admin() {
                   </div>
                   {/* Actions */}
                   <div className="flex flex-col sm:flex-row gap-2 shrink-0">
-                    <button onClick={() => { setEditingEvent(ev); setEventForm({ title: ev.title, description: ev.description }); setEventImageFile(null); setEventPdfFile(null); setShowEventForm(true); }}
+                    <button onClick={async () => {
+                      const next = ev.active === false;
+                      const r = await authedFetch(`${API}/admin/events/${ev.id}/active`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ active: next }),
+                      });
+                      if (r.ok) {
+                        setEvents(prev => prev.map(e => e.id === ev.id ? { ...e, active: next } : e));
+                        setEventStatus({ type: "success", msg: next ? "Auf der Website sichtbar." : "Auf der Website ausgeblendet." });
+                      } else {
+                        setEventStatus({ type: "error", msg: "Status konnte nicht geändert werden." });
+                      }
+                    }}
+                      title={ev.active === false ? "Aktivieren (auf der Website anzeigen)" : "Deaktivieren (auf der Website ausblenden)"}
+                      className={`flex items-center gap-1.5 text-xs px-3 py-1.5 border transition-colors ${ev.active === false ? "border-green-500/30 text-green-400 hover:bg-green-500/10" : "border-zinc-500/40 text-zinc-300 hover:bg-white/5"}`}>
+                      {ev.active === false ? <><Eye className="w-3 h-3" />Aktivieren</> : <><EyeOff className="w-3 h-3" />Deaktivieren</>}
+                    </button>
+                    <button onClick={() => { setEditingEvent(ev); setEventForm({ title: ev.title, description: ev.description, active: ev.active !== false }); setEventImageFile(null); setEventPdfFile(null); setShowEventForm(true); }}
                       className="flex items-center gap-1.5 text-xs px-3 py-1.5 border border-[#c5a485]/40 text-[#c5a485] hover:bg-[#c5a485]/10 transition-colors">
                       <Pencil className="w-3 h-3" />Bearbeiten
                     </button>

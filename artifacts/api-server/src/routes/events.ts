@@ -21,7 +21,13 @@ export interface Event {
   imageUrl: string;
   pdfUrl: string;
   order: number;
+  /** false = auf der Website ausgeblendet. Fehlt das Feld (Altdaten), gilt der Eintrag als aktiv. */
+  active?: boolean;
 }
+
+const isActive = (e: Event) => e.active !== false;
+const parseActive = (v: unknown, fallback: boolean) =>
+  v === undefined ? fallback : v === true || v === "true" || v === "1";
 
 async function readEvents(): Promise<Event[]> {
   const data = await readJSON<Event[]>("events");
@@ -42,7 +48,46 @@ const router = Router();
 // ── Public ────────────────────────────────────────────────────────────────────
 
 router.get("/events", async (_req, res) => {
+  res.json((await readEvents()).filter(isActive));
+});
+
+// ── Admin — list (inkl. inaktive) ─────────────────────────────────────────────
+
+router.get("/admin/events", authMiddleware, async (_req, res) => {
   res.json(await readEvents());
+});
+
+// ── Admin — reorder (muss vor "/admin/events/:id" registriert sein) ───────────
+
+router.put("/admin/events/reorder", authMiddleware, async (req, res) => {
+  // body: { ids: string[] }  — full ordered list of event IDs
+  const { ids } = req.body ?? {};
+  if (!Array.isArray(ids)) return res.status(400).json({ error: "ids erwartet" });
+  const events = await readEvents();
+  const byId = new Map(events.map((e) => [e.id, e]));
+  const reordered: Event[] = [];
+  for (const id of ids) {
+    const ev = byId.get(id);
+    if (ev) { reordered.push(ev); byId.delete(id); }
+  }
+  // Einträge, die nicht in ids vorkommen, bleiben erhalten (am Ende)
+  reordered.push(...byId.values());
+  const renumbered = reordered.map((e, i) => ({ ...e, order: i }));
+  await writeEvents(renumbered);
+  res.json(renumbered);
+});
+
+// ── Admin — aktiv / inaktiv ───────────────────────────────────────────────────
+
+router.patch("/admin/events/:id/active", authMiddleware, async (req, res) => {
+  const { active } = req.body ?? {};
+  if (typeof active !== "boolean") return res.status(400).json({ error: "active (boolean) erwartet" });
+  const events = await readEvents();
+  const idx = events.findIndex((e) => e.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: "Nicht gefunden" });
+  events[idx] = { ...events[idx], active };
+  await writeEvents(events);
+  res.json(events[idx]);
 });
 
 // ── Admin — CRUD ──────────────────────────────────────────────────────────────
@@ -76,6 +121,7 @@ router.post(
       imageUrl,
       pdfUrl,
       order: events.length,
+      active: parseActive(req.body?.active, true),
     };
     events.push(event);
     await writeEvents(events);
@@ -113,6 +159,7 @@ router.put(
       description: description ?? events[idx].description,
       imageUrl,
       pdfUrl,
+      active: parseActive(req.body?.active, isActive(events[idx])),
     };
     await writeEvents(events);
     res.json(events[idx]);
@@ -130,22 +177,6 @@ router.delete("/admin/events/:id", authMiddleware, async (req, res) => {
   events.forEach((e, i) => { e.order = i; });
   await writeEvents(events);
   res.json({ success: true });
-});
-
-// ── Admin — reorder ───────────────────────────────────────────────────────────
-
-router.put("/admin/events/reorder", authMiddleware, async (req, res) => {
-  // body: { ids: string[] }  — full ordered list of event IDs
-  const { ids } = req.body ?? {};
-  if (!Array.isArray(ids)) return res.status(400).json({ error: "ids erwartet" });
-  const events = await readEvents();
-  const reordered: Event[] = [];
-  for (let i = 0; i < ids.length; i++) {
-    const ev = events.find((e) => e.id === ids[i]);
-    if (ev) reordered.push({ ...ev, order: i });
-  }
-  await writeEvents(reordered);
-  res.json(reordered);
 });
 
 export default router;
